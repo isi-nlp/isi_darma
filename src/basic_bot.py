@@ -54,16 +54,21 @@ def main():
         # otherwise, respond 
         logger.info(f"Retrieved non-bot comment: {comment.body}")
 
-        # determine whether to moderate 
+        # 1: translate 
+        source_language = detect_language(comment.body)
+        translated_comment = translate(comment.body, language="english")
+
+        # 2: determine if moderation is needed 
         if not needs_moderation(comment.body): 
             continue 
 
-        moderation_strategy = determine_moderation_strategy(comment.body)
+        # 3: determine the moderation strategy 
+        moderation_strategy = determine_moderation_strategy(translated_comment)
 
         if moderation_strategy=="respond": 
-            source_language = detect_language(comment.body)
-            translated_comment = translate(comment.body, language="english")
+            # 4: generate a response
             best_response = response_generator.generate_response(translated_comment)
+            # 5: translate back to source language
             final_response = translate(best_response, language=source_language)
 
         logger.info(f"Generated response: {final_response}")

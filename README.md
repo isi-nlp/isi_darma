@@ -22,6 +22,18 @@ DARMA is currently set up with 4 main modular components:
 3. `pip install -r requirements.txt`
 4. `pip install -e . ` 
 
+### DARMA Bot
+
+You can find a basic implementation of DARMA bot in `src/basic_bot.py`. 
+By executing `python src/basic_bot.py` and keeping it running, you will be running a bot that responds to all comments, except for its own, in the subreddit `r/darma_test`. It is currently set up to respond to all existing comments using [SpolinBot](https://spolin.isi.edu) without keeping track of which ones it already responded to. It has the following flow for the time being: 
+1. Detect language of incoming comment
+2. Translate comment to English 
+3. Determine whether moderation is needed. 
+4. If needed, determine the moderation strategy 
+5. If moderation stratey is to repond, generate a response. 
+6. Translate generated response back to source language. 
+
+
 ### Contributing
 
 First, clone this repo and then create your own branch. 
@@ -29,6 +41,8 @@ First, clone this repo and then create your own branch.
 ```
 git checkout -b <your branch name>
 <make code updates>
+git add . 
+git commit -m '<your updates>'
 ```
 
 Before making any code changes, make sure to regularly check whether there have been updates to the `main` branch and keep your code up to date. 
@@ -40,14 +54,10 @@ git checkout <your branch> # checkout to your branch
 git rebase main # make sure that your branch is building on top of all the updates in the main branch 
 ```
 
-After making updates, make sure to first rebase with the `main` branch before you make any pushes and pull requests. 
-
-```
-```
-
-
-
 You may have to resolve conflicts on merging with the last command. it might not be desirable to merge yet if there are conflicts, so if in doubt, please ask. 
+
+After making updates, make sure to first rebase with the `main` branch before you make any pushes and pull requests. Follow the same steps as above. 
+
 
 ### Reddit API 
 
