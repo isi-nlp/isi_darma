@@ -1,2 +1,4 @@
 praw
 pyyaml
+loguru
+requests
