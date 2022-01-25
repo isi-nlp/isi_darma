@@ -73,7 +73,10 @@ def main():
 
         # 1: translate 
         source_language = detect_language(comment.body)
-        translated_comment = translate(comment.body, language="english")
+        if source_language != "english":
+            translated_comment = translate(comment.body, language=source_language)
+        else:
+            translated_comment = comment.body
 
         # 2: determine if moderation is needed 
         if not needs_moderation(comment.body):
