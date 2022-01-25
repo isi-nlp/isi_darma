@@ -26,7 +26,8 @@ def determine_moderation_strategy(comment_str: str, moderation_decision_result: 
 
 def detect_language(comment_str: str):
     """
-    Skeleton code for language detection 
+    Skeleton code for language detection
+    TODO: Check if RTG has an API to enable this.
     """
 
     return "english"
@@ -87,6 +88,7 @@ def main():
             # 5: translate back to source language
             final_response = translate(best_response, language=source_language)
 
+        # TODO: Need to add code for when bot the decides NOT to respond
         logger.info(f"Generated response: {final_response}")
 
         comment.reply(final_response)
