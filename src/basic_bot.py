@@ -1,8 +1,11 @@
+from requests import post
 from loguru import logger
 from utils import load_credentials, load_reddit_client, get_username
 from pipeline.response_generators import SpolinBotRG
 
 SUBREDDIT = "darma_test"
+# Assuming (for MVP) that the RTG MT will run on the same machine as this project.
+RTG_API = 'http://localhost:6060/translate'
 CREDS = load_credentials()
 
 
@@ -33,7 +36,17 @@ def translate(comment_str: str, language: str = "english"):
     """
     Skeleton code for translating to target language 
     """
-    return comment_str
+
+    source = {'source': [comment_str]}
+    response = post(RTG_API, json=source)
+    if response.ok:
+        response = response.json()
+        logger.info(f'Received translation from RTG for {response.source} -> {response.translation}')
+        return response.translation[0]
+    else:
+        logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
+        logger.warning(f'Response Body from RTG:\n{response.json()}')
+        return comment_str
 
 
 def main():
