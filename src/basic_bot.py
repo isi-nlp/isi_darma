@@ -39,14 +39,19 @@ def translate(comment_str: str, language: str = "english"):
     """
 
     source = {'source': [comment_str]}
-    response = post(RTG_API, json=source)
-    if response.ok:
-        response = response.json()
-        logger.info(f'Received translation from RTG for {response.source} -> {response.translation}')
-        return response.translation[0]
-    else:
-        logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
-        logger.warning(f'Response Body from RTG:\n{response.json()}')
+    try:
+        response = post(RTG_API, json=source)
+        if response.ok:
+            response = response.json()
+            logger.info(f'Received translation from RTG for {response.source} -> {response.translation}')
+            return response.translation[0]
+        else:
+            logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
+            logger.warning(f'Response Body from RTG:\n{response.json()}')
+            return comment_str
+
+    except Exception as e:
+        logger.error(f'Error connecting to RTG API: {e}')
         return comment_str
 
 
