@@ -35,6 +35,7 @@ def load_reddit_client():
 
     return reddit
 
+
 # TODO: Add handler for creating log files
 def setup_logger():
     pass

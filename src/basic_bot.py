@@ -68,15 +68,12 @@ def main():
         if username == CREDS["username"]:
             continue
 
-        # otherwise, respond
+            # otherwise, respond
         logger.info(f"Retrieved non-bot comment: {comment.body}")
 
-        # 1: translate if source_language is something other than English
+        # 1: translate 
         source_language = detect_language(comment.body)
-        if source_language != "english":
-            translated_comment = translate(comment.body, language=source_language)
-        else:
-            translated_comment = comment.body
+        translated_comment = translate(comment.body, language="english")
 
         # 2: determine if moderation is needed 
         if not needs_moderation(comment.body):
@@ -91,7 +88,7 @@ def main():
             # 5: translate back to source language
             final_response = translate(best_response, language=source_language)
 
-        # TODO: Need to add code for when bot the decides NOT to respond
+        # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
         logger.info(f"Generated response: {final_response}")
 
         comment.reply(final_response)
