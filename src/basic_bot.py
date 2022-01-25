@@ -1,6 +1,6 @@
 from requests import post
 from loguru import logger
-from utils import load_credentials, load_reddit_client, get_username
+from utils import load_credentials, load_reddit_client, get_username, setup_logger
 from pipeline.response_generators import SpolinBotRG
 
 SUBREDDIT = "darma_test"
@@ -68,10 +68,10 @@ def main():
         if username == CREDS["username"]:
             continue
 
-            # otherwise, respond
+        # otherwise, respond
         logger.info(f"Retrieved non-bot comment: {comment.body}")
 
-        # 1: translate 
+        # 1: translate if source_language is something other than English
         source_language = detect_language(comment.body)
         if source_language != "english":
             translated_comment = translate(comment.body, language=source_language)
@@ -82,7 +82,7 @@ def main():
         if not needs_moderation(comment.body):
             continue
 
-            # 3: determine the moderation strategy
+        # 3: determine the moderation strategy
         moderation_strategy = determine_moderation_strategy(translated_comment)
 
         if moderation_strategy == "respond":
