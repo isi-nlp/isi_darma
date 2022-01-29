@@ -39,11 +39,12 @@ def translate(comment_str: str, language: str = "english"):
     """
 
     source = {'source': [comment_str]}
+    logger.info(f'Sending source to RTG for translation: {source}')
     try:
         response = post(RTG_API, json=source)
         if response.ok:
             response = response.json()
-            logger.info(f'Received translation from RTG for {response.source} -> {response.translation}')
+            logger.info(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
             return response.translation[0]
         else:
             logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
@@ -79,6 +80,7 @@ def main():
         # 1: translate 
         source_language = detect_language(comment.body)
         translated_comment = translate(comment.body, language="english")
+        logger.info(f"Received Translated Comment: {translated_comment}")
 
         # 2: determine if moderation is needed 
         if not needs_moderation(comment.body):
