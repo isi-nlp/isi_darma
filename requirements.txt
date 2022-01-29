@@ -1,5 +1,5 @@
-praw~=7.5.0
-pyyaml~=6.0
-loguru~=0.5.3
-requests~=2.26.0
-yaml~=0.2.5
+praw
+pyyaml
+loguru
+requests
+yaml
