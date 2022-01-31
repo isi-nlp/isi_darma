@@ -45,7 +45,7 @@ def translate(comment_str: str, language: str = "english"):
         if response.ok:
             response = response.json()
             logger.info(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
-            return response.translation[0]
+            return response["translation"][0]
         else:
             logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
             logger.warning(f'Response Body from RTG:\n{response.json()}')
@@ -79,6 +79,7 @@ def main():
 
         # 1: translate 
         source_language = detect_language(comment.body)
+        logger.info(f"Sending comment body for translation: {comment.body}")
         translated_comment = translate(comment.body, language="english")
         logger.info(f"Received Translated Comment: {translated_comment}")
 
@@ -93,6 +94,7 @@ def main():
             # 4: generate a response
             best_response = response_generator.generate_response(translated_comment)
             # 5: translate back to source language
+            logger.info(f"Sending best response for translation: {best_response}")
             final_response = translate(best_response, language=source_language)
 
         # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
