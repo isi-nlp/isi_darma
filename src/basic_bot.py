@@ -1,9 +1,8 @@
 from requests import post
 from logging_setup import logger
-from utils import load_credentials, load_reddit_client, get_username
+from isi_darma.utils import load_credentials, load_reddit_client, get_username
 from pipeline.response_generators import SpolinBotRG
 
-logger.info("\n\n\n")
 SUBREDDIT = "darma_test"
 # Assuming (for MVP) that the RTG MT will run on the same machine as this project.
 RTG_API = 'http://localhost:6060/translate'

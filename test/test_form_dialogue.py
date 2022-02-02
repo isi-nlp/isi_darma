@@ -1,4 +1,4 @@
-from utils import load_reddit_client
+from isi_darma.utils import load_reddit_client
 from typing import List 
 
 reddit = load_reddit_client()
