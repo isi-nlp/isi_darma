@@ -8,7 +8,7 @@ Usage: python test_praw.py <title> <body>
 """
 
 import praw 
-from utils import load_reddit_client
+from isi_darma.utils import load_reddit_client
 import sys 
 from logging_setup import logger
 
