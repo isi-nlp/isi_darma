@@ -10,7 +10,7 @@ Usage: python test_praw.py <title> <body>
 import praw 
 from utils import load_reddit_client
 import sys 
-from loguru import logger 
+from logging_setup import logger
 
 title, body = sys.argv[1], sys.argv[2]
 subreddit = "darma_test"

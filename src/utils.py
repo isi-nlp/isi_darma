@@ -1,8 +1,8 @@
 import yaml
-from loguru import logger
 from typing import Dict
 import praw
 from praw.models import Redditor
+from logging_setup import logger
 
 
 def get_username(redditor_obj: Redditor):
@@ -35,7 +35,3 @@ def load_reddit_client():
 
     return reddit
 
-
-# TODO: Add handler for creating log files
-def setup_logger():
-    pass
