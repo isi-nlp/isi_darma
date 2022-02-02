@@ -30,7 +30,7 @@ By executing `python src/basic_bot.py` and keeping it running, you will be runni
 2. Translate comment to English 
 3. Determine whether moderation is needed. 
 4. If needed, determine the moderation strategy 
-5. If moderation stratey is to repond, generate a response. 
+5. If moderation strategy is to respond, generate a response. 
 6. Translate generated response back to source language. 
 
 
@@ -83,7 +83,7 @@ References
 1. [How To Make A Reddit Bot?](https://yojji.io/blog/how-to-make-a-reddit-bot)
 1. https://www.reddit.com/r/redditdev/comments/fj06x8/comment_reply_bot_using_praw/
 1. https://github.com/toddrob99/MLB-StatBot/blob/master/statbot/main.py
-1. [Reddit Moderater Guide](https://www.reddit.com/r/modguide/wiki/index#wiki_modguide_index)
+1. [Reddit Moderator Guide](https://www.reddit.com/r/modguide/wiki/index#wiki_modguide_index)
 1. [Bobby-b-bot](https://github.com/bobby-b-bot/reddit/blob/master/reddit_bot.py): easiest code base to use as starting point for bot that replies to comments. 
 
 
