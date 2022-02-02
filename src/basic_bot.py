@@ -17,7 +17,6 @@ def needs_moderation(comment_str: str):
     """
     return bool(comment_str)
 
-
 def determine_moderation_strategy(comment_str: str, moderation_decision_result: str = None):
     """
     Skeleton code for determining specific moderation strategy 
