@@ -1,5 +1,6 @@
 src/creds.yaml
 **egg-info**
+creds.yaml
 **__pycache__**
 **/**.egg-info/
 .DS_Store
