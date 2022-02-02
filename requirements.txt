@@ -3,3 +3,4 @@ pyyaml
 loguru
 requests
 yaml
+numpy
