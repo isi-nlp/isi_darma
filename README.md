@@ -21,6 +21,10 @@ DARMA is currently set up with 4 main modular components:
 2. `cd isi_darma` 
 3. `pip install -r requirements.txt`
 4. `pip install -e . ` 
+5. `export CRED_FP="<your path to creds.yaml file>"`
+
+**Important**: 
+Step 5 is important for being able to use the reddit client. Refer to the [reddit client section](#reddit-api)
 
 ### DARMA Bot
 
@@ -74,17 +78,25 @@ reddit = praw.Reddit(
 
 - `user_agent` can be anything, but the recommended format is `<platform>:<app ID>:<version string> (by u/<Reddit username>)`
 - You can find the `client_id`, `client_secret` in https://www.reddit.com/prefs/apps/. 
-- The username and password is the reddit account's username and password. Ask Justin for the username and password. 
+- The username and password is the reddit account's username and password. 
+- All the relevant information is loaded from a `creds.yaml` file. Ask Justin for this file if you would like to test with darma bot or provide your own credentials to test your own bot. 
+- `creds.yaml` file should have the format: 
 
-A simple script that creates a post can be found in `src/test_praw.py`.  
+```
+username: 
+password: 
+client_secret: 
+client_id: 
+```
 
+### References
 
-References
+Here are the list of references used for developing this bot. 
 1. [How To Make A Reddit Bot?](https://yojji.io/blog/how-to-make-a-reddit-bot)
-1. https://www.reddit.com/r/redditdev/comments/fj06x8/comment_reply_bot_using_praw/
-1. https://github.com/toddrob99/MLB-StatBot/blob/master/statbot/main.py
-1. [Reddit Moderator Guide](https://www.reddit.com/r/modguide/wiki/index#wiki_modguide_index)
-1. [Bobby-b-bot](https://github.com/bobby-b-bot/reddit/blob/master/reddit_bot.py): easiest code base to use as starting point for bot that replies to comments. 
+2. https://www.reddit.com/r/redditdev/comments/fj06x8/comment_reply_bot_using_praw/
+3. https://github.com/toddrob99/MLB-StatBot/blob/master/statbot/main.py
+4. [Reddit Moderator Guide](https://www.reddit.com/r/modguide/wiki/index#wiki_modguide_index)
+5. [Bobby-b-bot](https://github.com/bobby-b-bot/reddit/blob/master/reddit_bot.py): easiest code base to use as starting point for bot that replies to comments. 
 
 
 
