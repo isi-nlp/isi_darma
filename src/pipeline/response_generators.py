@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import requests
-from loguru import logger
+from src.logging_setup import logger
 
 SPOLIN_ENDPOINT = "https://spolin.isi.edu/ya_back/api"
 
