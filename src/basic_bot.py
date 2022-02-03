@@ -1,12 +1,10 @@
-from requests import post
 from logging_setup import logger
 from utils import load_credentials, load_reddit_client, get_username
 from pipeline.response_generators import SpolinBotRG
+from pipeline.translators import Translator
 
 logger.info("\n\n\n")
 SUBREDDIT = "darma_test"
-# Assuming (for MVP) that the RTG MT will run on the same machine as this project.
-RTG_API = 'http://localhost:6060/translate'
 CREDS = load_credentials()
 
 
@@ -38,23 +36,8 @@ def translate(comment_str: str, language: str = "english"):
     """
     Skeleton code for translating to target language 
     """
-
-    source = {'source': [comment_str]}
-    logger.info(f'Sending source to RTG for translation: {source}')
-    try:
-        response = post(RTG_API, json=source)
-        if response.ok:
-            response = response.json()
-            logger.info(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
-            return response["translation"][0]
-        else:
-            logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
-            logger.warning(f'Response Body from RTG:\n{response.json()}')
-            return comment_str
-
-    except Exception as e:
-        logger.error(f'Error connecting to RTG API: {e}')
-        return comment_str
+    # Functionality moved to pipeline.translators
+    pass
 
 
 def main():
@@ -66,6 +49,7 @@ def main():
 
     # instantiate response generator
     response_generator = SpolinBotRG()
+    translator = Translator()
 
     for comment in subreddit.stream.comments():
 
@@ -78,10 +62,10 @@ def main():
             # otherwise, respond
         logger.info(f"Retrieved non-bot comment: {comment.body}")
 
-        # 1: translate 
+        # 1: translate
         source_language = detect_language(comment.body)
         logger.info(f"Sending comment body for translation: {comment.body}")
-        translated_comment = translate(comment.body, language="english")
+        translated_comment = translator.rtg(comment.body)
         logger.info(f"Received Translated Comment: {translated_comment}")
 
         # 2: determine if moderation is needed 
@@ -96,7 +80,7 @@ def main():
             best_response = response_generator.generate_response(translated_comment)
             # 5: translate back to source language
             logger.info(f"Sending best response for translation: {best_response}")
-            final_response = translate(best_response, language=source_language)
+            final_response = translator.fran_translator(best_response)
 
         # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
         logger.info(f"Generated response: {final_response}")
