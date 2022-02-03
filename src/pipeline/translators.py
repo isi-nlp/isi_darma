@@ -1,5 +1,5 @@
 from requests import post
-from transformers import MarianTokenizer, MarianMTModel
+from transformers import MarianTokenizer, MarianMTModel, convert_graph_to_onnx
 
 from src.logging_setup import logger
 
@@ -7,8 +7,8 @@ from src.logging_setup import logger
 class Translator:
 
     def __init__(self):
-        # Assuming (for MVP) that the RTG MT will run on the same machine as this project.
         self.RTG_API = 'http://localhost:6060/translate'
+        # TODO: Use ONXX-Runtime to speed up inference
         self.fr_model_name = f"Helsinki-NLP/opus-mt-en-fr"
         self.fr_mt_model = MarianMTModel.from_pretrained(self.fr_model_name)
         self.fr_tokenizer = MarianTokenizer.from_pretrained(self.fr_model_name)
