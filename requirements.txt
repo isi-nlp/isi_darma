@@ -1,5 +1,7 @@
 praw
 pyyaml
+transformers
+sentencepiece
 requests
 yaml
 numpy
