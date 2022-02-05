@@ -3,5 +3,5 @@ pyyaml
 transformers
 sentencepiece
 requests
-yaml
+pyyaml
 numpy

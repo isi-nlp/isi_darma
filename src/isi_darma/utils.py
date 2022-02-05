@@ -3,7 +3,9 @@ from typing import Dict
 import praw
 from praw.models import Redditor
 from logging_setup import logger
+import os
 
+CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
 
 def get_username(redditor_obj: Redditor):
     """
@@ -14,7 +16,7 @@ def get_username(redditor_obj: Redditor):
     return redditor_obj.name
 
 
-def load_credentials(creds_fn: str = "creds.yaml") -> Dict[str, str]:
+def load_credentials(creds_fn: str = CRED_FN) -> Dict[str, str]:
     with open(creds_fn, "r") as f:
         creds = yaml.safe_load(f)
 
