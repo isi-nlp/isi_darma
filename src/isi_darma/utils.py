@@ -1,9 +1,9 @@
-import yaml
-from typing import Dict
-import praw
-from praw.models import Redditor
-from logging_setup import logger
 import os
+import yaml
+import praw
+from typing import Dict
+from praw.models import Redditor
+from src.logging_setup import logger
 
 CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
 
