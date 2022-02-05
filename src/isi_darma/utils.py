@@ -5,7 +5,7 @@ from praw.models import Redditor
 from logging_setup import logger
 import os
 
-CRED_FN = os.environ.get("CRED_FP", "creds.yaml")
+CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
 
 def get_username(redditor_obj: Redditor):
     """
