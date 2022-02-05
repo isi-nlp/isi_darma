@@ -1,5 +1,4 @@
 from logging_setup import logger
-from pipeline.response_generators import SpolinBotRG
 from pipeline.translators import Translator
 from isi_darma.utils import load_credentials, load_reddit_client, get_username
 from isi_darma.comments_utils import format_dialogue, get_dialogue_text
@@ -12,12 +11,13 @@ SUBREDDIT = "darma_test"
 CREDS = load_credentials()
 
 
-def needs_moderation(dialogue: List[str], title:str="", post:str="", subreddit_guidelines:str=""):
+def needs_moderation(dialogue: List[str], title: str = "", post: str = "", subreddit_guidelines: str = ""):
     """
     Skeleton code for moderation classification  
     Expand to take in more parameters (post, subreddit guidelines, etc.)
     """
     return bool(dialogue)
+
 
 def determine_moderation_strategy(comment_str: str, moderation_decision_result: str = None):
     """
@@ -42,7 +42,6 @@ def translate(comment_str: str, language: str = "english"):
     # Functionality moved to pipeline.translators
     pass
 
-
 def main():
 
     parser = ArgumentParser()
@@ -52,7 +51,7 @@ def main():
     reddit_client = load_reddit_client()
     logger.info("Instantiated Reddit Client")
 
-    # get replies 
+    # get replies
     subreddit = reddit_client.subreddit(SUBREDDIT)
 
     # instantiate response generator
@@ -77,19 +76,14 @@ def main():
                 continue
 
             dialogue_text = get_dialogue_text(d)
-                # otherwise, respond
+            # otherwise, respond
             logger.info(f"Retrieved dialogue: {dialogue_text}")
 
-        # 1: translate
-        source_language = detect_language(comment.body)
-        logger.info(f"Sending comment body for translation: {comment.body}")
-        translated_comment = translator.rtg(comment.body)
-        logger.info(f"Received Translated Comment: {translated_comment}")
             # 1: translate
             # 1-1: detect language based on last comment
             source_language = detect_language(last_comment.body)
             logger.info(f"Translating all turns in dialogue")
-            translated_dialogue = [translate(comment.body, language="english") for comment in d]
+            translated_dialogue = [translator.rtg(comment.body) for comment in d]
             logger.info(f"Received Translated dialogue: {translated_dialogue}")
 
             # 2: determine if moderation is needed
@@ -104,9 +98,7 @@ def main():
                 best_response = response_generator.generate_response(translated_dialogue)
                 # 5: translate back to source language
                 logger.info(f"Sending best response for translation: {best_response}")
-                final_response = translate(best_response, language=source_language)
                 final_response = translator.fran_translator(best_response)
-
 
             # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
             logger.info(f"Generated response: {final_response}")
