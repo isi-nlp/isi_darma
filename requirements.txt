@@ -1,6 +1,7 @@
 praw
 pyyaml
-loguru
+transformers
+sentencepiece
 requests
 pyyaml
 numpy
