@@ -29,7 +29,6 @@ def determine_moderation_strategy(comment_str: str, moderation_decision_result: 
 def detect_language(comment_str: str):
     """
     Skeleton code for language detection
-    TODO: Check if RTG has an API to enable this.
     """
 
     return "english"
