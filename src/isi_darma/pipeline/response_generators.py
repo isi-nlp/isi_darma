@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 import requests
-from src.isi_darma.logging_setup import logger
+from isi_darma.logging_setup import logger
 from typing import List
 
 SPOLIN_ENDPOINT = "https://spolin.isi.edu/ya_back/api"

@@ -1,7 +1,7 @@
 from requests import post
 from transformers import MarianTokenizer, MarianMTModel
 
-from src.isi_darma.logging_setup import logger
+from isi_darma.logging_setup import logger
 
 
 class Translator:
