@@ -55,7 +55,7 @@ def main():
 
     # instantiate response generator
     response_generator = SpolinBotRG()
-    translator = Translator()
+    translator = Translator(french=False)
 
     for submission in subreddit.stream.submissions():
         title = submission.title
@@ -97,7 +97,8 @@ def main():
                 best_response = response_generator.generate_response(translated_dialogue)
                 # 5: translate back to source language
                 logger.info(f"Sending best response for translation: {best_response}")
-                final_response = translator.fran_translator(best_response)
+                final_response = best_response
+                # final_response = translator.fran_translator(best_response)
 
             # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
             logger.info(f"Generated response: {final_response}")

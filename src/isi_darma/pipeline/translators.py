@@ -6,13 +6,14 @@ from isi_darma.logging_setup import logger
 
 class Translator:
 
-    def __init__(self):
+    def __init__(self, french=True):
         self.RTG_API = 'http://localhost:6060/translate'
         # TODO: Use ONXX-Runtime to speed up inference
         self.fr_model_name = f"Helsinki-NLP/opus-mt-en-fr"
         self.fr_mt_model = MarianMTModel.from_pretrained(self.fr_model_name)
         self.fr_tokenizer = MarianTokenizer.from_pretrained(self.fr_model_name)
-        logger.info(f"{self.fr_model_name} model loaded for Eng to French Translation")
+        if french:
+            logger.info(f"{self.fr_model_name} model loaded for Eng to French Translation")
 
     def rtg(self, comment_str: str) -> str:
         source = {'source': [comment_str]}
