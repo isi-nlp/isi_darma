@@ -3,9 +3,10 @@ import yaml
 import praw
 from typing import Dict
 from praw.models import Redditor
-from src.logging_setup import logger
+from src.isi_darma.logging_setup import logger
 
 CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
+
 
 def get_username(redditor_obj: Redditor):
     """
@@ -36,4 +37,3 @@ def load_reddit_client():
     )
 
     return reddit
-

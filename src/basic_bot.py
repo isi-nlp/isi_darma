@@ -1,4 +1,4 @@
-from logging_setup import logger
+from isi_darma.logging_setup import logger
 from isi_darma.pipeline.translators import Translator
 from isi_darma.utils import load_credentials, load_reddit_client, get_username
 from isi_darma.comments_utils import format_dialogue, get_dialogue_text
