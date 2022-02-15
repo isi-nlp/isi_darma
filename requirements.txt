@@ -5,3 +5,5 @@ sentencepiece
 requests
 pyyaml
 numpy
+google-api-python-client
+torch
