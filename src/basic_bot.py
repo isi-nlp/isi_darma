@@ -1,8 +1,9 @@
 from isi_darma.logging_setup import logger
-from isi_darma.pipeline.translators import Translator
 from isi_darma.utils import load_credentials, load_reddit_client, get_username
 from isi_darma.comments_utils import format_dialogue, get_dialogue_text
 from isi_darma.pipeline.response_generators import SpolinBotRG
+from isi_darma.pipeline.translators import Translator
+from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from typing import List
 from argparse import ArgumentParser
 
@@ -11,7 +12,7 @@ SUBREDDIT = "darma_test"
 CREDS = load_credentials()
 
 
-def needs_moderation(dialogue: List[str], title: str = "", post: str = "", subreddit_guidelines: str = ""):
+def needs_moderation(dialogue: List[str], title: str = "", post: str = "", subreddit_guidelines: str = "") -> bool:
     """
     Skeleton code for moderation classification  
     Expand to take in more parameters (post, subreddit guidelines, etc.)
@@ -56,6 +57,7 @@ def main():
     # instantiate response generator
     response_generator = SpolinBotRG()
     translator = Translator(french=False)
+    moderation_classifier = PerspectiveAPIModerator()
 
     for submission in subreddit.stream.submissions():
         title = submission.title
@@ -86,8 +88,12 @@ def main():
             logger.info(f"Received Translated dialogue: {translated_dialogue}")
 
             # 2: determine if moderation is needed
-            if not needs_moderation(dialogue=dialogue_text, post=post_body, title=title):
-                continue
+            # if not needs_moderation(dialogue=dialogue_text, post=post_body, title=title):
+            #     continue
+
+            # determine whether to moderate based on last comment
+            toxicity = moderation_classifier.measure_toxicity(translated_dialogue[-1])
+            needs_mod = moderation_classifier.needs_moderation(toxicity=toxicity)
 
             # 3: determine the moderation strategy
             moderation_strategy = determine_moderation_strategy(translated_dialogue)
@@ -97,14 +103,18 @@ def main():
                 best_response = response_generator.generate_response(translated_dialogue)
                 # 5: translate back to source language
                 logger.info(f"Sending best response for translation: {best_response}")
-                final_response = best_response
-                # final_response = translator.fran_translator(best_response)
+                final_response = translator.fran_translator(best_response)
+                if needs_mod:
+                    final_response = f"Hey, that's toxic! In fact {toxicity*100:.2f} toxic. \n {final_response}"
+                logger.info(f"Generated response: {final_response}")
 
             # TODO:  Add logic for when bot the decides NOT to respond, final_response empty in that case
-            logger.info(f"Generated response: {final_response}")
+            else:
+                final_response = ""
+                logger.info(f"No response generated based on moderation strategy: {moderation_strategy}")
 
             # only actually reply if not run in test mode
-            if not args.test:
+            if not args.test and final_response:
                 last_comment.reply(final_response)
                 logger.info(f"Replied to comment in subreddit {last_comment.subreddit}")
     return
