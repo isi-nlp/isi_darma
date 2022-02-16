@@ -3,7 +3,7 @@ import yaml
 import praw
 from typing import Dict
 from praw.models import Redditor
-from src.logging_setup import logger
+from isi_darma.logging_setup import logger
 
 CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
 
