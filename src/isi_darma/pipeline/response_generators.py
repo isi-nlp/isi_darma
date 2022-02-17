@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
+from logging import Logger
+
 import requests
-from isi_darma.logging_setup import logger
 from typing import List
 
 SPOLIN_ENDPOINT = "https://spolin.isi.edu/ya_back/api"
@@ -15,7 +16,8 @@ class ResponseGenerator(ABC):
 
 class SpolinBotRG(ResponseGenerator):
 
-	def __init__(self, endpoint: str = SPOLIN_ENDPOINT):
+	def __init__(self, logger: Logger, endpoint: str = SPOLIN_ENDPOINT):
+		self.logger = logger
 		self.api_endpoint = endpoint
 
 	def generate_response(self, incoming_dialogue: List[str]):
@@ -35,6 +37,6 @@ class SpolinBotRG(ResponseGenerator):
 		# returned format: {'responses: [[response1, score1], [response2, score2]...]}
 
 		best_response = response_json["responses"][0][0]
-		logger.info(f"Generated response: {best_response}")
+		self.logger.info(f"Generated response: {best_response}")
 
 		return best_response

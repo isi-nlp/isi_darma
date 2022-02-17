@@ -1,7 +1,5 @@
 from googleapiclient import discovery
 from abc import ABC, abstractmethod
-from isi_darma.logging_setup import logger
-import json
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
@@ -15,7 +13,7 @@ class ModerationClassifier(ABC):
 
 class PerspectiveAPIModerator(ModerationClassifier):
 
-	def __init__(self) -> None:
+	def __init__(self, logger) -> None:
 
 		self.client = discovery.build(
 			"commentanalyzer",
@@ -26,6 +24,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		)
 
 		self.toxicity_threshold = 0.7
+		self.logger = logger
 
 	def needs_moderation(self, toxicity) -> bool:
 		return toxicity >= self.toxicity_threshold
@@ -41,7 +40,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		try:
 			toxicity_score = float(response["attributeScores"]["TOXICITY"]["summaryScore"]["value"])
 		except Exception as e:
-			logger.info(f"Exception occurred: {e}. Setting toxicity to 0.")
+			self.logger.info(f"Exception occurred: {e}. Setting toxicity to 0.")
 			toxicity_score = 0
 
 		return toxicity_score

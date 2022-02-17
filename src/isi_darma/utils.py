@@ -1,11 +1,12 @@
 import os
+from logging import Logger
+
 import yaml
 import praw
 from typing import Dict
 from praw.models import Redditor
-from isi_darma.logging_setup import logger
 
-CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/creds.yaml")
+CRED_FN = os.environ.get("CRED_FP", "/Users/darpanjain/Documents/Coursework/RA - ISI/isi_darma/src/isi_darma/creds.yaml")
 
 
 def get_username(redditor_obj: Redditor):
@@ -17,7 +18,7 @@ def get_username(redditor_obj: Redditor):
     return redditor_obj.name
 
 
-def load_credentials(creds_fn: str = CRED_FN) -> Dict[str, str]:
+def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
     with open(creds_fn, "r") as f:
         creds = yaml.safe_load(f)
 
@@ -25,8 +26,8 @@ def load_credentials(creds_fn: str = CRED_FN) -> Dict[str, str]:
     return creds
 
 
-def load_reddit_client():
-    creds = load_credentials()
+def load_reddit_client(logger):
+    creds = load_credentials(logger)
 
     reddit = praw.Reddit(
         user_agent=f"reddit:darma:0 (by u/{creds['username']})",
