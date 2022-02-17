@@ -10,8 +10,8 @@ def setup_logger(logname, filename, test=False):
 
     """
 
-    if not os.path.exists('logs'):
-        os.mkdir('logs')
+    if not os.path.exists('./logs'):
+        os.mkdir('./logs')
 
     log_format = '<%(asctime)s> [%(levelname)s] <%(lineno)s> <%(funcName)s> %(message)s'
     file_logger = RotatingFileHandler(filename, mode='a', maxBytes=500 * 1024 * 1024, backupCount=10)
