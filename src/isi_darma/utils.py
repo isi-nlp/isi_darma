@@ -6,7 +6,7 @@ import praw
 from typing import Dict
 from praw.models import Redditor
 
-CRED_FN = os.environ.get("CRED_FP", "/Users/darpanjain/Documents/Coursework/RA - ISI/isi_darma/src/isi_darma/creds.yaml")
+CRED_FN = os.environ.get("CRED_FP", "/isi_darma/src/isi_darma/creds.yaml")
 
 
 def get_username(redditor_obj: Redditor):
