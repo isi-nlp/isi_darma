@@ -1,16 +1,12 @@
 from abc import ABC, abstractmethod
 from typing import List
 
-from basic_bot import determine_moderation_strategy
 from isi_darma.comments_utils import format_dialogue, get_dialogue_text
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
 from isi_darma.utils import load_credentials, get_username
-
-
-CREDS = load_credentials()
 
 
 class ModerationBot(ABC):
@@ -52,7 +48,7 @@ class BasicBot(ModerationBot):
 	def translate(self, text):
 		return self.translator.rtg(text)
 
-	def determine_moderation_strategy(self):
+	def determine_moderation_strategy(self, comment_str: str):
 		return "respond"
 
 	def generate_response(self, dialogue):
@@ -67,7 +63,7 @@ class BasicBot(ModerationBot):
 		comment_queue = submission.comments[:]  # Seed with top-level
 
 		# check that we didn't already moderate the post
-		if all([get_username(comment) != CREDS["username"] for comment in comment_queue]):
+		if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
 			self.moderate_post(submission)
 
 		# dialogues is a list of comment objects
@@ -75,7 +71,7 @@ class BasicBot(ModerationBot):
 		for d in dialogues:
 			last_comment = d[-1]
 			username = get_username(last_comment.author)
-			if username == CREDS["username"]:
+			if username == self.CREDS["username"]:
 				continue
 			self.moderate_comment_thread(d, title=title, post_body=post_body)
 
@@ -116,7 +112,7 @@ class BasicBot(ModerationBot):
 		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 
-		moderation_strategy = determine_moderation_strategy(dialogue_str[-1])
+		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
 
 		if moderation_strategy == "respond":
 			best_response = self.response_generator.generate_response(dialogue_str)
