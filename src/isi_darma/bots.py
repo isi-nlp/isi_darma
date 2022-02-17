@@ -26,18 +26,24 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-	def __init__(self, reddit_client=None, response_generator=SpolinBotRG(), translator=Translator(), moderation_classifier=PerspectiveAPIModerator(), test=False) -> None:
+	def __init__(self, reddit_client=None, test=False) -> None:
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
+
+		# Setup logger based on the 'test' flag
 		if not self.test:
-			self.logger = setup_logger('app', '../logs/app.log', test=self.test)
+			self.logger = setup_logger('app', 'logs/app.log', test=self.test)
 		else:
 			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
+
+		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
 		self.reddit_client = reddit_client
-		self.response_generator = response_generator
-		self.translator = translator
-		self.moderation_classifier = moderation_classifier
+		self.response_generator = SpolinBotRG(self.logger)
+		self.translator = Translator(self.logger)
+		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
+		self.CREDS = load_credentials(self.logger)
+		self.current_dialogue = None
 
 	@staticmethod
 	def detect_language(text):
