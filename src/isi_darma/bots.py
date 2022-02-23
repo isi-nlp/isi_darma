@@ -1,133 +1,140 @@
 from abc import ABC, abstractmethod
-from urllib import response
-from basic_bot import determine_moderation_strategy
-from isi_darma.pipeline.response_generators import SpolinBotRG
-from isi_darma.pipeline.translators import Translator
-from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
-from isi_darma.logging_setup import logger
-from isi_darma.utils import load_credentials, get_username
-from isi_darma.comments_utils import format_dialogue, get_dialogue_text
 from typing import List
 
-CREDS = load_credentials()
+from isi_darma.comments_utils import format_dialogue, get_dialogue_text
+from isi_darma.logging_setup import setup_logger
+from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
+from isi_darma.pipeline.response_generators import SpolinBotRG
+from isi_darma.pipeline.translators import Translator
+from isi_darma.utils import load_credentials, get_username
+
 
 class ModerationBot(ABC):
 
-    @abstractmethod
-    def moderate(): 
-        pass 
+	@abstractmethod
+	def moderate(self):
+		pass
 
-    @abstractmethod
-    def determine_moderation_strategy(): 
-        pass
+	@abstractmethod
+	def determine_moderation_strategy(self):
+		pass
 
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, response_generator=SpolinBotRG(), translator=Translator(), moderation_classifier=PerspectiveAPIModerator(), test=False) -> None:
-        super().__init__()
+	def __init__(self, reddit_client=None, test=False) -> None:
+		super().__init__()
 
-        self.test = test # whether to actually post things to redd
-        self.reddit_client = reddit_client
-        self.response_generator = response_generator
-        self.translator = translator
-        self.moderation_classifier = moderation_classifier
+		self.test = test  # whether to actually post things to reddit
 
-    def detect_language(self, text): 
-        return "english"
+		# Setup logger based on the 'test' flag
+		if not self.test:
+			self.logger = setup_logger('app', 'logs/app.log', test=self.test)
+		else:
+			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
-    def translate(self, text): 
-        return self.translator.rtg(text)
+		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
+		self.reddit_client = reddit_client
+		self.response_generator = SpolinBotRG(self.logger)
+		self.translator = Translator(self.logger)
+		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
+		self.CREDS = load_credentials(self.logger)
+		self.current_dialogue = None
 
-    def determine_moderation_strategy(self): 
-        return "respond"
+	@staticmethod
+	def detect_language(text):
+		return "english"
 
-    def generate_response(self, dialogue): 
-        return self.response_generator.generate_response(dialogue)
+	def translate(self, text):
+		return self.translator.rtg(text)
 
+	def determine_moderation_strategy(self, comment_str: str):
+		return "respond"
 
-    def moderate_submission(self, submission): 
+	def generate_response(self, dialogue):
+		return self.response_generator.generate_response(dialogue)
 
-        title = submission.title
-        post_body = submission.selftext
+	def moderate_submission(self, submission):
 
-        submission.comments.replace_more(limit=None)
-        comment_queue = submission.comments[:]  # Seed with top-level
+		title = submission.title
+		post_body = submission.selftext
 
-        #check that we didn't already moderate the post
-        if all([get_username(comment) != CREDS["username"] for comment in comment_queue]): 
-            self.moderate_post(title=title, post_body=post_body)
+		submission.comments.replace_more(limit=None)
+		comment_queue = submission.comments[:]  # Seed with top-level
 
-        # dialogues is a list of comment objects 
-        dialogues = format_dialogue(comment_queue)
-        for d in dialogues: 
-            last_comment = d[-1]
-            username = get_username(last_comment.author)
-            if username == CREDS["username"]:
-                continue 
-            self.moderate_comment_thread(d, title=title, post_body=post_body)
+		# check that we didn't already moderate the post
+		if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
+			self.moderate_post(submission)
 
-    def moderate_post(self, submission):
-        """
-        Process post before sending to moderate function
-        """  
-        title = submission.title 
-        post_body = submission.selftext 
+		# dialogues is a list of comment objects
+		dialogues = format_dialogue(comment_queue)
+		for d in dialogues:
+			last_comment = d[-1]
+			username = get_username(last_comment.author)
+			if username == self.CREDS["username"]:
+				continue
+			self.moderate_comment_thread(d, title=title, post_body=post_body)
 
-        first_turn = f"{title} {post_body}".strip() 
-        translated_dialogue = [self.translator.rtg(first_turn)]
-        self.moderate(translated_dialogue, submission)
+	def moderate_post(self, submission):
+		"""
+		Process post before sending to moderate function
+		"""
+		title = submission.title
+		post_body = submission.selftext
 
-    def moderate_comment_thread(self, dialogue, title="", post_body=""): 
-        """
-        Process comment thread before sending to moderate function
-        """  
-        self.current_dialogue = dialogue 
+		first_turn = f"{title} {post_body}".strip()
+		translated_dialogue = [self.translator.rtg(first_turn)]
+		self.moderate(translated_dialogue, submission)
 
-        last_comment = dialogue[-1]
-        dialogue_text = get_dialogue_text(dialogue) 
-        logger.info(f"Retrieved dialogue: {dialogue_text}")
+	def moderate_comment_thread(self, dialogue, title="", post_body=""):
+		"""
+		Process comment thread before sending to moderate function
+		"""
+		self.current_dialogue = dialogue
 
-        source_language = self.detect_language(last_comment.body)
-        logger.info(f"Translating all turns in dialogue")
-        translated_dialogue = [self.translator.rtg(comment.body) for comment in dialogue]
-        if title or post_body: 
-            first_turn = f"{title} {post_body}".strip() 
-            translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+		last_comment = dialogue[-1]
+		dialogue_text = get_dialogue_text(dialogue)
+		self.logger.info(f"Retrieved dialogue: {dialogue_text}")
 
-        logger.info(f"Received Translated dialogue: {translated_dialogue}")
-        self.moderate(translated_dialogue, last_comment)
+		source_language = self.detect_language(last_comment.body)
+		self.logger.info(f"Translating all turns in dialogue")
+		translated_dialogue = [self.translator.rtg(comment.body) for comment in dialogue]
 
-    def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str: 
+		if title or post_body:
+			first_turn = f"{title} {post_body}".strip()
+			translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
-        toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
-        needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)    
+		self.logger.info(f"Received Translated dialogue: {translated_dialogue}")
+		self.moderate(translated_dialogue, last_comment)
 
-        moderation_strategy = determine_moderation_strategy(self)
+	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
 
-        if moderation_strategy == "respond": 
-            best_response = self.response_generator.generate_response(dialogue_str)
-            # 5: translate back to source language
-            logger.info(f"Sending best response for translation: {best_response}")
-            final_response = self.translator.fran_translator(best_response)
+		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
+		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 
-            response_toxicity = self.moderation_classifier.measure_toxicity(final_response)
-            response_needs_mod = self.moderation_classifier.needs_moderation(toxicity=response_toxicity)
-            if response_needs_mod: 
-                final_response = f"I know this is toxic, in fact {response_toxicity:.2f} toxic, but I'm going to say it: {final_response}"
+		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
 
-            if needs_mod: 
-                final_response = f"Hey, that's toxic! In fact {toxicity*100:.2f} toxic. \n {final_response}"
-            logger.info(f"Generated response: {final_response}")
-        # TODO:  Add logic for when bot the decides NOT to respond,     final_response empty in that case
-        else: 
-            final_response = "" 
-            logger.info(f"No response generated based on moderation strategy: {moderation_strategy}")
-          
-        if not self.test and final_response and obj_to_reply:
-            obj_to_reply.reply(final_response)
-            logger.info(f"Replied to comment/post in subreddit {obj_to_reply.subreddit}")
-        
-        return final_response
+		if moderation_strategy == "respond":
+			best_response = self.response_generator.generate_response(dialogue_str)
+			# 5: translate back to source language
+			self.logger.info(f"Sending best response for translation: {best_response}")
+			final_response = self.translator.fran_translator(best_response)
 
+			response_toxicity = self.moderation_classifier.measure_toxicity(final_response)
+			response_needs_mod = self.moderation_classifier.needs_moderation(toxicity=response_toxicity)
+			if response_needs_mod:
+				final_response = f"I know this is toxic, in fact {response_toxicity:.2f} toxic, but I'm going to say it: {final_response}"
 
+			if needs_mod:
+				final_response = f"Hey, that's toxic! In fact {toxicity * 100:.2f} toxic. \n {final_response}"
+			self.logger.info(f"Generated response: {final_response}")
+
+		else:
+			final_response = ""
+			self.logger.info(f"No response generated based on moderation strategy: {moderation_strategy}")
+
+		if not self.test and final_response and obj_to_reply:
+			obj_to_reply.reply(final_response)
+			self.logger.info(f"Replied to comment/post in subreddit {obj_to_reply.subreddit}")
+
+		return final_response
