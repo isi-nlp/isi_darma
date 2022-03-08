@@ -82,10 +82,12 @@ class BasicBot(ModerationBot):
 		"""
 		title = submission.title
 		post_body = submission.selftext
+		authorname = submission.comments[0].author.name
+		self.logger.debug('Author name ----> ', authorname)
 
 		first_turn = f"{title} {post_body}".strip()
 		translated_dialogue = [self.translator.rtg(first_turn)]
-		self.moderate(translated_dialogue, submission)
+		self.moderate(translated_dialogue, submission, authorname)
 
 	def moderate_comment_thread(self, dialogue, title="", post_body=""):
 		"""
@@ -95,6 +97,7 @@ class BasicBot(ModerationBot):
 
 		last_comment = dialogue[-1]
 		author_username = get_username(last_comment.author)
+		self.logger.debug(f'Author username for toxic comments: {author_username}')
 		dialogue_text = get_dialogue_text(dialogue)
 		self.logger.info(f"Retrieved dialogue: {dialogue_text}")
 
@@ -134,7 +137,10 @@ class BasicBot(ModerationBot):
 		# 	self.logger.info(f"Generated response: {final_response}")
 
 		if needs_mod and moderation_strategy == 'respond':
-			initial_response = f"Hi, {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
+			if author_username:
+				initial_response = "Hi, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
+			else:
+				initial_response = f"Hi {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
 
 			if not self.test and initial_response and obj_to_reply:
 				self.logger.info(f'Sending out initial response in response to toxic user: {initial_response}')
