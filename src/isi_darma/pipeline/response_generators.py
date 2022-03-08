@@ -47,7 +47,7 @@ class SpolinBotRG(ResponseGenerator):
 		usernames = ",".join(usernames)
 		comtype_responses = [
 			f'Please quit doing that and behave!',
-			f'You used this kind of behavior in response to {usernames}',
+			f'You used this kind of behavior in response to {usernames}.',
 			f'You used this kind of behavior in response to {usernames}. I feel upset because even though I don’t know {usernames}, the language you used when communicating with them would make me upset.',
 			f'You used this kind of behavior in response to {usernames}. Is this because you are angry at {usernames} for having beliefs that are different from yours?',
 			f'You used this kind of behavior in response to {usernames}. Is this because you are angry at {usernames} for having beliefs that are  different from yours? Do you want {usernames} to change their opinions and perhaps convince others who currently share their opinions to also change?'
