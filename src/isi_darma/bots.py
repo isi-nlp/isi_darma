@@ -82,7 +82,7 @@ class BasicBot(ModerationBot):
 		"""
 		title = submission.title
 		post_body = submission.selftext
-		self.logger.debug(f'Moderating a POST "{title}" now....')
+		self.logger.info(f'Moderating a POST "{title}" now....')
 
 		first_turn = f"{title} {post_body}".strip()
 		translated_dialogue = [self.translator.rtg(first_turn)]
@@ -92,30 +92,30 @@ class BasicBot(ModerationBot):
 		"""
 		Process comment thread before sending to moderate function
 		"""
-		self.logger.debug(f'Moderating a COMMENT THREAD now....')
+		self.logger.info(f'Moderating a COMMENT THREAD now....')
 
 		self.current_dialogue = dialogue
 		last_comment = dialogue[-1]
 
 		dialogue_text = get_dialogue_text(dialogue)
-		self.logger.info(f"Retrieved dialogue: {dialogue_text}")
+		self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
 
 		source_language = self.detect_language(last_comment.body)
-		self.logger.info(f"Translating all turns in dialogue")
+		self.logger.debug(f"Translating all turns in dialogue")
 		translated_dialogue = [self.translator.rtg(comment.body) for comment in dialogue]
 
 		if title or post_body:
 			first_turn = f"{title} {post_body}".strip()
 			translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
-		self.logger.info(f"Received Translated dialogue: {translated_dialogue}")
+		self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
 		self.moderate(translated_dialogue, last_comment)
 
 	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
 
 		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
-		self.logger.info(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. needs_mod = {needs_mod}.')
+		self.logger.debug(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. needs_mod = {needs_mod}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
 
 		if needs_mod and moderation_strategy == 'respond':
@@ -126,19 +126,19 @@ class BasicBot(ModerationBot):
 				initial_response = f"Hi {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
 				self.logger.debug(f'Initial Bot response generated: {initial_response}')
 				translated_intial = self.translator.fran_translator(initial_response)
-				self.logger.info(f'Sending out initial response in response to toxic user: {translated_intial}')
+				self.logger.debug(f'Sending out initial response in response to toxic user: {translated_intial}')
 
 			if not self.test and translated_intial:
 				obj_to_reply.reply(translated_intial)
 
 			best_response = self.response_generator.get_random_comtype_resp()
-			self.logger.info(f'Randomly sampled Comtype response: {best_response}')
+			self.logger.debug(f'Randomly sampled Comtype response: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
-			self.logger.info(f"Generated (and translated) response: {final_response}")
+			self.logger.debug(f"Generated (and translated) response: {final_response}")
 
 		else:
 			final_response = ""
-			self.logger.info(f"No response generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}")
+			self.logger.debug(f"No response generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}")
 
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
