@@ -63,7 +63,6 @@ class BasicBot(ModerationBot):
 		comment_queue = submission.comments[:]  # Seed with top-level
 
 		# check that we didn't already moderate the post
-		check_list = [get_username(comment) != self.CREDS["username"] for comment in comment_queue]
 		if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
 			self.moderate_post(submission)
 

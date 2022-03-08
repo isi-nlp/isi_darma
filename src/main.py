@@ -22,6 +22,8 @@ def main(test=False):
 	for submission in subreddit.stream.submissions():
 		moderation_bot.moderate_submission(submission)
 
+	return
+
 
 if __name__ == "__main__":
 	main()
