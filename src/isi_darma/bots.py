@@ -63,7 +63,7 @@ class BasicBot(ModerationBot):
 		comment_queue = submission.comments[:]  # Seed with top-level
 
 		# check that we didn't already moderate the post
-		# TODO: Not working, still replies to everything
+		check_list = [get_username(comment) != self.CREDS["username"] for comment in comment_queue]
 		if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
 			self.moderate_post(submission)
 
@@ -71,7 +71,7 @@ class BasicBot(ModerationBot):
 		dialogues = format_dialogue(comment_queue)
 		for d in dialogues:
 			last_comment = d[-1]
-			username = get_username(last_comment.author)
+			username = get_username(last_comment)
 			if username == self.CREDS["username"]:
 				continue
 			self.moderate_comment_thread(d, title=title, post_body=post_body)
@@ -80,15 +80,13 @@ class BasicBot(ModerationBot):
 		"""
 		Process post before sending to moderate function
 		"""
-		self.logger.debug(f'Moderating a POST now....')
 		title = submission.title
 		post_body = submission.selftext
-		authorname = submission.comments[0].author.name
-		self.logger.debug(f'Toxic post Author name ----> {authorname}')
+		self.logger.debug(f'Moderating a POST "{title}" now....')
 
 		first_turn = f"{title} {post_body}".strip()
 		translated_dialogue = [self.translator.rtg(first_turn)]
-		self.moderate(translated_dialogue, submission, authorname)
+		self.moderate(translated_dialogue, submission)
 
 	def moderate_comment_thread(self, dialogue, title="", post_body=""):
 		"""
@@ -98,8 +96,7 @@ class BasicBot(ModerationBot):
 
 		self.current_dialogue = dialogue
 		last_comment = dialogue[-1]
-		author_username = get_username(last_comment.author)
-		self.logger.debug(f'Author username for toxic comments: {author_username}')
+
 		dialogue_text = get_dialogue_text(dialogue)
 		self.logger.info(f"Retrieved dialogue: {dialogue_text}")
 
@@ -112,29 +109,27 @@ class BasicBot(ModerationBot):
 			translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
 		self.logger.info(f"Received Translated dialogue: {translated_dialogue}")
-		self.moderate(translated_dialogue, last_comment, author_username=author_username)
+		self.moderate(translated_dialogue, last_comment)
 
-	def moderate(self, dialogue_str: List[str], obj_to_reply=None, author_username=None) -> str:
+	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
 
 		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
-		self.logger.info(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. Needs mod = {needs_mod}. Authorname = {author_username}')
-
+		self.logger.info(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. needs_mod = {needs_mod}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
 
 		if needs_mod and moderation_strategy == 'respond':
-			if author_username:
+
+			if obj_to_reply:
+				author_username = obj_to_reply.author
+				self.logger.debug(f'Toxic post Author name ----> {author_username}')
 				initial_response = f"Hi {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
-			else:
-				initial_response = "Hi , I’m a bot (check out my profile for details) and it looks like you’re Toxic."
-
-			self.logger.debug(f'Initial Bot response generated: {initial_response}')
-
-			if not self.test and initial_response and obj_to_reply:
+				self.logger.debug(f'Initial Bot response generated: {initial_response}')
 				translated_intial = self.translator.fran_translator(initial_response)
 				self.logger.info(f'Sending out initial response in response to toxic user: {translated_intial}')
 
-				obj_to_reply.reply(initial_response)
+			if not self.test and translated_intial:
+				obj_to_reply.reply(translated_intial)
 
 			best_response = self.response_generator.get_random_comtype_resp()
 			self.logger.info(f'Randomly sampled Comtype response: {best_response}')
