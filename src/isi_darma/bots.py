@@ -139,4 +139,5 @@ class BasicBot(ModerationBot):
 			obj_to_reply.reply(final_response)
 			self.logger.info(f"Replied to comment/post in subreddit {obj_to_reply.subreddit}")
 
+		self.logger.info(f'Final response being added to the thread: {final_response}')
 		return final_response

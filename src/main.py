@@ -18,6 +18,7 @@ def main():
 
 	subreddit = reddit_client.subreddit(SUBREDDIT)
 
+	# TODO: Poll for new replies and posts
 	for submission in subreddit.stream.submissions():
 		moderation_bot.moderate_submission(submission)
 
