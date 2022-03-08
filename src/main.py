@@ -17,14 +17,10 @@ def main(test=False):
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
 
-	while True:
-
-		subreddit = reddit_client.subreddit(SUBREDDIT)
-		for submission in subreddit.stream.submissions():
-			moderation_bot.moderate_submission(submission)
-
-		# moderation_bot.logger.info(f'------------ NO MORE POSTS/COMMENTS TO RESPOND TO! SLEEPING NOW... ------------')
-		# sleep(15*60)
+	# Stream doesn't track new comments on existing posts and threads
+	subreddit = reddit_client.subreddit(SUBREDDIT)
+	for submission in subreddit.stream.submissions():
+		moderation_bot.moderate_submission(submission)
 
 
 if __name__ == "__main__":
