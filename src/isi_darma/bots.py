@@ -6,7 +6,7 @@ from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
-from isi_darma.utils import load_credentials, get_username
+from isi_darma.utils import load_credentials, get_username, get_random_comtype_resp, disclaimer
 
 
 class ModerationBot(ABC):
@@ -73,7 +73,7 @@ class BasicBot(ModerationBot):
 			username = get_username(last_comment.author)
 			if username == self.CREDS["username"]:
 				continue
-			self.moderate_comment_thread(d, title=title, post_body=post_body)
+			self.moderate_comment_thread(d, title=title, post_body=post_body, username=username)
 
 	def moderate_post(self, submission):
 		"""
@@ -86,7 +86,7 @@ class BasicBot(ModerationBot):
 		translated_dialogue = [self.translator.rtg(first_turn)]
 		self.moderate(translated_dialogue, submission)
 
-	def moderate_comment_thread(self, dialogue, title="", post_body=""):
+	def moderate_comment_thread(self, dialogue, title="", post_body="", username=username):
 		"""
 		Process comment thread before sending to moderate function
 		"""
@@ -107,7 +107,7 @@ class BasicBot(ModerationBot):
 		self.logger.info(f"Received Translated dialogue: {translated_dialogue}")
 		self.moderate(translated_dialogue, last_comment)
 
-	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
+	def moderate(self, dialogue_str: List[str], obj_to_reply=None, username=None) -> str:
 
 		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
@@ -123,10 +123,12 @@ class BasicBot(ModerationBot):
 			response_toxicity = self.moderation_classifier.measure_toxicity(final_response)
 			response_needs_mod = self.moderation_classifier.needs_moderation(toxicity=response_toxicity)
 			if response_needs_mod:
-				final_response = f"I know this is toxic, in fact {response_toxicity:.2f} toxic, but I'm going to say it: {final_response}"
+				# final_response = f"I know this is toxic, in fact {response_toxicity:.2f} toxic, but I'm going to say it: {final_response}"
+				final_response = f"Hi, {username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic.\n"
 
 			if needs_mod:
-				final_response = f"Hey, that's toxic! In fact {toxicity * 100:.2f} toxic. \n {final_response}"
+				final_response = final_response + get_random_comtype_resp()
+				# final_response = f"Hey, that's toxic! In fact {toxicity * 100:.2f} toxic. \n {final_response}"
 			self.logger.info(f"Generated response: {final_response}")
 
 		else:
