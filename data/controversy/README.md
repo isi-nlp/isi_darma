@@ -25,8 +25,7 @@ Months: 1-12 (from Jan. to Dec.)
   - Size: 2.4MB
   - More information in Table 1: Submissions data description in Pushshift paper 
 - Comment:
-  - Total number: 14384
-  - Information: 3,163,310
+  - Total number: 3,163,310
   - Information: id, subreddit, subreddit_language, text, type, author, timestamp, parent_id, controversial, score, submission_id, month.
   - Size : 722.5MB
   - Ratio of controversial comments: 5.1%
