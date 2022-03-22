@@ -17,7 +17,7 @@ def main(test=False):
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
 
-	# Stream doesn't track new comments on existing posts and threads
+	# TODO: Stream doesn't track new comments on existing posts and threads
 	subreddit = reddit_client.subreddit(SUBREDDIT)
 	for submission in subreddit.stream.submissions():
 		moderation_bot.moderate_submission(submission)
