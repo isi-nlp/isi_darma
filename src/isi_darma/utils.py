@@ -14,8 +14,7 @@ def get_username(redditor_obj: Redditor):
     Get the username of a redditor
     Redditor object reference: https://praw.readthedocs.io/en/latest/code_overview/models/redditor.html#praw.models.Redditor
     """
-
-    return redditor_obj.name
+    return redditor_obj.author
 
 
 def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
