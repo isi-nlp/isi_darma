@@ -1,5 +1,7 @@
 from googleapiclient import discovery
 from abc import ABC, abstractmethod
+from requests import get, post
+import operator
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
@@ -25,6 +27,11 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 		self.toxicity_threshold = 0.7
 		self.logger = logger
+		self.toxicity_endpoint = "http://effectmed01.isi.edu:5001/"
+		self.tox_classifier_behavtypes = "http://effectmed01.isi.edu:5001/v1/toxicity/types"
+		self.tox_classifier_endpoint = "http://effectmed01.isi.edu:5001/v1/toxicity/"
+
+	# self.behav_types = self.get_behavTypes(self.tox_classifier_behavtypes, self.toxicity_endpoint)
 
 	def needs_moderation(self, toxicity) -> bool:
 		return toxicity >= self.toxicity_threshold
