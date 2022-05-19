@@ -112,9 +112,10 @@ class BasicBot(ModerationBot):
 
 	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
 
-		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
+		toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
-		self.logger.debug(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. needs_mod = {needs_mod}.')
+		self.logger.debug(
+			f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity} with behavior type = {behav_type}. needs_mod = {needs_mod}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
 
 		if needs_mod and moderation_strategy == 'respond':
@@ -122,22 +123,26 @@ class BasicBot(ModerationBot):
 			if obj_to_reply:
 				author_username = obj_to_reply.author
 				self.logger.debug(f'Toxic post Author name ----> {author_username}')
-				initial_response = f"Hi {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
-				self.logger.debug(f'Initial Bot response generated: {initial_response}')
+
+				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
+				                   f"stop responding to you or collecting your comments) " \
+				                   f"and it looks like you're [BEHAVTYPE]."
+
+				self.logger.info(f'Initial Bot response generated: {initial_response}')
 				translated_intial = self.translator.fran_translator(initial_response)
-				self.logger.debug(f'Sending out initial response in response to toxic user: {translated_intial}')
+				self.logger.info(f'Sending out initial response in response to toxic user: {translated_intial}')
 
 			if not self.test and translated_intial:
 				obj_to_reply.reply(translated_intial)
 
 			best_response = self.response_generator.get_random_comtype_resp()
-			self.logger.debug(f'Randomly sampled Comtype response: {best_response}')
+			self.logger.info(f'Randomly sampled Comtype response: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
-			self.logger.debug(f"Generated (and translated) response: {final_response}")
+			self.logger.info(f"Generated (and translated) response: {final_response}")
 
 		else:
 			final_response = ""
-			self.logger.debug(f"No response generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}")
+			self.logger.info(f"No response generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}. Behav_type: {behav_type}")
 
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
