@@ -43,4 +43,25 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			self.logger.info(f"Exception occurred: {e}. Setting toxicity to 0.")
 			toxicity_score = 0
 
-		return toxicity_score
+	def map_behavtypes(self, toxicity_scores):
+		mapping = {
+					"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
+					"ad-hominem attack": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+					"obscenities/vulgarities": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
+					"dehumanization": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+				}
+
+		self.logger.debug(f"Toxicity scores after mapping: {mapping}")
+		behav_type = max(mapping.items(), key=operator.itemgetter(1))[0]
+		self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
+		return mapping[behav_type], behav_type
+
+	def get_behavTypes(self, behavtype_endpoint, endpoint):
+		endpoint_health = get(endpoint).status_code
+		if endpoint_health == 200:
+			behav_types = get(behavtype_endpoint).json()
+			self.logger.info(f"Current tracking Toxicity Behaviour types: {behav_types}")
+			return behav_types
+		else:
+			self.logger.info(f"Endpoint {endpoint} is not healthy. Returning status code {endpoint_health}.")
+			return {}
