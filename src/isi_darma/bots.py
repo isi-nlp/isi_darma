@@ -81,7 +81,7 @@ class BasicBot(ModerationBot):
 		"""
 		title = submission.title
 		post_body = submission.selftext
-		self.logger.info(f'Moderating a POST "{title}" now....')
+		self.logger.info(f'Moderating the POST "{title}" now....')
 
 		first_turn = f"{title} {post_body}".strip()
 		translated_dialogue = [self.translator.rtg(first_turn)]
@@ -111,6 +111,10 @@ class BasicBot(ModerationBot):
 		self.moderate(translated_dialogue, last_comment)
 
 	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
+		"""
+		Moderates a dialogue of comments.
+		Optionally, a comment object can be passed in to reply to.
+		"""
 
 		toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
