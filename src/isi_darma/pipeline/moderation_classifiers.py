@@ -29,19 +29,27 @@ class PerspectiveAPIModerator(ModerationClassifier):
 	def needs_moderation(self, toxicity) -> bool:
 		return toxicity >= self.toxicity_threshold
 
-	def measure_toxicity(self, comment) -> float:
+	def measure_toxicity(self, comment) -> (float, str):
 
 		analyze_request = {
 			'comment': {'text': comment},
-			'requestedAttributes': {'TOXICITY': {}}
+			'requestedAttributes': {
+				# 'TOXICITY': {},
+				'IDENTITY_ATTACK': {},
+				'INSULT': {},
+				'PROFANITY': {},
+				'THREAT': {},
+			}
 		}
 
 		response = self.client.comments().analyze(body=analyze_request).execute()
 		try:
-			toxicity_score = float(response["attributeScores"]["TOXICITY"]["summaryScore"]["value"])
+			toxicity_score, behav_type = self.map_behavtypes(response)
 		except Exception as e:
-			self.logger.info(f"Exception occurred: {e}. Setting toxicity to 0.")
-			toxicity_score = 0
+			self.logger.debug(f"Exception occurred: {e}. Setting toxicity to 0 with empty behaviour type.")
+			toxicity_score, behav_type = 0, ""
+
+		return toxicity_score, behav_type
 
 	def map_behavtypes(self, toxicity_scores):
 		mapping = {
