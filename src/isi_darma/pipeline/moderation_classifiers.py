@@ -55,7 +55,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			toxicity_score, behav_type = self.map_behavtypes(response)
 
 		except Exception as e:
-			self.logger.debug(f"Exception occurred: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
+			self.logger.error(f"Exception occurred: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
 			toxicity_score, behav_type = 0, ""
 
 		return toxicity_score, behav_type
@@ -77,7 +77,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
 			behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
 			score = mapping["behav_types"][behav_type]
-			self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
+			self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
 
 		else:
 			self.logger.info(f'Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
