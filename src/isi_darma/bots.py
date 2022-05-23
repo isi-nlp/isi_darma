@@ -122,12 +122,12 @@ class BasicBot(ModerationBot):
 		"""
 
 		toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
-		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
+		# needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 		self.logger.debug(
 			f'Toxicity score from Perspective for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}. needs_mod = {needs_mod}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
-		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
+		if moderation_strategy == 'respond' and obj_to_reply:
 
 			author_username = obj_to_reply.author
 
