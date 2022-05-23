@@ -127,11 +127,11 @@ class BasicBot(ModerationBot):
 			f'Toxicity score from Perspective for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}. needs_mod = {needs_mod}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
-		if needs_mod and moderation_strategy == 'respond':
+		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
 
 			author_username = obj_to_reply.author
 
-			if obj_to_reply and author_username not in self.toxic_users:
+			if author_username not in self.toxic_users:
 
 				self.toxic_users.add(author_username)
 				self.logger.debug(f'New Toxic Author name ----> {author_username}')
