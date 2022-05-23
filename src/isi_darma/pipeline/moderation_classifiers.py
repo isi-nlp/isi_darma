@@ -54,7 +54,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			toxicity_score, behav_type = self.map_behavtypes(response)
 
 		except Exception as e:
-			self.logger.debug(f"Exception occurred: {e}. Setting toxicity to 0 with empty behaviour type.")
+			self.logger.debug(f"Exception occurred: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
 			toxicity_score, behav_type = 0, ""
 
 		return toxicity_score, behav_type
