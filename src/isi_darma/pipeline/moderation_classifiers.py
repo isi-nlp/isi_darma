@@ -25,7 +25,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			static_discovery=False,
 		)
 
-		self.toxicity_threshold = 0.7
+		self.toxicity_threshold = 0.6
 		self.logger = logger
 		self.toxicity_endpoint = "http://effectmed01.isi.edu:5001/"
 		self.tox_classifier_behavtypes = "http://effectmed01.isi.edu:5001/v1/toxicity/types"
