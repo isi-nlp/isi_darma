@@ -1,6 +1,5 @@
 from isi_darma.utils import load_reddit_client
 from isi_darma.bots import BasicBot
-from time import sleep
 
 from argparse import ArgumentParser
 
