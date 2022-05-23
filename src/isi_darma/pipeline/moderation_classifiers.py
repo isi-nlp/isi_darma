@@ -64,16 +64,18 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		mapping = {
 					"toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
 					"severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
-					"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
-					"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
-					"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
-					"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+					"behav_types": {
+						"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
+						"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+						"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
+						"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+					}
 				}
 
 		self.logger.debug(f"Toxicity scores after mapping: {mapping}")
 
 		if self.needs_moderation(mapping["toxicity"]):
-			behav_type = max(mapping.items(), key=operator.itemgetter(1))[0]
+			behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
 			score = mapping[behav_type]
 			self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
 
