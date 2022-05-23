@@ -49,9 +49,10 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			}
 		}
 
-		response = self.client.comments().analyze(body=analyze_request).execute()
 		try:
+			response = self.client.comments().analyze(body=analyze_request).execute()
 			toxicity_score, behav_type = self.map_behavtypes(response)
+
 		except Exception as e:
 			self.logger.debug(f"Exception occurred: {e}. Setting toxicity to 0 with empty behaviour type.")
 			toxicity_score, behav_type = 0, ""
@@ -61,9 +62,9 @@ class PerspectiveAPIModerator(ModerationClassifier):
 	def map_behavtypes(self, toxicity_scores):
 		mapping = {
 					"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
-					"ad-hominem attack": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
-					"obscenities/vulgarities": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
-					"dehumanization": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+					"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+					"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
+					"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
 				}
 
 		self.logger.debug(f"Toxicity scores after mapping: {mapping}")
