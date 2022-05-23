@@ -155,7 +155,7 @@ class BasicBot(ModerationBot):
 		else:
 			final_response = ""
 			self.logger.info(
-				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}. Toxicity Score = {toxicity} & Behav_type = {behav_type}\n")
+				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & Behav_type = {behav_type}\n")
 
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
