@@ -105,9 +105,9 @@ class BasicBot(ModerationBot):
 			self.logger.debug(f"Translating all turns in dialogue")
 			translated_dialogue = self.translator.rtg(last_comment.body)
 
-		if title or post_body:
-			first_turn = f"{title} {post_body}".strip()
-			translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+			# if title or post_body:
+			# 	first_turn = f"{title} {post_body}".strip()
+			# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
 			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
 			self.moderate(translated_dialogue, last_comment)
@@ -118,7 +118,7 @@ class BasicBot(ModerationBot):
 		Optionally, a comment object can be passed in to reply to.
 		"""
 
-		toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
+		toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
 		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 		self.logger.debug(
 			f'Toxicity score from Perspective for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}. needs_mod = {needs_mod}.')
