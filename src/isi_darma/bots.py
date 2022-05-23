@@ -40,6 +40,7 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
+		self.toxic_users = set()
 
 	@staticmethod
 	def detect_language(text):
@@ -124,9 +125,12 @@ class BasicBot(ModerationBot):
 
 		if needs_mod and moderation_strategy == 'respond':
 
-			if obj_to_reply:
-				author_username = obj_to_reply.author
-				self.logger.debug(f'Toxic post Author name ----> {author_username}')
+			author_username = obj_to_reply.author
+			if obj_to_reply and author_username not in self.toxic_users:
+
+				self.toxic_users.add(author_username)
+
+				self.logger.debug(f'New Toxic Author name ----> {author_username}')
 
 				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
 				                   f"stop responding to you or collecting your comments) " \
