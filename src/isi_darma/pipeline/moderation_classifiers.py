@@ -41,7 +41,8 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		analyze_request = {
 			'comment': {'text': comment},
 			'requestedAttributes': {
-				# 'TOXICITY': {},
+				'TOXICITY': {},
+				'SEVERE_TOXICITY': {},
 				'IDENTITY_ATTACK': {},
 				'INSULT': {},
 				'PROFANITY': {},
@@ -61,6 +62,8 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 	def map_behavtypes(self, toxicity_scores):
 		mapping = {
+					"toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
+					"severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
 					"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
 					"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
 					"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
@@ -68,9 +71,17 @@ class PerspectiveAPIModerator(ModerationClassifier):
 				}
 
 		self.logger.debug(f"Toxicity scores after mapping: {mapping}")
-		behav_type = max(mapping.items(), key=operator.itemgetter(1))[0]
-		self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
-		return mapping[behav_type], behav_type
+
+		if self.needs_moderation(mapping["toxicity"]):
+			behav_type = max(mapping.items(), key=operator.itemgetter(1))[0]
+			score = mapping[behav_type]
+			self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
+
+		else:
+			self.logger.info(f'Toxicity score {mapping["toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
+			score, behav_type = 0.0, ""
+
+		return score, behav_type
 
 	def get_behavTypes(self, behavtype_endpoint, endpoint):
 		endpoint_health = get(endpoint).status_code
