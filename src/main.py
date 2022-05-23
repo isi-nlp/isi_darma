@@ -7,15 +7,15 @@ from argparse import ArgumentParser
 SUBREDDIT = "darma_test"
 
 
-def main(test=False):
-	parser = ArgumentParser()
-	parser.add_argument("--test", "-t", action="store_true")
-	args = parser.parse_args()
+def main():
+    parser = ArgumentParser()
+    parser.add_argument("--test", "-t", action="store_true")
+    args = parser.parse_args()
 
-	moderation_bot = BasicBot(test=args.test)
+    moderation_bot = BasicBot(test=args.test)
 
-	reddit_client = load_reddit_client(moderation_bot.logger)
-	moderation_bot.logger.info("Instantiated Reddit Client")
+    reddit_client = load_reddit_client(moderation_bot.logger)
+    moderation_bot.logger.info("Instantiated Reddit Client")
 
 	# TODO: Stream doesn't track new comments on existing posts and threads
 	subreddit = reddit_client.subreddit(SUBREDDIT)
