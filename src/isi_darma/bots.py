@@ -112,6 +112,9 @@ class BasicBot(ModerationBot):
 			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
 			self.moderate(translated_dialogue, last_comment)
 
+		else:
+			self.logger.debug(f'ALREADY MODERATED COMMENT THREAD -> {last_comment.body}')
+
 	def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
 		"""
 		Moderates a dialogue of comments.
@@ -127,10 +130,10 @@ class BasicBot(ModerationBot):
 		if needs_mod and moderation_strategy == 'respond':
 
 			author_username = obj_to_reply.author
+
 			if obj_to_reply and author_username not in self.toxic_users:
 
 				self.toxic_users.add(author_username)
-
 				self.logger.debug(f'New Toxic Author name ----> {author_username}')
 
 				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
