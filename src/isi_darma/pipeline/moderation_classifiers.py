@@ -76,7 +76,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
 			behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
-			score = mapping[behav_type]
+			score = mapping["behav_types"][behav_type]
 			self.logger.info(f"Current max Toxicity Behaviour type: {behav_type} with score {mapping[behav_type]}")
 
 		else:
