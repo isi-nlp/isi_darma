@@ -22,7 +22,7 @@ class Translator:
             response = post(self.RTG_API, json=source)
             if response.ok:
                 response = response.json()
-                self.logger.debug(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
+                self.logger.info(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
                 return response["translation"][0]
             else:
                 self.logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')

@@ -72,7 +72,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 					}
 				}
 
-		self.logger.debug(f"Toxicity scores after mapping: {mapping}")
+		self.logger.info(f"Toxicity scores after mapping: {mapping}")
 
 		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
 			needs_mod = True
