@@ -124,12 +124,11 @@ class BasicBot(ModerationBot):
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
 		# needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 		self.logger.debug(
-			f'Toxicity score from Perspective for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
+			f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
 		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
 
-			#TODO: Remove toxic users maintaining logic
 			author_username = obj_to_reply.author
 
 			if author_username not in self.toxic_users:
@@ -148,7 +147,6 @@ class BasicBot(ModerationBot):
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
 					obj_to_reply.reply(translated_intial)
 
-			#FIXME: Response generated even if moderation is not required
 			best_response = self.response_generator.get_random_comtype_resp()
 			self.logger.info(f'Randomly sampled Comtype response: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
@@ -157,7 +155,7 @@ class BasicBot(ModerationBot):
 		else:
 			final_response = ""
 			self.logger.info(
-				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & Behav_type = {behav_type}\n")
+				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
