@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List
 
-from isi_darma.comments_utils import format_dialogue, get_dialogue_text
+from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
