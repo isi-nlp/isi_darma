@@ -7,18 +7,19 @@ SUBREDDIT = "darma_test"
 
 
 def main():
-    parser = ArgumentParser()
-    parser.add_argument("--test", "-t", action="store_true")
-    args = parser.parse_args()
+	parser = ArgumentParser()
+	parser.add_argument("--test", "-t", action="store_true")
+	args = parser.parse_args()
 
-    moderation_bot = BasicBot(test=args.test)
+	moderation_bot = BasicBot(test=args.test)
 
-    reddit_client = load_reddit_client(moderation_bot.logger)
-    moderation_bot.logger.info("Instantiated Reddit Client")
+	reddit_client = load_reddit_client(moderation_bot.logger)
+	moderation_bot.logger.info("Instantiated Reddit Client")
 
-    subreddit = reddit_client.subreddit(SUBREDDIT)
-    posts = subreddit.stream.submissions(pause_after=-1)
-    cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
+	subreddit = reddit_client.subreddit(SUBREDDIT)
+	posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
+	cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
+	moderation_bot.logger.info("Instantiated Subreddit stream for posts and comments")
 
     while True:
         try:
@@ -37,6 +38,7 @@ def main():
         except Exception as e:
             moderation_bot.logger.error(f"Exception occurred while streaming posts and comments: {e}")
             continue
+
 
 if __name__ == "__main__":
     main()
