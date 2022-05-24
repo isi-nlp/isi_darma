@@ -95,7 +95,7 @@ class BasicBot(ModerationBot):
 		last_comment = dialogue
 
 		if get_username(last_comment) != self.CREDS["username"]:
-			self.logger.info(f'Moderating a COMMENT THREAD {last_comment.body} now....')
+			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
 			# self.current_dialogue = dialogue
 			# dialogue_text = get_dialogue_text(dialogue)
