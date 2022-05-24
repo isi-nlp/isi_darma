@@ -121,7 +121,6 @@ class BasicBot(ModerationBot):
 		"""
 
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
-		# needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
 		self.logger.debug(
 			f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
