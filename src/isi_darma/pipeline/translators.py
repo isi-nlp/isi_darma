@@ -30,7 +30,7 @@ class Translator:
                 return comment_str
 
         except Exception as e:
-            self.logger.error(f'Error connecting to RTG API: {e}')
+            self.logger.error(f'Error connecting to RTG API: {e}. Returning original comment.')
             return comment_str
 
     def fran_translator(self, eng_response: str) -> str:
