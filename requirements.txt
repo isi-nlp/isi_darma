@@ -7,3 +7,5 @@ pyyaml
 numpy
 google-api-python-client
 torch
+prawcore
+yaml
