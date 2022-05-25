@@ -135,8 +135,7 @@ class BasicBot(ModerationBot):
 				self.logger.debug(f'New Toxic Author name ----> {author_username}')
 
 				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
-				                   f"stop responding to you or collecting your comments) " \
-				                   f"and it looks like you're {behav_type}."
+				                   f"stop responding to you or collecting your comments)."
 
 				self.logger.info(f'Initial Bot response generated: {initial_response}')
 				translated_intial = self.translator.fran_translator(initial_response)
@@ -145,10 +144,10 @@ class BasicBot(ModerationBot):
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
 					obj_to_reply.reply(translated_intial)
 
-			best_response = self.response_generator.get_random_comtype_resp()
-			self.logger.info(f'Randomly sampled Comtype response: {best_response}')
+			best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
+			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
-			self.logger.info(f"Generated (and translated) response: {final_response}\n")
+			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 
 		else:
 			final_response = ""
