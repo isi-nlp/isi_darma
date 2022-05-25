@@ -127,7 +127,7 @@ class BasicBot(ModerationBot):
 
 		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
 
-			author_username = get_username(obj_to_reply.author)
+			author_username = get_username(obj_to_reply)
 
 			if author_username not in self.toxic_users:
 
