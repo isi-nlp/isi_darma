@@ -21,7 +21,7 @@ def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
 	with open(creds_fn, "r") as f:
 		creds = yaml.safe_load(f)
 
-	logger.info(f"Loaded credentials: {creds}")
+	logger.debug(f"Loaded credentials: {creds}")
 	return creds
 
 
