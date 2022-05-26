@@ -3,5 +3,5 @@ RUN mkdir /isi_darma/
 ADD ./src /isi_darma/src/
 ADD ./requirements.txt /isi_darma/requirements.txt
 RUN cd /isi_darma/src/
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r /isi_darma/requirements.txt
 CMD ["python3", "src/main.py"]
