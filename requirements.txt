@@ -5,3 +5,4 @@ PyYAML==6.0
 requests==2.26.0
 transformers==4.16.2
 torch
+sentencepiece
