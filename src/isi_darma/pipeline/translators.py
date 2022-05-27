@@ -5,7 +5,7 @@ from transformers import MarianTokenizer, MarianMTModel
 class Translator:
 
     def __init__(self, logger, french=True):
-        self.RTG_API = 'http://localhost:6060/translate'
+        self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
 
         if french:
@@ -22,7 +22,7 @@ class Translator:
             response = post(self.RTG_API, json=source)
             if response.ok:
                 response = response.json()
-                self.logger.debug(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
+                self.logger.info(f'Received translation from RTG for {response["source"]} -> {response["translation"]}')
                 return response["translation"][0]
             else:
                 self.logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
@@ -30,7 +30,7 @@ class Translator:
                 return comment_str
 
         except Exception as e:
-            self.logger.error(f'Error connecting to RTG API: {e}')
+            self.logger.error(f'Error connecting to RTG API: {e}. Returning original comment.')
             return comment_str
 
     def fran_translator(self, eng_response: str) -> str:

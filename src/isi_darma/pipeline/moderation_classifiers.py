@@ -1,5 +1,7 @@
 from googleapiclient import discovery
 from abc import ABC, abstractmethod
+from requests import get, post
+import operator
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
@@ -23,24 +25,73 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			static_discovery=False,
 		)
 
-		self.toxicity_threshold = 0.7
+		self.toxicity_threshold = 0.5
 		self.logger = logger
+		self.toxicity_endpoint = "http://effectmed01.isi.edu:5001/"
+		self.tox_classifier_behavtypes = "http://effectmed01.isi.edu:5001/v1/toxicity/types"
+		self.tox_classifier_endpoint = "http://effectmed01.isi.edu:5001/v1/toxicity/"
+
+	# self.behav_types = self.get_behavTypes(self.tox_classifier_behavtypes, self.toxicity_endpoint)
 
 	def needs_moderation(self, toxicity) -> bool:
 		return toxicity >= self.toxicity_threshold
 
-	def measure_toxicity(self, comment) -> float:
+	def measure_toxicity(self, comment) -> (float, str):
 
 		analyze_request = {
 			'comment': {'text': comment},
-			'requestedAttributes': {'TOXICITY': {}}
+			'requestedAttributes': {
+				'TOXICITY': {},
+				'SEVERE_TOXICITY': {},
+				'IDENTITY_ATTACK': {},
+				'INSULT': {},
+				'PROFANITY': {},
+				'THREAT': {},
+			}
 		}
 
-		response = self.client.comments().analyze(body=analyze_request).execute()
 		try:
-			toxicity_score = float(response["attributeScores"]["TOXICITY"]["summaryScore"]["value"])
-		except Exception as e:
-			self.logger.info(f"Exception occurred: {e}. Setting toxicity to 0.")
-			toxicity_score = 0
+			response = self.client.comments().analyze(body=analyze_request).execute()
+			needs_mod, toxicity_score, behav_type = self.map_behavtypes(response)
 
-		return toxicity_score
+		except Exception as e:
+			self.logger.error(f"Exception occurred: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
+			needs_mod, toxicity_score, behav_type = False, 0, ""
+
+		return needs_mod, toxicity_score, behav_type
+
+	def map_behavtypes(self, toxicity_scores):
+		mapping = {
+					"toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
+					"severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
+					"behav_types": {
+						"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
+						"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+						"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
+						"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+					}
+				}
+
+		self.logger.info(f"Toxicity scores after mapping: {mapping}")
+
+		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
+			needs_mod = True
+			behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
+			score = mapping["behav_types"][behav_type]
+			self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
+
+		else:
+			self.logger.info(f'Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
+			needs_mod, score, behav_type = False, 0.0, ""
+
+		return needs_mod, score, behav_type
+
+	def get_behavTypes(self, behavtype_endpoint, endpoint):
+		endpoint_health = get(endpoint).status_code
+		if endpoint_health == 200:
+			behav_types = get(behavtype_endpoint).json()
+			self.logger.info(f"Current tracking Toxicity Behaviour types: {behav_types}")
+			return behav_types
+		else:
+			self.logger.info(f"Endpoint {endpoint} is not healthy. Returning status code {endpoint_health}.")
+			return {}

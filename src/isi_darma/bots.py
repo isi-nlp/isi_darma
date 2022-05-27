@@ -1,7 +1,6 @@
 from abc import ABC, abstractmethod
-from typing import List
 
-from isi_darma.comments_utils import format_dialogue, get_dialogue_text
+from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
@@ -40,6 +39,7 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
+		self.toxic_users = set()
 
 	@staticmethod
 	def detect_language(text):
@@ -73,7 +73,7 @@ class BasicBot(ModerationBot):
 			username = get_username(last_comment)
 			if username == self.CREDS["username"]:
 				continue
-			self.moderate_comment_thread(d, title=title, post_body=post_body)
+			self.moderate_comment_thread(last_comment, title=title, post_body=post_body)
 
 	def moderate_post(self, submission):
 		"""
@@ -81,63 +81,78 @@ class BasicBot(ModerationBot):
 		"""
 		title = submission.title
 		post_body = submission.selftext
-		self.logger.info(f'Moderating a POST "{title}" now....')
+		self.logger.info(f'Moderating the POST "{title}" now....')
 
 		first_turn = f"{title} {post_body}".strip()
-		translated_dialogue = [self.translator.rtg(first_turn)]
+		translated_dialogue = self.translator.rtg(first_turn)
 		self.moderate(translated_dialogue, submission)
 
 	def moderate_comment_thread(self, dialogue, title="", post_body=""):
 		"""
 		Process comment thread before sending to moderate function
 		"""
-		self.logger.info(f'Moderating a COMMENT THREAD now....')
+		last_comment = dialogue
 
-		self.current_dialogue = dialogue
-		last_comment = dialogue[-1]
+		if get_username(last_comment) != self.CREDS["username"]:
+			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
-		dialogue_text = get_dialogue_text(dialogue)
-		self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
+			# self.current_dialogue = dialogue
+			# dialogue_text = get_dialogue_text(dialogue)
+			# self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
 
-		source_language = self.detect_language(last_comment.body)
-		self.logger.debug(f"Translating all turns in dialogue")
-		translated_dialogue = [self.translator.rtg(comment.body) for comment in dialogue]
+			source_language = self.detect_language(last_comment.body)
+			self.logger.debug(f"Translating all turns in dialogue")
+			translated_dialogue = self.translator.rtg(last_comment.body)
 
-		if title or post_body:
-			first_turn = f"{title} {post_body}".strip()
-			translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+			# if title or post_body:
+			# 	first_turn = f"{title} {post_body}".strip()
+			# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
-		self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
-		self.moderate(translated_dialogue, last_comment)
+			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
+			self.moderate(translated_dialogue, last_comment)
 
-	def moderate(self, dialogue_str: List[str], obj_to_reply=None) -> str:
+		else:
+			self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
 
-		toxicity = self.moderation_classifier.measure_toxicity(dialogue_str[-1])
-		needs_mod = self.moderation_classifier.needs_moderation(toxicity=toxicity)
-		self.logger.debug(f'Toxicity score from Perspective for "{dialogue_str[-1]}" = {toxicity}. needs_mod = {needs_mod}.')
-		moderation_strategy = self.determine_moderation_strategy(dialogue_str[-1])
+	def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
+		"""
+		Moderates a dialogue of comments.
+		Optionally, a comment object can be passed in to reply to.
+		"""
 
-		if needs_mod and moderation_strategy == 'respond':
+		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
+		self.logger.debug(
+			f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
+		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
-			if obj_to_reply:
-				author_username = obj_to_reply.author
-				self.logger.debug(f'Toxic post Author name ----> {author_username}')
-				initial_response = f"Hi {author_username}, I’m a bot (check out my profile for details) and it looks like you’re Toxic."
-				self.logger.debug(f'Initial Bot response generated: {initial_response}')
+		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
+
+			author_username = get_username(obj_to_reply)
+
+			if author_username not in self.toxic_users:
+
+				self.toxic_users.add(author_username)
+				self.logger.debug(f'New Toxic Author name ----> {author_username}')
+
+				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
+				                   f"stop responding to you or collecting your comments)."
+
+				self.logger.info(f'Initial Bot response generated: {initial_response}')
 				translated_intial = self.translator.fran_translator(initial_response)
-				self.logger.debug(f'Sending out initial response in response to toxic user: {translated_intial}')
 
-			if not self.test and translated_intial:
-				obj_to_reply.reply(translated_intial)
+				if not self.test and translated_intial:
+					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
+					obj_to_reply.reply(translated_intial)
 
-			best_response = self.response_generator.get_random_comtype_resp()
-			self.logger.debug(f'Randomly sampled Comtype response: {best_response}')
+			best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
+			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
-			self.logger.debug(f"Generated (and translated) response: {final_response}")
+			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 
 		else:
 			final_response = ""
-			self.logger.debug(f"No response generated based on moderation strategy: {moderation_strategy} and needs_mod: {needs_mod}")
+			self.logger.info(
+				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)

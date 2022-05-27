@@ -1,9 +1,8 @@
-praw
-pyyaml
-transformers
-sentencepiece
-requests
-pyyaml
-numpy
-google-api-python-client
+google_api_python_client==2.49.0
+praw==7.5.0
+prawcore==2.3.0
+PyYAML==6.0
+requests==2.26.0
+transformers==4.16.2
 torch
+sentencepiece
