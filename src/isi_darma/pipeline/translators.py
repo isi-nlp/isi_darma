@@ -5,7 +5,7 @@ from transformers import MarianTokenizer, MarianMTModel
 class Translator:
 
     def __init__(self, logger, french=True):
-        self.RTG_API = 'http://localhost:6060/translate'
+        self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
 
         if french:
