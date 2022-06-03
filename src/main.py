@@ -5,7 +5,7 @@ import time
 import prawcore.exceptions
 from argparse import ArgumentParser
 
-SUBREDDIT = "darma_test"
+SUBREDDIT = "timo_darma_test"
 
 
 def main():
@@ -17,10 +17,14 @@ def main():
 
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
+	# print("reddit_client:", reddit_client)
 
 	subreddit = reddit_client.subreddit(SUBREDDIT)
+	# print("subreddit:", subreddit)
 	posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
 	cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
+	# print("posts:", posts)
+	# print("cmts", cmts)
 	moderation_bot.logger.info("Instantiated Subreddit stream for posts and comments")
 
 	while True:

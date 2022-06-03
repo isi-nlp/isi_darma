@@ -6,7 +6,7 @@ import praw
 from typing import Dict
 from praw.models import Redditor
 
-CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/src/isi_darma/creds.yaml")
+CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/src/isi_darma/creds2.yaml")
 
 
 def get_username(redditor_obj: Redditor):
@@ -27,6 +27,8 @@ def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
 
 def load_reddit_client(logger):
 	creds = load_credentials(logger)
+
+	print("creds:", creds)
 
 	reddit = praw.Reddit(
 		user_agent=f"reddit:darma:0 (by u/{creds['username']})",
