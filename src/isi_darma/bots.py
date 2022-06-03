@@ -1,5 +1,7 @@
 from abc import ABC, abstractmethod
 
+from sqlalchemy import false, true
+
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
@@ -93,23 +95,47 @@ class BasicBot(ModerationBot):
 		"""
 		last_comment = dialogue
 
+		# print("last_comment:", last_comment)
+
+		textComment = last_comment.body.lower().strip()
+
+		print("textComment:", textComment)
+
+		if textComment == "opt out":
+			self.logger.info(f'Ok. We will no longer moderate {get_username(last_comment)}.')
+			optOutFile = open("optout.txt", "a")
+			optOutFile.write(f'{get_username(last_comment)}\n')
+			optOutFile.close()
+
 		if get_username(last_comment) != self.CREDS["username"]:
-			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
-			# self.current_dialogue = dialogue
-			# dialogue_text = get_dialogue_text(dialogue)
-			# self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
+			optedOut = false
+			optOutFile = open("optout.txt","r")
+			for line in optOutFile:
+				checkLine = line
+				if get_username(last_comment) == checkLine.strip():
+					optedOut = true
+			
+			optOutFile.close()
+			
+			if optedOut == false:
 
-			source_language = self.detect_language(last_comment.body)
-			self.logger.debug(f"Translating all turns in dialogue")
-			translated_dialogue = self.translator.rtg(last_comment.body)
+				self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
-			# if title or post_body:
-			# 	first_turn = f"{title} {post_body}".strip()
-			# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+				# self.current_dialogue = dialogue
+				# dialogue_text = get_dialogue_text(dialogue)
+				# self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
 
-			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
-			self.moderate(translated_dialogue, last_comment)
+				source_language = self.detect_language(last_comment.body)
+				self.logger.debug(f"Translating all turns in dialogue")
+				translated_dialogue = self.translator.rtg(last_comment.body)
+
+				# if title or post_body:
+				# 	first_turn = f"{title} {post_body}".strip()
+				# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+
+				self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
+				self.moderate(translated_dialogue, last_comment)
 
 		else:
 			self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
