@@ -155,6 +155,8 @@ class BasicBot(ModerationBot):
 
 			author_username = get_username(obj_to_reply)
 
+			initReply = ""
+
 			if author_username not in self.toxic_users:
 
 				self.toxic_users.add(author_username)
@@ -168,11 +170,15 @@ class BasicBot(ModerationBot):
 
 				if not self.test and translated_intial:
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
-					obj_to_reply.reply(translated_intial)
+					# obj_to_reply.reply(translated_intial)
+					initReply = translated_intial
 
 			best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
 			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
+
+			final_response = translated_intial + " " + final_response
+
 			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 
 		else:
