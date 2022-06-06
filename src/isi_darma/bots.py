@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+from imp import init_builtin
 
 from sqlalchemy import false, true
 
@@ -24,9 +25,13 @@ class ModerationBot(ABC):
 class BasicBot(ModerationBot):
 
 	def __init__(self, reddit_client=None, test=False) -> None:
+		# print("start of bots")
+		
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
+
+		# print("in bots 0")
 
 		# Setup logger based on the 'test' flag
 		if not self.test:
@@ -34,14 +39,40 @@ class BasicBot(ModerationBot):
 		else:
 			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
+		# print("In Bots 1")
+		# print("In Bots 1")
+
 		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
+
+		# print("In Bots 1.1")
+
 		self.reddit_client = reddit_client
+
+		# print("In Bots 1.2")
+
+
 		self.response_generator = SpolinBotRG(self.logger)
+
+
+		# print("In Bots 1.3")
+
 		self.translator = Translator(self.logger)
+
+		# print("In Bots 1.4")
+
+
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
+
+		# print("Load creds now")
+
 		self.CREDS = load_credentials(self.logger)
+
+		# print("Loads cred done!")
+
 		self.current_dialogue = None
 		self.toxic_users = set()
+
+		# print("In bots 2")
 
 	@staticmethod
 	def detect_language(text):
@@ -177,7 +208,7 @@ class BasicBot(ModerationBot):
 			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
 
-			final_response = translated_intial + " " + final_response
+			final_response = initReply + " " + final_response
 
 			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 
