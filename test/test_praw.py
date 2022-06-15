@@ -15,7 +15,7 @@ from isi_darma.logging_setup import logger
 title, body = sys.argv[1], sys.argv[2]
 
 
-SUBREDDIT = "timo_darma_test"
+SUBREDDIT = "darma_test"
 
 reddit_client = load_reddit_client()
 

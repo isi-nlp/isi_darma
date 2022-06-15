@@ -7,7 +7,7 @@ from typing import List
 
 reddit = load_reddit_client()
 
-subreddit = reddit.subreddit("timo_darma_test")
+subreddit = reddit.subreddit("darma_test")
 response_generator = SpolinBotRG()
 
 for submission in subreddit.stream.submissions(): 

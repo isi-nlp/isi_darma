@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 from imp import init_builtin
 
-from sqlalchemy import false, true
+import json
+
+from numpy import empty
 
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
@@ -25,13 +27,10 @@ class ModerationBot(ABC):
 class BasicBot(ModerationBot):
 
 	def __init__(self, reddit_client=None, test=False) -> None:
-		# print("start of bots")
 		
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
-
-		# print("in bots 0")
 
 		# Setup logger based on the 'test' flag
 		if not self.test:
@@ -39,40 +38,20 @@ class BasicBot(ModerationBot):
 		else:
 			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
-		# print("In Bots 1")
-		# print("In Bots 1")
-
 		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
-
-		# print("In Bots 1.1")
 
 		self.reddit_client = reddit_client
 
-		# print("In Bots 1.2")
-
-
 		self.response_generator = SpolinBotRG(self.logger)
-
-
-		# print("In Bots 1.3")
 
 		self.translator = Translator(self.logger)
 
-		# print("In Bots 1.4")
-
-
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
-
-		# print("Load creds now")
 
 		self.CREDS = load_credentials(self.logger)
 
-		# print("Loads cred done!")
-
 		self.current_dialogue = None
 		self.toxic_users = set()
-
-		# print("In bots 2")
 
 	@staticmethod
 	def detect_language(text):
@@ -118,7 +97,11 @@ class BasicBot(ModerationBot):
 
 		first_turn = f"{title} {post_body}".strip()
 		translated_dialogue = self.translator.rtg(first_turn)
-		self.moderate(translated_dialogue, submission)
+		botReply = self.moderate(translated_dialogue, submission)
+		
+		self.create_json_thread(submission, True, botReply)
+		
+
 
 	def moderate_comment_thread(self, dialogue, title="", post_body=""):
 		"""
@@ -126,50 +109,106 @@ class BasicBot(ModerationBot):
 		"""
 		last_comment = dialogue
 
-		# print("last_comment:", last_comment)
-
 		textComment = last_comment.body.lower().strip()
 
-		print("textComment:", textComment)
-
-		if textComment == "opt out":
-			self.logger.info(f'Ok. We will no longer moderate {get_username(last_comment)}.')
-			optOutFile = open("optout.txt", "a")
-			optOutFile.write(f'{get_username(last_comment)}\n')
-			optOutFile.close()
-
 		if get_username(last_comment) != self.CREDS["username"]:
-
-			optedOut = false
-			optOutFile = open("optout.txt","r")
-			for line in optOutFile:
-				checkLine = line
-				if get_username(last_comment) == checkLine.strip():
-					optedOut = true
 			
-			optOutFile.close()
-			
-			if optedOut == false:
+			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
-				self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
+			# self.current_dialogue = dialogue
+			# dialogue_text = get_dialogue_text(dialogue)
+			# self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
 
-				# self.current_dialogue = dialogue
-				# dialogue_text = get_dialogue_text(dialogue)
-				# self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
+			source_language = self.detect_language(last_comment.body)
+			self.logger.debug(f"Translating all turns in dialogue")
+			translated_dialogue = self.translator.rtg(last_comment.body)
 
-				source_language = self.detect_language(last_comment.body)
-				self.logger.debug(f"Translating all turns in dialogue")
-				translated_dialogue = self.translator.rtg(last_comment.body)
+			# if title or post_body:
+			# 	first_turn = f"{title} {post_body}".strip()
+			# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
-				# if title or post_body:
-				# 	first_turn = f"{title} {post_body}".strip()
-				# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
+			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
+			botReply = self.moderate(translated_dialogue, last_comment)
 
-				self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
-				self.moderate(translated_dialogue, last_comment)
+			self.create_json_thread(last_comment, False, botReply)
 
 		else:
 			self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
+
+	def get_child_comments(self, currComment, commentList, botReply, postedComment):
+		"""
+		Helper method for create_json_thread()
+		"""
+		if currComment.replies._comments is empty:
+			return
+		else:
+			myComments = currComment.replies._comments
+			for x in myComments:
+				myAuthor = "[Author of deleted post.]"
+				if x.author is not None:
+					myAuthor = x.author.fullname
+				addComment = [myAuthor, x.body]
+				commentList.append(addComment)
+				self.get_child_comments(x, commentList, botReply, postedComment)
+
+				if x == postedComment:
+					addComment = ["DarmaBot", botReply]
+					commentList.append(addComment)
+
+	def create_json_thread(self, comment, isSubmission, botReply):
+		"""
+		Records entire conversation tree into JSON format
+		"""
+
+		commentList = []
+
+		thisSubmission = comment
+
+		if not isSubmission:
+			thisSubmission = comment.submission
+		
+		addSubmission = [thisSubmission.author.fullname, thisSubmission.selftext]
+		commentList.append(addSubmission)
+
+		myComments = thisSubmission.comments._comments
+
+		for x in myComments:
+			myAuthor = "[Author of deleted post.]"
+			if x.author is not None:
+				myAuthor = x.author.fullname
+			addComment = [myAuthor, x.body]
+			commentList.append(addComment)
+			self.get_child_comments(x, commentList, botReply, comment)
+
+			if x == comment:
+				addComment = ["DarmaBot", botReply]
+				commentList.append(addComment)
+
+
+		myConversation = []
+
+		for x in commentList:
+			newUtterance = {}
+			newUtterance["speaker_id"] = x[0]
+			newUtterance["text"] = x[1]
+			myConversation.append(newUtterance)
+		
+		data = {}
+		data["conversation"] = myConversation
+		data["target_user"] = comment.author.fullname
+
+		with open("conversationDump.json", "w") as write_file:
+			json.dump(data, write_file, indent=4)
+
+		write_file.close()
+
+	def get_replied_to(self, comment) -> str:
+		thisComment = comment
+
+		if isinstance(thisComment.parent(), type(comment)) or isinstance(thisComment.parent(), type(comment.submission)):
+			return " towards " + thisComment.parent().author.name
+		else:
+			return ""
 
 	def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
 		"""
@@ -204,7 +243,9 @@ class BasicBot(ModerationBot):
 					# obj_to_reply.reply(translated_intial)
 					initReply = translated_intial
 
-			best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
+			parent = self.get_replied_to(obj_to_reply)
+
+			best_response = f"It looks like you're {behav_type}{parent}. " + self.response_generator.get_random_comtype_resp()
 			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
 
