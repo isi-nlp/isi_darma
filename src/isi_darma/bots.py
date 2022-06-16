@@ -1,10 +1,7 @@
+import json
 from abc import ABC, abstractmethod
 from imp import init_builtin
-
-import json
-
 from numpy import empty
-
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
@@ -39,17 +36,11 @@ class BasicBot(ModerationBot):
 			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
 		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
-
 		self.reddit_client = reddit_client
-
 		self.response_generator = SpolinBotRG(self.logger)
-
 		self.translator = Translator(self.logger)
-
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
-
 		self.CREDS = load_credentials(self.logger)
-
 		self.current_dialogue = None
 		self.toxic_users = set()
 
@@ -101,8 +92,6 @@ class BasicBot(ModerationBot):
 		
 		self.create_json_thread(submission, True, botReply)
 		
-
-
 	def moderate_comment_thread(self, dialogue, title="", post_body=""):
 		"""
 		Process comment thread before sending to moderate function
@@ -110,9 +99,7 @@ class BasicBot(ModerationBot):
 		last_comment = dialogue
 
 		textComment = last_comment.body.lower().strip()
-
 		if get_username(last_comment) != self.CREDS["username"]:
-			
 			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
 			# self.current_dialogue = dialogue
@@ -129,7 +116,6 @@ class BasicBot(ModerationBot):
 
 			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
 			botReply = self.moderate(translated_dialogue, last_comment)
-
 			self.create_json_thread(last_comment, False, botReply)
 
 		else:
@@ -139,7 +125,7 @@ class BasicBot(ModerationBot):
 		"""
 		Helper method for create_json_thread()
 		"""
-		if currComment.replies._comments is empty:
+		if not currComment.replies._comments:
 			return
 		else:
 			myComments = currComment.replies._comments
@@ -155,46 +141,46 @@ class BasicBot(ModerationBot):
 					addComment = ["DarmaBot", botReply]
 					commentList.append(addComment)
 
-	def create_json_thread(self, comment, isSubmission, botReply):
+	def create_json_thread(self, comment, is_submission, bot_reply):
 		"""
 		Records entire conversation tree into JSON format
 		"""
 
-		commentList = []
+		comment_list = []
 
-		thisSubmission = comment
+		this_submission = comment
 
-		if not isSubmission:
-			thisSubmission = comment.submission
+		if not is_submission:
+			this_submission = comment.submission
 		
-		addSubmission = [thisSubmission.author.fullname, thisSubmission.selftext]
-		commentList.append(addSubmission)
+		add_submission = [this_submission.author.fullname, this_submission.selftext]
+		comment_list.append(add_submission)
 
-		myComments = thisSubmission.comments._comments
+		my_comments = this_submission.comments._comments
 
-		for x in myComments:
-			myAuthor = "[Author of deleted post.]"
-			if x.author is not None:
-				myAuthor = x.author.fullname
-			addComment = [myAuthor, x.body]
-			commentList.append(addComment)
-			self.get_child_comments(x, commentList, botReply, comment)
+		for this_comment in my_comments:
+			my_author = "[Author of deleted post.]"
+			if this_comment.author is not None:
+				my_author = this_comment.author.fullname
+			add_comment = [my_author, this_comment.body]
+			comment_list.append(add_comment)
+			self.get_child_comments(this_comment, comment_list, bot_reply, comment)
 
-			if x == comment:
-				addComment = ["DarmaBot", botReply]
-				commentList.append(addComment)
+			if this_comment == comment:
+				add_comment = ["DarmaBot", bot_reply]
+				comment_list.append(add_comment)
 
 
-		myConversation = []
+		my_conversation = []
 
-		for x in commentList:
-			newUtterance = {}
-			newUtterance["speaker_id"] = x[0]
-			newUtterance["text"] = x[1]
-			myConversation.append(newUtterance)
+		for x in comment_list:
+			new_utterance = {}
+			new_utterance["speaker_id"] = x[0]
+			new_utterance["text"] = x[1]
+			my_conversation.append(new_utterance)
 		
 		data = {}
-		data["conversation"] = myConversation
+		data["conversation"] = my_conversation
 		data["target_user"] = comment.author.fullname
 
 		with open("conversationDump.json", "w") as write_file:
@@ -203,10 +189,10 @@ class BasicBot(ModerationBot):
 		write_file.close()
 
 	def get_replied_to(self, comment) -> str:
-		thisComment = comment
+		this_comment = comment
 
-		if isinstance(thisComment.parent(), type(comment)) or isinstance(thisComment.parent(), type(comment.submission)):
-			return " towards " + thisComment.parent().author.name
+		if isinstance(this_comment.parent(), type(comment)) or isinstance(this_comment.parent(), type(comment.submission)):
+			return " towards " + this_comment.parent().author.name
 		else:
 			return ""
 
@@ -225,7 +211,7 @@ class BasicBot(ModerationBot):
 
 			author_username = get_username(obj_to_reply)
 
-			initReply = ""
+			init_reply = ""
 
 			if author_username not in self.toxic_users:
 
@@ -241,7 +227,7 @@ class BasicBot(ModerationBot):
 				if not self.test and translated_intial:
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
 					# obj_to_reply.reply(translated_intial)
-					initReply = translated_intial
+					init_reply = translated_intial
 
 			parent = self.get_replied_to(obj_to_reply)
 
@@ -249,7 +235,7 @@ class BasicBot(ModerationBot):
 			self.logger.info(f'Final response to toxic user: {best_response}')
 			final_response = self.translator.fran_translator(best_response)
 
-			final_response = initReply + " " + final_response
+			final_response = init_reply + " " + final_response
 
 			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 
