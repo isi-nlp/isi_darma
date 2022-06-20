@@ -144,10 +144,17 @@ class BasicBot(ModerationBot):
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
 					obj_to_reply.reply(translated_intial)
 
-			best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
-			self.logger.info(f'Final response to toxic user: {best_response}')
-			final_response = self.translator.fran_translator(best_response)
-			self.logger.info(f"Generated (and translated) final response: {final_response}\n")
+				# Repeat toxic-user, send out response only
+				best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
+				self.logger.info(f'Final response to toxic user: {best_response}')
+				final_response = self.translator.fran_translator(best_response)
+				self.logger.info(f"Generated (and translated) final response: {final_response}\n")
+
+			# User opted-out of moderation in comments, add to database and no response
+			else:
+				self.logger.info(f'User opted out of toxicity moderation')
+				add_to_db(self.redis_client, author_username)
+				final_response = ""
 
 		else:
 			final_response = ""

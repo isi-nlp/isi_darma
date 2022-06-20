@@ -37,3 +37,30 @@ def load_reddit_client(logger):
 	)
 
 	return reddit
+
+
+def check_for_opt_out(comment_str: str) -> bool:
+	"""
+	Check if the comment contains the opt out phrase
+	"""
+
+	# Remove all non-alphanumeric characters
+	comment_lower = comment_str.lower()
+	if "opt out" in comment_lower or "optout" in comment_lower:
+		return True
+
+	return False
+
+def add_to_db(redis_client: redis.Redis, username: str):
+	"""
+	Save the username to the redis store
+	"""
+	redis_client.set(username, "opted out")
+
+
+def search_db(redis_client: redis.Redis, username: str):
+	"""
+	Search the redis store for the username
+	"""
+	# Return true if the username is in the store
+	return redis_client.get(username) is not None
