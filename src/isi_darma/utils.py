@@ -1,7 +1,7 @@
 import os
 from logging import Logger
-
 import yaml
+import redis
 import praw
 from typing import Dict
 from praw.models import Redditor
