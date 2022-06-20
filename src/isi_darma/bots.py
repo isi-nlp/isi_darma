@@ -123,6 +123,8 @@ class BasicBot(ModerationBot):
 		Optionally, a comment object can be passed in to reply to.
 		"""
 
+		#TODO: Consolidate if statements in this method for cleaner control flow
+
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
 		self.logger.debug(
 			f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
