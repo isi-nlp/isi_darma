@@ -90,7 +90,7 @@ class BasicBot(ModerationBot):
 		translated_dialogue = self.translator.rtg(first_turn)
 		self.moderate(translated_dialogue, submission)
 
-	def moderate_comment_thread(self, dialogue, title="", post_body=""):
+	def moderate_comment_thread(self, dialogue):
 		"""
 		Process comment thread before sending to moderate function
 		"""
@@ -126,8 +126,7 @@ class BasicBot(ModerationBot):
 		#TODO: Consolidate if statements in this method for cleaner control flow
 
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
-		self.logger.debug(
-			f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
+		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
 		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
@@ -149,9 +148,9 @@ class BasicBot(ModerationBot):
 					self.logger.info(f'Initial Bot response generated: {initial_response}')
 					translated_intial = self.translator.fran_translator(initial_response)
 
-				if not self.test and translated_intial:
-					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
-					obj_to_reply.reply(translated_intial)
+					if not self.test and translated_intial:
+						self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
+						obj_to_reply.reply(translated_intial)
 
 				# Repeat toxic-user, send out response only
 				best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
