@@ -1,11 +1,13 @@
 from abc import ABC, abstractmethod
 
+import redis
+
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
-from isi_darma.utils import load_credentials, get_username
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, search_db
 
 
 class ModerationBot(ABC):
@@ -39,6 +41,7 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
+		self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
 		self.toxic_users = set()
 
 	@staticmethod
@@ -128,17 +131,21 @@ class BasicBot(ModerationBot):
 		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
 
 			author_username = get_username(obj_to_reply)
+			opt_out = check_for_opt_out(dialogue_str)
 
-			if author_username not in self.toxic_users:
+			# Check if user has opted-out of moderation
+			if not opt_out and not search_db(self.redis_client, author_username):
 
-				self.toxic_users.add(author_username)
-				self.logger.debug(f'New Toxic Author name ----> {author_username}')
+				if author_username not in self.toxic_users:
+					# First time toxic user, send out initial response
+					self.toxic_users.add(author_username)
+					self.logger.debug(f'New Toxic Author name ----> {author_username}')
 
-				initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
-				                   f"stop responding to you or collecting your comments)."
+					initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
+					                   f"stop responding to you or collecting your comments)."
 
-				self.logger.info(f'Initial Bot response generated: {initial_response}')
-				translated_intial = self.translator.fran_translator(initial_response)
+					self.logger.info(f'Initial Bot response generated: {initial_response}')
+					translated_intial = self.translator.fran_translator(initial_response)
 
 				if not self.test and translated_intial:
 					self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
