@@ -1,4 +1,5 @@
 import json
+import os
 from abc import ABC, abstractmethod
 from imp import init_builtin
 from numpy import empty
@@ -8,7 +9,6 @@ from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
 from isi_darma.utils import load_credentials, get_username
-
 
 class ModerationBot(ABC):
 
@@ -24,7 +24,6 @@ class ModerationBot(ABC):
 class BasicBot(ModerationBot):
 
 	def __init__(self, reddit_client=None, test=False) -> None:
-		
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
@@ -183,9 +182,15 @@ class BasicBot(ModerationBot):
 		data["conversation"] = my_conversation
 		data["target_user"] = comment.author.fullname
 
-		with open("conversationDump.json", "w") as write_file:
-			json.dump(data, write_file, indent=4)
+		json_outputs_path = "json_outputs"
+		if not os.path.isdir(json_outputs_path):
+			os.mkdir(json_outputs_path)
 
+		size = len(os.listdir(json_outputs_path))
+		
+		json_outputs_path = os.path.join(json_outputs_path, "conversationDump" + str(size) + ".json")
+		with open(json_outputs_path, "w") as write_file:
+			json.dump(data, write_file, indent=4)
 		write_file.close()
 
 	def get_replied_to(self, comment) -> str:
