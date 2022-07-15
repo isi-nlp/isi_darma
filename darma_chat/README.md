@@ -2,33 +2,12 @@
 
 ## Overview
 
-Main command: `python run.py`
-This is equivalent to `python run.py conf=darma`, which will run crowdsourcing tasks on the local server. Use `python run.py conf=mturk_sandbox` to run the tasks on a heroku server that was set up with https://mephisto.ai/docs/guides/quickstart/ and publish them on Mechanical Turk. 
+Main command: `python -m darma_chat`
+This is equivalent to `python -m darma_chat conf=darma`, which will run crowdsourcing tasks on the local server. Use `python -m darma_chat conf=mturk_sandbox` to run the tasks on a heroku server that was set up with https://mephisto.ai/docs/guides/quickstart/ and publish them on Mechanical Turk. 
 
 This task is adapted from `https://github.com/isi-nlp/ParlAI/tree/main/parlai/crowdsourcing/tasks/model_chat` and therefore there may be a number of unnecessary artifacts from this task that remain in this script.
 
-## Contributing:
-
-  1. Set up environment: `conda create -n darma python=3.8`; `conda activate darma`
-  2. Make sure Mephisto is set up properly following these steps: https://mephisto.ai/docs/guides/quickstart/
-  3. Go to ParlAI main directory (i.e. `cd ~/ParlAI`) and install ParlAI in development mode `pip3 install -e . `
-  4. Go back to the Mephisto directory and install all the required packages: `pip install -r requirements.txt`
-  5. Manually install the pip incompatibilities for Mephisto by running the following command
-  ```bash
-  pip3 install zipp==3.1.0
-  pip3 install importlib-metadata==1.6.0
-  pip3 install atomicwrites==1.3.0
-  pip3 install colorama==0.4.3
-  ```
-  6. Publish tasks `cd parlai/crowdsourcing/tasks/darma_chat/; python run.py` and follow the instructions from the terminal to access the tasks. 
-  7. If there is bug, quit the process, make edits to the relevant scripts, and repeat step 4. 
-  8. Repeat steps 4 & 5 until there are no bugs. 
-
-Issue tracking: https://github.com/isi-nlp/isi_darma/issues 
-
----
-
-## Setup (Revised by TG)
+## Contributing: Setup and Quick Start
 
 1. Set up environment: `conda create -n darma python=3.8`; `conda activate darma`
 1. clone this source code and cd into the root of the repo
@@ -48,9 +27,9 @@ Issue tracking: https://github.com/isi-nlp/isi_darma/issues
 1. Run darma_chat  
  We have two options:
     1. Locally:  
-       Either `darma_chat conf=darma`
+       Either `darma-chat conf=darma`
        or  
-        simply `darma_chat`
+        simply `darma-chat`
     2. Remotely on mturk with heroku  
       More info is here https://mephisto.ai/docs/guides/quickstart/
           1. Configure AWS credentials for mturk
@@ -69,8 +48,11 @@ Issue tracking: https://github.com/isi-nlp/isi_darma/issues
               ```
           1. Run darma chat
                ```bash
-               darma_chat conf=mturk_sandbox
+               darma-chat conf=mturk_sandbox
               ```
+
+Issue tracking: https://github.com/isi-nlp/isi_darma/issues 
+
 
 ### Docker deployment
 1. cd to the root of this repo

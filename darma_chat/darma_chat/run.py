@@ -7,6 +7,7 @@
 import os
 from dataclasses import dataclass, field
 from typing import Any, List
+from pathlib import Path
 
 import hydra
 from omegaconf import DictConfig
@@ -20,8 +21,8 @@ Read parlai/crowdsourcing/README.md to learn how to launch
 crowdsourcing tasks with this script.
 """
 
-TASK_DIRECTORY = os.path.dirname(os.path.abspath(__file__))
-
+TASK_DIRECTORY = Path(__file__).parent.resolve()
+CWD = Path(".").resolve()
 
 defaults = ["_self_", {"conf": "darma"}]
 
