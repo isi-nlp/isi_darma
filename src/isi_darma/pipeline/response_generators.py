@@ -45,6 +45,7 @@ class SpolinBotRG(ResponseGenerator):
 	@staticmethod
 	def get_random_comtype_resp(usernames=['others']):
 		usernames = ",".join(usernames)
+		# TODO: replace with french translations of the responses
 		comtype_responses = [
 			f'Please quit doing that and behave!',
 			f'You used this kind of behavior in response to {usernames}.',
