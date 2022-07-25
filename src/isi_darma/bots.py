@@ -1,13 +1,11 @@
 from abc import ABC, abstractmethod
 
-import redis
-
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, search_db
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, search_db, read_db
 
 
 class ModerationBot(ABC):
@@ -41,7 +39,7 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
-		self.redis_client = redis.Redis(host='localhost', port=6379, db=0)
+		self.db = read_db()
 		self.toxic_users = set()
 
 	@staticmethod
@@ -135,8 +133,9 @@ class BasicBot(ModerationBot):
 			opt_out = check_for_opt_out(dialogue_str)
 
 			# Check if user has opted-out of moderation
-			if not opt_out and not search_db(self.redis_client, author_username):
+			if not opt_out and not search_db(self.db, author_username):
 
+				# TODO: Respond only once per user i.e. remove the toxic users store
 				if author_username not in self.toxic_users:
 					# First time toxic user, send out initial response
 					self.toxic_users.add(author_username)
@@ -160,8 +159,8 @@ class BasicBot(ModerationBot):
 
 			# User opted-out of moderation in comments, add to database and no response
 			else:
-				self.logger.info(f'User opted out of toxicity moderation')
-				add_to_db(self.redis_client, author_username)
+				self.logger.info(f'{author_username} opted out of toxicity moderation.')
+				self.db = add_to_db(self.db, author_username, toxicity, behav_type)
 				final_response = ""
 
 		else:
