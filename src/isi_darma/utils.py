@@ -1,7 +1,8 @@
 import os
 from logging import Logger
 import yaml
-import redis
+import re
+import json
 import praw
 from typing import Dict
 from praw.models import Redditor
@@ -44,23 +45,46 @@ def check_for_opt_out(comment_str: str) -> bool:
 	Check if the comment contains the opt out phrase
 	"""
 
-	# Remove all non-alphanumeric characters
+	print('Before Regex: ', comment_str)
+	# Remove all non-alphanumeric characters using regex
+	re.sub('[\W_]+', '', comment_str)
+	print('After Regex: ', comment_str)
+
+	# Covert comment to lowercase
 	comment_lower = comment_str.lower()
+
 	if "opt out" in comment_lower or "optout" in comment_lower:
 		return True
 
 	return False
 
-def add_to_db(redis_client: redis.Redis, username: str):
+
+def read_db( filename : str = "db.json"):
+	"""
+	Read the json file for opt-out users
+	"""
+	return json.loads( open(filename, "r").read() )
+
+
+def add_to_db(db : dict, username: str, toxicity_score: float, behav_type: str):
 	"""
 	Save the username to the redis store
 	"""
-	redis_client.set(username, "opted out")
+	db[username] = {
+					'toxicity_score' : toxicity_score,
+	                'behav_type': behav_type
+				   }
+
+	with open("db.json", "w") as f:
+		f.write(json.dumps(db))
+
+	return db
 
 
-def search_db(redis_client: redis.Redis, username: str):
+def search_db(db : dict, username: str):
 	"""
 	Search the redis store for the username
 	"""
-	# Return true if the username is in the store
-	return redis_client.get(username) is not None
+	if username in db.keys():
+		return True
+	return False
