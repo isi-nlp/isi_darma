@@ -28,11 +28,13 @@ def main():
 			for post in posts:
 				if post is None:
 					break
+				# print("POST: ", post.title)
 				moderation_bot.moderate_submission(post)
 
 			for cmt in cmts:
 				if cmt is None:
 					break
+				# print("CMT: ", cmt.title)
 				moderation_bot.moderate_comment_thread(cmt)
 
 		# In case of server error from praw, give some time for reddit to recover and try again.
