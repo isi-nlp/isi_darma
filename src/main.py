@@ -39,6 +39,7 @@ def main():
 
 		# In case of server error from praw, give some time for reddit to recover and try again.
 		except prawcore.exceptions.ServerError as server_error:
+			moderation_bot.logger.warning(f"Reddit Server error: {server_error}. Waiting for 30 seconds.")
 			time.sleep(30)
 
 		except Exception as e:
