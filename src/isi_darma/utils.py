@@ -84,10 +84,9 @@ def user_in_db(db : dict, username: str):
 	"""
 	return True if username in db.keys() else False
 
-def search_db(db : dict, username: str):
+
+def read_responses(path : str = "isi_darma/data/optout/responses.json"):
 	"""
-	Search the redis store for the username
+	Read the json file for bot info.
 	"""
-	if username in db.keys():
-		return True
-	return False
+	return json.loads(open(path, "r").read())
