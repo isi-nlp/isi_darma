@@ -127,13 +127,14 @@ class BasicBot(ModerationBot):
 		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
-		if needs_mod and moderation_strategy == 'respond' and obj_to_reply:
+		opt_out = check_for_opt_out(dialogue_str)
 
-			author_username = get_username(obj_to_reply)
-			opt_out = check_for_opt_out(dialogue_str)
+		#TODO: Consolidate if statements in this method for cleaner control flow
+		if not opt_out and not user_in_db(get_username(obj_to_reply), self.db):
 
-			# Check if user has opted-out of moderation
-			if not opt_out and not search_db(self.db, author_username):
+			if needs_mod and moderation_strategy == 'respond' and ( obj_to_reply or self.test) :
+
+				author_username = get_username(obj_to_reply)
 
 				# TODO: Respond only once per user i.e. remove the toxic users store
 				if author_username not in self.toxic_users:
@@ -163,7 +164,11 @@ class BasicBot(ModerationBot):
 				self.db = add_to_db(self.db, author_username, toxicity, behav_type)
 				final_response = ""
 
+		# User opted-out of moderation in comments, add to database and no moderation/response
 		else:
+			author_username = get_username(obj_to_reply)
+			self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
+			self.db = add_to_db(self.db, author_username, toxicity, behav_type)
 			final_response = ""
 			self.logger.info(
 				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
