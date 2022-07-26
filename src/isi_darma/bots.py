@@ -152,11 +152,11 @@ class BasicBot(ModerationBot):
 				final_response += '\n' + self.bot_info_fr
 				self.logger.info(f"Added bot info to final response.")
 
-			# User opted-out of moderation in comments, add to database and no response
+			# No response sent to user
 			else:
-				self.logger.info(f'{author_username} opted out of toxicity moderation.')
-				self.db = add_to_db(self.db, author_username, toxicity, behav_type)
 				final_response = ""
+				self.logger.info(
+					f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
 		# User opted-out of moderation in comments, add to database and no moderation/response
 		else:
@@ -164,10 +164,8 @@ class BasicBot(ModerationBot):
 			self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
 			self.db = add_to_db(self.db, author_username, toxicity, behav_type)
 			final_response = ""
-			self.logger.info(
-				f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
+		# Final response sent as reply in reddit thread/post
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
-
-		return final_response
+			self.logger.info(f'Response sent to toxic user: {get_username(obj_to_reply)}')
