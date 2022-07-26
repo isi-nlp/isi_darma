@@ -78,6 +78,11 @@ def add_to_db(db : dict, username: str, toxicity_score: float, behav_type: str):
 
 	return db
 
+def user_in_db(db : dict, username: str):
+	"""
+	Search the redis store for the username
+	"""
+	return True if username in db.keys() else False
 
 def search_db(db : dict, username: str):
 	"""
