@@ -45,13 +45,11 @@ def check_for_opt_out(comment_str: str) -> bool:
 	Check if the comment contains the opt out phrase
 	"""
 
-	print('Before Regex: ', comment_str)
 	# Remove all non-alphanumeric characters using regex
-	re.sub('[\W_]+', '', comment_str)
-	print('After Regex: ', comment_str)
+	comment_alphanum = re.sub('[\W_]+', '', comment_str)
 
 	# Covert comment to lowercase
-	comment_lower = comment_str.lower()
+	comment_lower = comment_alphanum.lower()
 
 	if "opt out" in comment_lower or "optout" in comment_lower:
 		return True
