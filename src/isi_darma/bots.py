@@ -119,9 +119,13 @@ class BasicBot(ModerationBot):
 		"""
 		Moderates a dialogue of comments.
 		Optionally, a comment object can be passed in to reply to.
-		"""
 
-		#TODO: Consolidate if statements in this method for cleaner control flow
+		If statements hierarchy:
+		- Opt-out
+		- Needs moderation and moderation stategy
+		- If test flag is set
+		- If obj_to_reply is exists
+		"""
 
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
 		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
