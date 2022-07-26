@@ -5,7 +5,7 @@ from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, search_db, read_db
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, read_db, user_in_db, read_responses
 
 
 class ModerationBot(ABC):
@@ -21,7 +21,7 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-	def __init__(self, reddit_client=None, test=False) -> None:
+	def __init__(self, reddit_client=None, test=False, db = '') -> None:
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
@@ -39,8 +39,8 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
-		self.db = read_db()
-		self.toxic_users = set()
+		self.db = read_db(db)
+		self.bot_info_fr = read_responses()["bot_info_fr"]
 
 	@staticmethod
 	def detect_language(text):
