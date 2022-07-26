@@ -57,11 +57,11 @@ def check_for_opt_out(comment_str: str) -> bool:
 	return False
 
 
-def read_db( filename : str = "db.json"):
+def read_db(path : str = "isi_darma/data/optout/optout_db.json"):
 	"""
 	Read the json file for opt-out users
 	"""
-	return json.loads( open(filename, "r").read() )
+	return json.loads(open(path, "r").read())
 
 
 def add_to_db(db : dict, username: str, toxicity_score: float, behav_type: str):
