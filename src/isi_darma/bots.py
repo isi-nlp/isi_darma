@@ -137,26 +137,20 @@ class BasicBot(ModerationBot):
 				author_username = get_username(obj_to_reply)
 
 				# TODO: Respond only once per user i.e. remove the toxic users store
-				if author_username not in self.toxic_users:
-					# First time toxic user, send out initial response
-					self.toxic_users.add(author_username)
-					self.logger.debug(f'New Toxic Author name ----> {author_username}')
+				initial_response = f"Bonjour, {author_username}, Je suis un bot informatique (consultez mon profil pour plus de détails, " \
+				                   f"notamment pour savoir comment faire pour que je cesse de vous répondre ou de recueillir vos commentaires) et vous semblez "
+				self.logger.info(f'Initial response generated & translated.')
 
-					initial_response = f"Hi, {author_username}, I'm a bot (check out my profile for details including how to get me to " \
-					                   f"stop responding to you or collecting your comments)."
-
-					self.logger.info(f'Initial Bot response generated: {initial_response}')
-					translated_intial = self.translator.fran_translator(initial_response)
-
-					if not self.test and translated_intial:
-						self.logger.info(f'Sending out translated initial response to toxic user: {translated_intial}')
-						obj_to_reply.reply(translated_intial)
-
-				# Repeat toxic-user, send out response only
-				best_response = f"It looks like you're {behav_type}. " + self.response_generator.get_random_comtype_resp()
+				# Response sampled from templates
+				# TODO: Replace english with translated french responses to templates
+				best_response = self.response_generator.get_random_comtype_resp()
 				self.logger.info(f'Final response to toxic user: {best_response}')
-				final_response = self.translator.fran_translator(best_response)
+
+				# Combine initial and best response for FINAL response
+				final_response = initial_response + ' ' + best_response
 				self.logger.info(f"Generated (and translated) final response: {final_response}\n")
+				final_response += '\n' + self.bot_info_fr
+				self.logger.info(f"Added bot info to final response.")
 
 			# User opted-out of moderation in comments, add to database and no response
 			else:
