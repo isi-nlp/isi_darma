@@ -5,20 +5,20 @@
     "version": "0.2.0",
     "configurations": [
         {
+            "name": "python -m darma_chat",
+            "type": "python",
+            "request": "launch",
+            "module": "darma_chat",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
             "name": "Python: Current File",
             "type": "python",
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "justMyCode": true,
-        },
-        {
-            "name": "run.py",
-            "type": "python",
-            "request": "launch",
-            "program": "run.py",
-            "console": "integratedTerminal",
-            "justMyCode": true,
+            "justMyCode": false,
         }
     ]
 }
