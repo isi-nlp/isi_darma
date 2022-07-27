@@ -147,7 +147,6 @@ class BasicBot(ModerationBot):
 			if needs_mod and moderation_strategy == 'respond' and ( obj_to_reply or self.test) :
 
 				author_username = get_username(obj_to_reply)
-				parent = get_replied_to(obj_to_reply)
 				# TODO: Use parent username in intro message
 				initial_response = f"Bonjour, {author_username}, Je suis un bot informatique (consultez mon profil pour plus de détails, " \
 				                   f"notamment pour savoir comment faire pour que je cesse de vous répondre ou de recueillir vos commentaires) et vous semblez "
@@ -155,7 +154,8 @@ class BasicBot(ModerationBot):
 
 				# Response sampled from templates
 				# TODO: Replace english with translated french responses to templates
-				best_response = self.response_generator.get_random_comtype_resp()
+				parent_username = get_replied_to(obj_to_reply)
+				best_response = self.response_generator.get_random_comtype_resp([parent_username])
 				self.logger.info(f'Final response to toxic user: {best_response}')
 
 				# Combine initial and best response for FINAL response
