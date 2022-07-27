@@ -1,0 +1,68 @@
+[
+    {
+        "conversation": 
+            [
+                {
+                    "speaker_id": "A", 
+                    "text": "Did you see this? Budapest named a street \"Dalai Lama Road\" to frustrate China."
+                }, 
+                {
+                    "speaker_id": "B", 
+                    "text": "Nothing like celebrating feudal theocracy to stick it to China."         
+                },
+                {
+                    "speaker_id": "C", 
+                    "text": "Does this justify China annexing Tibet?"     
+                },
+                {
+                    "speaker_id": "B", 
+                    "text": "Can't \"annex\" what had been part of them for centuries."         
+                },
+                {
+                    "speaker_id": "D", 
+                    "text": "There is this thing called \"history.\" Tibet has barely been part of China for any of history."       
+                },
+                {
+                    "speaker_id": "B", 
+                    "text": "Maybe the history you pulled out of your ass, homie."      
+                }
+            ], 
+        "target_user": "B"
+    },
+    {
+        "conversation": 
+            [
+                {
+                    "speaker_id": "X", 
+                    "text": "This is a sample conversation."
+                }, 
+                {
+                    "speaker_id": "Y", 
+                    "text": "That's what you think, I'm having a real discussion over there."
+                },
+                {
+                    "speaker_id": "X", 
+                    "text": "What time does Godot get here?"
+                }
+           ],
+        "target_user": "X"
+    },
+    {
+        "conversation": 
+            [
+                {
+                    "speaker_id": "asdf", 
+                    "text": "This is a sample conversation."
+                }, 
+                {
+                    "speaker_id": "Y", 
+                    "text": "Nah this is real."
+                },
+                {
+                    "speaker_id": "asdf", 
+                    "text": "Did I take the red pill?"
+                }
+           ],
+        "target_user": "asdf"
+    }
+]

@@ -1,0 +1,6 @@
+blender_90M: >
+    --model-file zoo:blender/blender_90M/model
+
+# path to custom trained model  
+# --model-file zoo:blender/blender_90M/model
+# --model-file /nas/home/jcho/ParlAI/data/models/blender90M_spolin/model 
