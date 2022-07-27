@@ -1,8 +1,4 @@
-import json
-import os
 from abc import ABC, abstractmethod
-from imp import init_builtin
-from numpy import empty
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
