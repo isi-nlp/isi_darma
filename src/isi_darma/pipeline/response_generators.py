@@ -43,8 +43,13 @@ class SpolinBotRG(ResponseGenerator):
 		return best_response
 
 	@staticmethod
-	def get_random_comtype_resp(usernames=['others']):
+	def get_random_comtype_resp(usernames: List[str] = None):
+
+		if usernames is None:
+			usernames = ['others']
+
 		usernames = ",".join(usernames)
+
 		comtype_responses = [
 			f"Veuillez cesser de faire cela et vous comporter correctement!",
 			f"Vous avez eu un comportement de ce genre en répondant à {usernames}",
