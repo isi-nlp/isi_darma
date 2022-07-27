@@ -1,4 +1,5 @@
 FROM python:3.9
+RUN  python -m pip install --upgrade pip
 RUN mkdir -p /isi_darma/isi_darma/
 ADD ./src /isi_darma/isi_darma/src/
 ADD ./requirements.txt /isi_darma/isi_darma/requirements.txt
