@@ -1,12 +1,15 @@
+import json
+import os
 from abc import ABC, abstractmethod
-
+from imp import init_builtin
+from numpy import empty
 from isi_darma.comments_utils import format_dialogue
 from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
 from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, read_db, user_in_db, read_responses
-
+from isi_darma.utils import get_replied_to, create_json_thread
 
 class ModerationBot(ABC):
 
@@ -88,12 +91,16 @@ class BasicBot(ModerationBot):
 		translated_dialogue = self.translator.rtg(first_turn)
 		self.moderate(translated_dialogue, submission)
 
+		botReply = self.moderate(translated_dialogue, submission)
+		create_json_thread(submission, True, botReply)
+
 	def moderate_comment_thread(self, dialogue):
 		"""
 		Process comment thread before sending to moderate function
 		"""
 		last_comment = dialogue
 
+		textComment = last_comment.body.lower().strip()
 		if get_username(last_comment) != self.CREDS["username"]:
 			self.logger.info(f'Moderating the COMMENT THREAD: {last_comment.body}')
 
@@ -110,7 +117,8 @@ class BasicBot(ModerationBot):
 			# 	translated_dialogue = [self.translator.rtg(first_turn)] + translated_dialogue
 
 			self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
-			self.moderate(translated_dialogue, last_comment)
+			botReply = self.moderate(translated_dialogue, last_comment)
+			create_json_thread(last_comment, False, botReply)
 
 		else:
 			self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
@@ -139,8 +147,8 @@ class BasicBot(ModerationBot):
 			if needs_mod and moderation_strategy == 'respond' and ( obj_to_reply or self.test) :
 
 				author_username = get_username(obj_to_reply)
-
-				# TODO: Respond only once per user i.e. remove the toxic users store
+				parent = get_replied_to(obj_to_reply)
+				# TODO: Use parent username in intro message
 				initial_response = f"Bonjour, {author_username}, Je suis un bot informatique (consultez mon profil pour plus de détails, " \
 				                   f"notamment pour savoir comment faire pour que je cesse de vous répondre ou de recueillir vos commentaires) et vous semblez "
 				self.logger.info(f'Initial response generated & translated.')

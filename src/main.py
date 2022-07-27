@@ -34,7 +34,7 @@ def main():
 			for cmt in cmts:
 				if cmt is None:
 					break
-				# print("CMT: ", cmt.body[:50])
+				# print("CMT: ", cmt.title)
 				moderation_bot.moderate_comment_thread(cmt)
 
 		# In case of server error from praw, give some time for reddit to recover and try again.
