@@ -137,13 +137,46 @@ The key `activation` takes the following values
 Whereas `{pre,post}process_args` take a dictionary of arguments to MT backend.
 
 __The following MT backends are supported__
-* `rtg_api` which calls RTG over a REST API. See http://rtg.isi.edu/many-eng/ 
-* `huggingface` calls `transformers` library. Requires `model` argument which can be obtained from https://huggingface.co/models?pipeline_tag=translation
+
+1. `rtg_api` which calls RTG over a REST API. See http://rtg.isi.edu/many-eng/ \
+    Arguments:
+    * `api_url`: str -- RTG API URL ending with `/translate`
+1.  `nllb_api` which calls https://github.com/thammegowda/nllb-serve\
+    Arguments
+    * `api_url`: str -- API URL ending with `/translate`
+    * `src_lang`: str -- source/input language ID, e.g, `fra_Latn`
+    * `tgt_lang`: str -- target/output language ID, e.g, `eng_Latn`
+
+    NLLB model supports translation between 200 languages.
+    Here is a an example config to use NLLB API for both French(Human)->English(Bot)->French(Human).
+
+    ```yaml
+    translator:
+      activation: 'pre+post' # pre, post, pre+post, null
+
+      preprocess: nllb_api
+      preprocess_args:
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: fra_Latn
+        tgt_lang: eng_Latn
+
+      postprocess: nllb_api
+      postprocess_args:
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: eng_Latn
+        tgt_lang: fra_Latn
+    ```
+
+1. `huggingface` calls `transformers` library.\
+    Arguments:
+   * `model`: str --- model name/ID, can be obtained from https://huggingface.co/models?pipeline_tag=translation
 
 
 
 
-## Debug logs/tips 
+
+
+## Debug logs/tips
 
 - Q: I'm making changes to the front end and it seems like they are not reflected in my task. 
   - A: examine the config that gets printed when running `python run.py` and make sure that all configurations point to the directory that you're making changes to. The `get_task_path()` function and imports that have not been updated after copying files from another crowdsourcing task directory may be the culprit. 

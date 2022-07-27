@@ -26,14 +26,19 @@ mephisto:
     final_rating_question: "How coherent was E? | How responsive was E to what you wrote? | Did E understand your point of view (as B)? | Did E convince you to change your behavior?"
     max_onboard_time: 6000
     translator:
-      activation: 'pre' # pre, post, pre+post, null
-      preprocess: rtg_api
+      activation: 'pre+post' # pre, post, pre+post, null
+
+      preprocess: nllb_api
       preprocess_args:
-        # TODO: change the URL to DARMA hosted service
-        api_url: http://rtg.isi.edu/many-eng/v1/translate
-      postprocess: huggingface
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: fra_Latn
+        tgt_lang: eng_Latn
+
+      postprocess: nllb_api
       postprocess_args:
-        model: Helsinki-NLP/opus-mt-en-fr
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: eng_Latn
+        tgt_lang: fra_Latnr
 
   task:
     allowed_concurrent: 1
