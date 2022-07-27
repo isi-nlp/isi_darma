@@ -211,6 +211,18 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         for idx, agent in enumerate([self.agent, self.bot]):
             if not self.chat_done:
                 acts[idx] = agent.act(timeout=self.max_resp_time)
+                if self.mt:
+                    text = acts[idx]['text']
+                    acts[idx]['text_orig'] = text
+                    mt_fn = self.mt.maybe_preprocess if idx == 0\
+                        else self.mt.maybe_postprocess
+                    text = mt_fn(text)
+                    # agent's act is a custom datatype, which requires force_set
+                    # but bot's act is a dict, which dont have force_set()
+                    if hasattr(acts[idx], 'force_set'):
+                        acts[idx].force_set('text', text)
+                    else:
+                        acts[idx]['text'] = mt_fn(text)
                 if agent == self.bot and\
                     hasattr(self.bot, 'agent_id') and self.bot.agent_id:
                     # Set speaker name as self.bot_agent_id otherwise, at frontend bot name such as "TransformerGenerator" would appear
@@ -278,15 +290,6 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                     'text': acts[idx]['text'].split('<br>')[0],
                     'id': acts[idx].get('id', 'NULL_ID'),  # In case model doesn't set id
                 }
-                print(f"===={idx} agent{agent}===")
-                pprint(utterance_data, width=200)
-                if self.mt:
-                    text = utterance_data['text']
-                    # preprocess for human/agent,  post process for bot
-                    translate_fn = self.mt.maybe_preprocess if agent is self.agent else self.mt.maybe_postprocess
-                    utterance_data['text_orig'] = text
-                    utterance_data['text'] = translate_fn(text)
-
                 self.dialog.append(utterance_data)
                 if idx == 0:
                     # Human has just responded. Any problem data received now will be
