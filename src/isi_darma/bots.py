@@ -161,9 +161,9 @@ class BasicBot(ModerationBot):
 				self.logger.info(f'Templated response to toxic user: {best_response}')
 
 				# Combine initial and best response for FINAL response
-				final_response = initial_response + ' ' + best_response
-				self.logger.info(f"Generated (and translated) final response: {final_response}\n")
-				final_response += '\n' + self.bot_info_fr
+				final_response = initial_response + '\n' + best_response
+				self.logger.info(f"Generated (and translated) response.")
+				final_response += '\n\n' + self.bot_responses["bot_info_fr"]
 				self.logger.info(f"Added bot info to final response.")
 				if self.test: self.logger.debug(f"Final response with bot info: \n{final_response}")
 
