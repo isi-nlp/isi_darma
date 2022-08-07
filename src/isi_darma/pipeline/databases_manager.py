@@ -39,7 +39,7 @@ class DatabaseManager:
                                         }
         with open(self.moderated_hashes_path, "w") as f:
             f.write(json.dumps(self.moderated_db))
-        self.logger.info(f"Hash {hash_value} added to the moderated database for")
+        self.logger.info(f"Hash {hash_value} added to the moderated database.")
 
 
     def search_moderated(self, hash_value: str) -> bool:
