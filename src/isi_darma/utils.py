@@ -64,16 +64,15 @@ def read_db(path : str = "isi_darma/data/optout/optout_db.json"):
 	return json.loads(open(path, "r").read())
 
 
-def add_to_db(db : dict, username: str, toxicity_score: float, behav_type: str):
+def add_to_db(db : dict, username: str, dialogue_str: str, path : str = "isi_darma/data/optout/optout_db.json"):
 	"""
 	Save the username to the redis store
 	"""
 	db[username] = {
-					'toxicity_score' : toxicity_score,
-	                'behav_type': behav_type
+					'dialogue': dialogue_str,
 				   }
 
-	with open("db.json", "w") as f:
+	with open(path, "w") as f:
 		f.write(json.dumps(db))
 
 	return db
