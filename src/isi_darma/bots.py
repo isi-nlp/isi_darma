@@ -20,7 +20,7 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-	def __init__(self, reddit_client=None, test=False, db = '') -> None:
+	def __init__(self, reddit_client=None, test=False) -> None:
 		super().__init__()
 
 		self.test = test  # whether to actually post things to reddit
@@ -38,7 +38,7 @@ class BasicBot(ModerationBot):
 		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
-		self.db = read_db(db)
+		self.db = read_db()
 		self.bot_info_fr = read_responses()["bot_info_fr"]
 
 
