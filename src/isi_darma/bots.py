@@ -157,6 +157,7 @@ class BasicBot(ModerationBot):
 				# Response sampled from templates
 				parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
 				best_response = self.response_generator.get_random_comtype_resp([parent_username])
+				self.logger.info(f'Author username: {author_username} and parent username: {parent_username}')
 				self.logger.info(f'Templated response to toxic user: {best_response}')
 
 				# Combine initial and best response for FINAL response
