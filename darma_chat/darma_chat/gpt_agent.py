@@ -1,29 +1,22 @@
-#!/usr/bin/env python3
+from parlai.core.params import ParlaiParser
+import openai  
 
-# Copyright (c) Facebook, Inc. and its affiliates.
-# This source code is licensed under the MIT license found in the
-# LICENSE file in the root directory of this source tree.
-
-import copy
 from typing import Dict
 
 from omegaconf import DictConfig
 import parlai.utils.logging as logging
 from parlai.core.agents import create_agent
-from parlai.core.message import Message
 from parlai.core.params import ParlaiParser
-from parlai.utils.strings import normalize_reply
 from darma_chat.constants import AGENT_1
 
 
-class TurkLikeAgent:
+class TurkLikeGptAgent:
     """
     Will act like a Turker but actually contains a bot agent.
     """
 
-    def __init__(self, opt, model_name, model_agent, num_turns, semaphore=None):
+    def __init__(self, opt, model_name, num_turns, semaphore=None):
         self.opt = opt
-        self.model_agent = model_agent
         self.id = AGENT_1
         self.num_turns = num_turns
         self.turn_idx = 0
@@ -36,55 +29,34 @@ class TurkLikeAgent:
         self.hit_is_returned = False
         self.disconnected = False
         self.hit_is_expired = False
+        self.sturns = ''
+        openai.api_key = '' 
 
     def act(self, timeout=None):
-        _ = timeout  # The model doesn't care about the timeout
-        if self.semaphore:
-            with self.semaphore:
-                act_out = self.model_agent.act()
+        instr = "Respond to the last user using nonviolent communication"
+        if self.turn_idx == 0:
+            few_shot_example = "user 1: Does this look like a normal poop? Worried\nuser 2: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\nuser 1: Get fucked\nYou: it sounds like you're worried about your poop and you're wondering if it is normal. Can you tell me more about it?"
         else:
-            act_out = self.model_agent.act()
-        act_out = Message(act_out).json_safe_payload()
-
-        if 'dict_lower' in self.opt and not self.opt['dict_lower']:
-            # model is cased so we don't want to normalize the reply like below
-            final_message_text = act_out['text']
+            few_shot_example = ""
+        p = prompt_compose(instr, few_shot_example, self.sturns)
+        print("#" * 30)
+        print(p)
+        if self.turn_idx == 0:
+            resp = query_completion_api(p)
         else:
-            final_message_text = normalize_reply(act_out['text'])
+            resp = query_completion_api(p, frequency_penalty=0, presence_penalty=0)
+        final_message_text = resp.choices[0].text 
+        final_message_text = final_message_text.strip()
+        self.sturns += f"you: {final_message_text}\n"
 
+        act_out = {}
         act_out['text'] = final_message_text
         act_out['id'] = "BOT"
-        assert ('episode_done' not in act_out) or (not act_out['episode_done'])
         self.turn_idx += 1
-        print("#" * 30)
-        print(act_out)
         return {**act_out, 'episode_done': False}
 
     def observe(self, observation, increment_turn: bool = True):
-        """
-        Need to protect the observe also with a semaphore for composed models where an
-        act() may be called within an observe()
-        """
-        logging.info(
-            f'{self.__class__.__name__}: In observe() before semaphore, self.turn_idx is {self.turn_idx} and observation is {observation}'
-        )
-        new_ob = copy.deepcopy(observation)
-        if self.semaphore:
-            with self.semaphore:
-                self.model_agent.observe(new_ob)
-        else:
-            self.model_agent.observe(new_ob)
-        if 'text' not in new_ob:
-            logging.warning(
-                f'{self.__class__.__name__}: In observe() AFTER semaphore, self.turn_idx: {self.turn_idx}, and observation is missing a "text" field: {new_ob}'
-            )
-        else:
-            logging.info(
-                f'{self.__class__.__name__}: In observe() AFTER semaphore, self.turn_idx: {self.turn_idx}, observation["text"]: {new_ob["text"]}'
-            )
-
-        if increment_turn:
-            self.turn_idx += 1
+        self.sturns += f"user {observation['id']}: {observation['text']}\n"
 
     def shutdown(self):
         pass
@@ -133,3 +105,21 @@ class TurkLikeAgent:
             model_agent = create_agent(model_opt, requireModelExists=True)
             shared_bot_agents[model_name] = model_agent.share()
         return shared_bot_agents
+
+def query_completion_api(prompt, engine='text-davinci-002', frequency_penalty=0, presence_penalty=0):
+    response = openai.Completion.create(
+        model=engine,
+        prompt=prompt,
+        temperature=0.7,
+        max_tokens=512,
+        top_p=1,
+        frequency_penalty=frequency_penalty,
+        presence_penalty=presence_penalty
+    )
+    
+    return response
+
+def prompt_compose(instr, few_shot_example, seed_turns):
+    if few_shot_example == "":
+        return f'{instr}\n\n{seed_turns}You:'
+    return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}You:'

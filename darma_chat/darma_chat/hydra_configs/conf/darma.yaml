@@ -24,7 +24,7 @@ mephisto:
     max_onboard_time: 6000
 
     translator:
-      activation: 'pre+post' # pre, post, pre+post, null
+      activation: null # pre, post, pre+post, null
 
       preprocess: nllb_api
       preprocess_args:

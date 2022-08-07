@@ -4,6 +4,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+import imp
 import time
 import os
 import json
@@ -24,6 +25,7 @@ from parlai.crowdsourcing.utils.worlds import CrowdOnboardWorld, CrowdTaskWorld
 from parlai.crowdsourcing.utils.mturk import get_mturk_id_from_mephisto_wrapper
 
 from darma_chat.bot_agent import TurkLikeAgent
+from darma_chat.gpt_agent import TurkLikeGptAgent
 from darma_chat.constants import (
     ONBOARD_FAIL,
     ONBOARD_SUCCESS,
@@ -541,11 +543,17 @@ def get_bot_worker(opt: Dict[str, Any], model_name: str) -> TurkLikeAgent:
     semaphore = opt['semaphore']
     shared_bot_agents = opt['shared_bot_agents']
     num_turns = opt['num_turns']
-    bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
-    bot_worker = TurkLikeAgent(
+    # bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
+    # bot_worker = TurkLikeAgent(
+    #     opt,
+    #     model_name=model_name,
+    #     model_agent=bot_agent,
+    #     num_turns=num_turns,
+    #     semaphore=semaphore,
+    # )
+    bot_worker = TurkLikeGptAgent(
         opt,
         model_name=model_name,
-        model_agent=bot_agent,
         num_turns=num_turns,
         semaphore=semaphore,
     )
