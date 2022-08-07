@@ -40,8 +40,8 @@ class BasicBot(ModerationBot):
         self.CREDS = load_credentials(self.logger)
         self.current_dialogue = None
 
-        self.databases = DatabaseManager(self.logger, root = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data')
-        self.bot_responses = self.response_generator.read_responses( path = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data/response_templates/responses.json')
+        self.databases = DatabaseManager(self.logger)
+        self.bot_responses = self.response_generator.read_responses()
 
     @staticmethod
     def detect_language(text):
