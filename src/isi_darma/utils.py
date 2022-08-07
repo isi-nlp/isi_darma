@@ -57,30 +57,6 @@ def check_for_opt_out(comment_str: str) -> bool:
 	return False
 
 
-def read_db(path : str = "isi_darma/data/optout/optout_db.json"):
-	"""
-	Read the json file for opt-out users
-	"""
-	return json.loads(open(path, "r").read())
-
-
-def add_to_db(db : dict, username: str, dialogue_str: str, path : str = "isi_darma/data/optout/optout_db.json"):
-	"""
-	Save the username to the redis store
-	"""
-	db[username] = {
-					'dialogue': dialogue_str,
-				   }
-
-	with open(path, "w") as f:
-		f.write(json.dumps(db))
-
-	return db
-
-def user_in_db(username: str, db : dict) -> bool:
-	return True if username in db.keys() else False
-
-
 def get_replied_to(comment) -> str:
 		this_comment = comment
 
