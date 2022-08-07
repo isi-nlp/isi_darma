@@ -150,10 +150,10 @@ class BasicBot(ModerationBot):
 
 			if needs_mod and moderation_strategy == 'respond' and ( obj_to_reply or self.test) :
 
-				author_username = get_username(obj_to_reply)
-				initial_response = f"Bonjour, {author_username}, Je suis un bot informatique (consultez mon profil pour plus de détails, " \
-				                   f"notamment pour savoir comment faire pour que je cesse de vous répondre ou de recueillir vos commentaires) et vous semblez "
-				self.logger.info(f'Initial response generated & translated.')
+				author_username = get_username(obj_to_reply) if not self.test else "test_user1"
+				behav_type_response = self.bot_responses[f'{behav_type}_resp_fr']
+				initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
+				self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
 				# Response sampled from templates
 				parent_username = get_replied_to(obj_to_reply)
