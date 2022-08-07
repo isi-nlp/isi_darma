@@ -85,7 +85,7 @@ def user_in_db(db : dict, username: str):
 	return True if username in db.keys() else False
 
 
-def read_responses(path : str = "isi_darma/data/optout/responses.json"):
+def read_responses(path : str = "isi_darma/data/response_templates/responses.json"):
 	"""
 	Read the json file for bot info.
 	"""
