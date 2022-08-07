@@ -156,7 +156,7 @@ class BasicBot(ModerationBot):
 				self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
 				# Response sampled from templates
-				parent_username = get_replied_to(obj_to_reply)
+				parent_username = get_replied_to(obj_to_reply) if not self.test else "test_user2"
 				best_response = self.response_generator.get_random_comtype_resp([parent_username])
 				self.logger.info(f'Templated response to toxic user: {best_response}')
 
