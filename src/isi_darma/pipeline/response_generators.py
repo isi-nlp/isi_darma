@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from logging import Logger
 
+import json
 import random
 import requests
 from typing import List
@@ -58,3 +59,10 @@ class SpolinBotRG(ResponseGenerator):
 			f"Voulez-vous que {usernames} changent d'opinion et peut-être convaincre d'autres personnes qui partagent actuellement leurs opinions de changer également?"
 		]
 		return random.sample(comtype_responses, 1)[0]
+
+	@staticmethod
+	def read_responses(path : str = "isi_darma/data/response_templates/responses.json"):
+		"""
+		Read the json file for bot info.
+		"""
+		return json.loads(open(path, "r").read())
