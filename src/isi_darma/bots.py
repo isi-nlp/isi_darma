@@ -143,9 +143,10 @@ class BasicBot(ModerationBot):
         moderation_strategy = self.determine_moderation_strategy(dialogue_str)
         author_username = get_username(obj_to_reply) if obj_to_reply else "test_author"
         opt_out = check_for_opt_out(dialogue_str)
+        no_mod_user = self.databases.search_optout_db(author_username)
 
         # Check if user has opted out of moderation now or earlier
-        if not opt_out and not self.databases.search_optout_db(author_username):
+        if not opt_out and not no_mod_user:
 
             # Check if user's dialogue needs moderation
             if needs_mod and moderation_strategy == 'respond' :
@@ -167,13 +168,18 @@ class BasicBot(ModerationBot):
                 self.logger.info(f"Added bot info to final response.")
                 if self.test: self.logger.debug(f"Final response with bot info: \n{final_response}")
 
-            # No moderation required for user's dialogue
+            # Dialogue requires no moderation
             else:
                 final_response = ""
                 self.logger.info(
                     f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
-        # User opted-out of moderation in comments, add to database and no moderation/response
+        # User has previously opted out of moderation
+        elif no_mod_user:
+            self.logger.info(f'User {author_username} in opt-out list. No moderation to be done.')
+            final_response = ""
+
+        # User opted-out of moderation, add to database
         else:
             self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
             self.databases.add_optout_user(author_username, dialogue_str)
