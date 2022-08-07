@@ -140,7 +140,7 @@ class BasicBot(ModerationBot):
 		"""
 
 		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
-		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}.')
+		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}')
 		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
 
 		opt_out = check_for_opt_out(dialogue_str)
@@ -158,13 +158,14 @@ class BasicBot(ModerationBot):
 				# Response sampled from templates
 				parent_username = get_replied_to(obj_to_reply)
 				best_response = self.response_generator.get_random_comtype_resp([parent_username])
-				self.logger.info(f'Final response to toxic user: {best_response}')
+				self.logger.info(f'Templated response to toxic user: {best_response}')
 
 				# Combine initial and best response for FINAL response
 				final_response = initial_response + ' ' + best_response
 				self.logger.info(f"Generated (and translated) final response: {final_response}\n")
 				final_response += '\n' + self.bot_info_fr
 				self.logger.info(f"Added bot info to final response.")
+				if self.test: self.logger.debug(f"Final response with bot info: \n{final_response}")
 
 			# No response sent to user
 			else:
