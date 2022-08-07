@@ -27,7 +27,7 @@ class DatabaseManager:
 
     def search_optout_db(self, username: str) -> bool:
         user_in_optout = username in self.optout_db.keys()
-        self.logger(f"User {username} is {'present' if user_in_optout else 'not present'} in the optout database.")
+        self.logger.info(f"User {username} is {'present' if user_in_optout else 'not present'} in the optout database.")
         return user_in_optout
 
 
@@ -47,7 +47,7 @@ class DatabaseManager:
         Check if the hash is in the list of moderated hashes
         """
         is_moderated = hash_value in self.moderated_db.keys()
-        self.logger(f"Hash {hash_value} is {'present' if is_moderated else 'not present'} in the moderated database")
+        self.logger.info(f"Hash {hash_value} is {'present' if is_moderated else 'not present'} in the moderated database")
 
         return is_moderated
 
