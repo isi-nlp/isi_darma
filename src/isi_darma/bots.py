@@ -184,3 +184,5 @@ class BasicBot(ModerationBot):
 		if not self.test and final_response and obj_to_reply:
 			obj_to_reply.reply(final_response)
 			self.logger.info(f'Response sent to toxic user: {get_username(obj_to_reply)}')
+
+		return final_response
