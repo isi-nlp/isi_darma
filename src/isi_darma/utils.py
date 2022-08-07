@@ -18,6 +18,10 @@ def get_username(redditor_obj: Redditor):
 	return redditor_obj.author if redditor_obj else ''
 
 
+def get_id_hash(redditor_obj: Redditor):
+	return redditor_obj.id if redditor_obj else ''
+
+
 def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
 	with open(creds_fn, "r") as f:
 		creds = yaml.safe_load(f)
