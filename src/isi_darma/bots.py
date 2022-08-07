@@ -32,15 +32,16 @@ class BasicBot(ModerationBot):
 		else:
 			self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
-		self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
-		self.reddit_client = reddit_client
-		self.response_generator = SpolinBotRG(self.logger)
-		self.translator = Translator(self.logger)
-		self.moderation_classifier = PerspectiveAPIModerator(self.logger)
-		self.CREDS = load_credentials(self.logger)
-		self.current_dialogue = None
-		self.db = read_db()
-		self.bot_responses = self.response_generator.read_responses()
+        self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
+        self.reddit_client = reddit_client
+        self.response_generator = SpolinBotRG(self.logger)
+        self.translator = Translator(self.logger)
+        self.moderation_classifier = PerspectiveAPIModerator(self.logger)
+        self.CREDS = load_credentials(self.logger)
+        self.current_dialogue = None
+
+        self.databases = DatabaseManager(self.logger)
+        self.bot_responses = self.response_generator.read_responses()
 
 
 	@staticmethod
@@ -139,21 +140,21 @@ class BasicBot(ModerationBot):
 		- If obj_to_reply is exists
 		"""
 
-		needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
-		self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}')
-		moderation_strategy = self.determine_moderation_strategy(dialogue_str)
+        needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
+        self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}')
+        moderation_strategy = self.determine_moderation_strategy(dialogue_str)
+        author_username = get_username(obj_to_reply) if obj_to_reply else "test_author"
+        opt_out = check_for_opt_out(dialogue_str)
 
-		opt_out = check_for_opt_out(dialogue_str)
+        # Check if user has opted out of moderation now or earlier
+        if not opt_out and not self.databases.search_optout_db(author_username):
 
-		#TODO: Consolidate if statements in this method for cleaner control flow
-		if not opt_out and not user_in_db(get_username(obj_to_reply), self.db):
+            # Check if user's dialogue needs moderation
+            if needs_mod and moderation_strategy == 'respond' :
 
-			if needs_mod and moderation_strategy == 'respond' and ( obj_to_reply or self.test) :
-
-				author_username = get_username(obj_to_reply) if obj_to_reply else "test_author"
-				behav_type_response = self.bot_responses[f'{behav_type}_resp_fr']
-				initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
-				self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
+                behav_type_response = self.bot_responses[f'{behav_type}_resp_fr']
+                initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
+                self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
 				# Response sampled from templates
 				parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
@@ -174,12 +175,11 @@ class BasicBot(ModerationBot):
 				self.logger.info(
 					f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
 
-		# User opted-out of moderation in comments, add to database and no moderation/response
-		else:
-			author_username = get_username(obj_to_reply)
-			self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
-			self.db = add_to_db(self.db, author_username, toxicity, behav_type)
-			final_response = ""
+        # User opted-out of moderation in comments, add to database and no moderation/response
+        else:
+            self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
+            self.databases.add_optout_user(author_username, dialogue_str)
+            final_response = ""
 
 		# Final response sent as reply in reddit thread/post
 		if not self.test and final_response and obj_to_reply:
