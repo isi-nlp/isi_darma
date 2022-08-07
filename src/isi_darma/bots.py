@@ -41,18 +41,23 @@ class BasicBot(ModerationBot):
 		self.db = read_db(db)
 		self.bot_info_fr = read_responses()["bot_info_fr"]
 
+
 	@staticmethod
 	def detect_language(text):
 		return "english"
 
+
 	def translate(self, text):
 		return self.translator.rtg(text)
+
 
 	def determine_moderation_strategy(self, comment_str: str):
 		return "respond"
 
+
 	def generate_response(self, dialogue):
 		return self.response_generator.generate_response(dialogue)
+
 
 	def moderate_submission(self, submission):
 
@@ -75,6 +80,7 @@ class BasicBot(ModerationBot):
 				continue
 			self.moderate_comment_thread(last_comment)
 
+
 	def moderate_post(self, submission):
 		"""
 		Process post before sending to moderate function
@@ -89,6 +95,7 @@ class BasicBot(ModerationBot):
 
 		botReply = self.moderate(translated_dialogue, submission)
 		create_json_thread(submission, True, botReply)
+
 
 	def moderate_comment_thread(self, dialogue):
 		"""
@@ -118,6 +125,7 @@ class BasicBot(ModerationBot):
 
 		else:
 			self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
+
 
 	def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
 		"""
