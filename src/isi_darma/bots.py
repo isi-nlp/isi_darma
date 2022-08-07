@@ -5,7 +5,7 @@ from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
 from isi_darma.pipeline.databases_manager import DatabaseManager
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, get_id_hash
 from isi_darma.utils import get_replied_to, create_json_thread
 
 class ModerationBot(ABC):
@@ -63,22 +63,27 @@ class BasicBot(ModerationBot):
     def moderate_submission(self, submission):
 
         title, post_body = submission.title, submission.selftext
+        submission_hash = get_id_hash(submission)
 
-        submission.comments.replace_more(limit=None)
-        comment_queue = submission.comments[:]  # Seed with top-level
+        if not self.databases.search_moderated(submission_hash):
+            submission.comments.replace_more(limit=None)
+            comment_queue = submission.comments[:]  # Seed with top-level
 
-        # check that we didn't already moderate the post
-        if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
-            self.moderate_post(submission)
+            # check that we didn't already moderate the post
+            if all([get_username(comment) != self.CREDS["username"] for comment in comment_queue]):
+                self.moderate_post(submission)
 
-        # dialogues is a list of comment objects
-        dialogues = format_dialogue(comment_queue)
-        for d in dialogues:
-            last_comment = d[-1]
-            username = get_username(last_comment)
-            if username == self.CREDS["username"]:
-                continue
-            self.moderate_comment_thread(last_comment)
+            # dialogues is a list of comment objects
+            dialogues = format_dialogue(comment_queue)
+            for d in dialogues:
+                last_comment = d[-1]
+                username = get_username(last_comment)
+                if username == self.CREDS["username"]:
+                    continue
+                self.moderate_comment_thread(last_comment)
+
+        else:
+            self.logger.info(f'Already moderated submission with hash value: {submission_hash} !!!')
 
 
     def moderate_post(self, submission):
@@ -124,19 +129,13 @@ class BasicBot(ModerationBot):
             create_json_thread(last_comment, False, botReply)
 
         else:
-            self.logger.debug(f'Self comment -> {last_comment.body} with username: {get_username(last_comment)}')
+            self.logger.debug(f'Not moderation self-comment -> {last_comment.body} with username: {get_username(last_comment)}')
 
 
     def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
         """
-        Moderates a dialogue of comments.
-        Optionally, a comment object can be passed in to reply to.
-
-        If statements hierarchy:
-        - Opt-out
-        - Needs moderation and moderation stategy
-        - If test flag is set
-        - If obj_to_reply is exists
+        Moderates a dialogue from comments or posts
+        Optionally, a reddit object can be passed in to reply to.
         """
 
         needs_mod, toxicity, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
@@ -183,6 +182,7 @@ class BasicBot(ModerationBot):
         # Final response sent as reply in reddit thread/post
         if not self.test and final_response and obj_to_reply:
             obj_to_reply.reply(final_response)
+            self.databases.add_to_moderated(get_id_hash(obj_to_reply), author_username, dialogue_str)
             self.logger.info(f'Response sent to toxic user: {get_username(obj_to_reply)}')
 
         return final_response
