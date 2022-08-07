@@ -3,7 +3,7 @@ import json
 class DatabaseManager:
 
 
-    def __init__(self, logger, root = "isi_darma/data"):
+    def __init__(self, logger, root = "/isi_darma/isi_darma/src/isi_darma/data"):
         self.logger = logger
         self.root_dir = root
         self.optout_db_path = f'{self.root_dir}/optout/optout_db.json'
