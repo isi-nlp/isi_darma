@@ -40,8 +40,8 @@ class BasicBot(ModerationBot):
         self.CREDS = load_credentials(self.logger)
         self.current_dialogue = None
 
-        self.databases = DatabaseManager(self.logger)
-        self.bot_responses = self.response_generator.read_responses()
+        self.databases = DatabaseManager(self.logger, root = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data')
+        self.bot_responses = self.response_generator.read_responses( path = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data/response_templates/responses.json')
 
     @staticmethod
     def detect_language(text):
@@ -170,9 +170,9 @@ class BasicBot(ModerationBot):
 
             # Dialogue requires no moderation
             else:
-                final_response = ""
                 self.logger.info(
                     f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}\n")
+                final_response = ""
 
         # User has previously opted out of moderation
         elif no_mod_user:
