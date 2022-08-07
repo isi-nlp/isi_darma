@@ -31,25 +31,23 @@ class DatabaseManager:
         return user_in_optout
 
 
-    def add_to_moderated(self, obj_type, hash_value, author, body):
-        self.moderated_db[obj_type].append(
-            {
-                "hash" : hash_value,
-                "author": author,
-                "content": body
-            }
-        )
+    def add_to_moderated(self, hash_value, author, body):
+        self.moderated_db[hash_value] = {
+                                            "hash" : hash_value,
+                                            "author": author,
+                                            "content": body
+                                        }
         with open(self.moderated_hashes_path, "w") as f:
             f.write(json.dumps(self.moderated_db))
-        self.logger.info(f"Hash {hash_value} added to the moderated database for {obj_type}")
+        self.logger.info(f"Hash {hash_value} added to the moderated database for")
 
 
-    def search_moderated(self, obj_type: str, hash_value: str) -> bool:
+    def search_moderated(self, hash_value: str) -> bool:
         """
         Check if the hash is in the list of moderated hashes
         """
-        is_moderated = hash_value in self.moderated_db[obj_type].keys()
-        self.logger(f"Hash {hash_value} is {'present' if is_moderated else 'not present'} in the moderated database for {obj_type}")
+        is_moderated = hash_value in self.moderated_db.keys()
+        self.logger(f"Hash {hash_value} is {'present' if is_moderated else 'not present'} in the moderated database")
 
         return is_moderated
 
