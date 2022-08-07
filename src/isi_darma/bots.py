@@ -4,7 +4,7 @@ from isi_darma.logging_setup import setup_logger
 from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, read_db, user_in_db, read_responses
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, add_to_db, read_db, user_in_db
 from isi_darma.utils import get_replied_to, create_json_thread
 
 class ModerationBot(ABC):
@@ -39,7 +39,7 @@ class BasicBot(ModerationBot):
 		self.CREDS = load_credentials(self.logger)
 		self.current_dialogue = None
 		self.db = read_db()
-		self.bot_info_fr = read_responses()["bot_info_fr"]
+		self.bot_responses = self.response_generator.read_responses()
 
 
 	@staticmethod
