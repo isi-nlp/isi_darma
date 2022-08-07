@@ -20,21 +20,42 @@ class RtgApiTranslator(BaseTranslator):
     def __init__(self, api_url='http://rtg.isi.edu/many-eng/v1/translate') -> None:
         self.api_url = api_url
 
-    def translate(self, text: str, src_lang ='mul', tgt_lang='eng') -> str:
-        source = {'source': [text]}
-        log.debug(f'Sending source to RTG for translation: {source}')
+    def _translate(self, req_data, out_key='translation'):
+        log.debug(f'Sending to {self.api_url} :: {req_data}')
+        response = requests.post(self.api_url, json=req_data)
+        if response.ok:
+            resp_data = response.json()
+            log.info(f'RTG translation: {resp_data[out_key]}')
+            return resp_data[out_key]
+        else:
+            log.warning(f'Response Body:\n{response.json()}')
+            raise Exception(
+                f'Translation failed {response.status_code} -> {response.reason}')
+
+    def translate(self, text: str, src_lang='mul', tgt_lang='eng') -> str:
+        req_data = {'source': [text]}
         try:
-            response = requests.post(self.api_url, json=source)
-            if response.ok:
-                response = response.json()
-                log.info(f'RTG translation: {response["translation"]}')
-                return response["translation"][0]
-            else:
-                log.warning(f'Translation failed {response.status_code} -> {response.reason}')
-                log.warning(f'Response Body from RTG:\n{response.json()}')
-                return text
+            return self._translate(req_data=req_data)[0]
         except Exception as e:
-            log.error(f'Error connecting to RTG API: {e}. Returning source.')
+            log.error(f'MT API Error:: {e}. Returning source.')
+            return text
+
+
+class NLLBApiTranslator(RtgApiTranslator):
+
+    def __init__(self, api_url: str, src_lang: str, tgt_lang: str) -> None:
+        super().__init__(api_url)
+        self.src_lang = src_lang
+        self.tgt_lang = tgt_lang
+
+    def translate(self, text: str, src_lang=None, tgt_lang=None) -> str:
+        req_data = dict(source=[text],
+                        src_lang=src_lang or self.src_lang,
+                        tgt_lang=tgt_lang or self.tgt_lang)
+        try:
+            return self._translate(req_data=req_data)[0]
+        except Exception as e:
+            log.error(f'MT API Error:: {e}. Returning source.')
             return text
 
 
@@ -45,19 +66,20 @@ class HuggingFaceTranslator(BaseTranslator):
         self.model = AutoTokenizer.from_pretrained(self.model_id)
         self.tokenizer = AutoModelForSeq2SeqLM.from_pretrained(self.model_id)
 
-    def translate(self, text: str, src_lang ='mul', tgt_lang='eng') -> str:
+    def translate(self, text: str, src_lang='mul', tgt_lang='eng') -> str:
         log.debug(f"Translating {text}...")
         batch = self.tokenizer([text], return_tensors="pt")
         gen = self.model.generate(**batch)
-        fr_response = self.tokenizer.batch_decode(gen, skip_special_tokens=True)
+        fr_response = self.tokenizer.batch_decode(
+            gen, skip_special_tokens=True)
         return fr_response[0]
-
 
 
 # TODO add other MTs
 registry = {
     'rtg_api': RtgApiTranslator,
-    'huggingface': HuggingFaceTranslator
+    'huggingface': HuggingFaceTranslator,
+    'nllb_api': NLLBApiTranslator,
 }
 
 
