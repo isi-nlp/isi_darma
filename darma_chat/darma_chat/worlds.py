@@ -4,13 +4,11 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-import imp
 import time
 import os
 import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
-import random
 import numpy as np
 import logging as log
 from pprint import pprint
@@ -543,20 +541,23 @@ def get_bot_worker(opt: Dict[str, Any], model_name: str) -> TurkLikeAgent:
     semaphore = opt['semaphore']
     shared_bot_agents = opt['shared_bot_agents']
     num_turns = opt['num_turns']
-    # bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
-    # bot_worker = TurkLikeAgent(
-    #     opt,
-    #     model_name=model_name,
-    #     model_agent=bot_agent,
-    #     num_turns=num_turns,
-    #     semaphore=semaphore,
-    # )
-    bot_worker = TurkLikeGptAgent(
-        opt,
-        model_name=model_name,
-        num_turns=num_turns,
-        semaphore=semaphore,
-    )
+    botbackend = opt.get('botbackend') or 'blenderbot'
+
+    if botbackend == 'blenderbot':
+        bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
+        AgentClass = TurkLikeAgent
+    elif botbackend == 'gpt':
+        bot_agent = None # we call it over an API
+        AgentClass = TurkLikeGptAgent
+    else:
+        raise Exception(f'Botbackend={botbackend} is not supported')
+    bot_worker = AgentClass(
+         opt,
+         model_name=model_name,
+         model_agent=bot_agent,
+         num_turns=num_turns,
+         semaphore=semaphore,
+     )
     return bot_worker
 
 def get_dialog_mt(opt: Dict[str, Any]):
