@@ -24,21 +24,22 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
 
     def act(self, timeout=None):
-        instr = "Respond to the last user using nonviolent communication"
+        instr = "The following is a conversation with a wise and loving being who has an understanding of how nonviolent communication work. This being is dedicated to building a more civil online environment."
         if self.turn_idx == 0:
-            few_shot_example = "user 1: Does this look like a normal poop? Worried\nuser 2: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\nuser 1: Get fucked\nYou: it sounds like you're worried about your poop and you're wondering if it is normal. Can you tell me more about it?"
+            few_shot_example = "user A: Does this look like a normal poop? Worried\nuser B: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\nuser A: Get fucked\nwise being: it sounds like you're worried about your poop and you're wondering if it is normal. Can you tell me more about it?"
         else:
             few_shot_example = ""
         p = self.prompt_compose(instr, few_shot_example, self.sturns)
-
+        # print("#" * 30)
+        # print(p)
         if self.turn_idx == 0:
             resp = self.query_completion_api(p, engine=self.engine)
         else:
             resp = self.query_completion_api(
-                p, engine=self.engine, frequency_penalty=0, presence_penalty=0)
+                p, engine=self.engine, frequency_penalty=1, presence_penalty=1, temperature=1)
         final_message_text = resp.choices[0].text
         final_message_text = final_message_text.strip()
-        self.sturns += f"you: {final_message_text}\n"
+        self.sturns += f"wise being: {final_message_text}\n"
 
         act_out = {}
         act_out['text'] = final_message_text
@@ -51,11 +52,11 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
     @staticmethod
     def query_completion_api(prompt, engine=DEF_ENGINE,
-                             frequency_penalty=0, presence_penalty=0):
+                             frequency_penalty=0, presence_penalty=0, temperature=0):
         response = openai.Completion.create(
             model=engine,
             prompt=prompt,
-            temperature=0.7,
+            temperature=temperature,
             max_tokens=512,
             top_p=1,
             frequency_penalty=frequency_penalty,
@@ -66,5 +67,5 @@ class TurkLikeGptAgent(TurkLikeAgent):
     @staticmethod
     def prompt_compose(instr, few_shot_example, seed_turns):
         if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}You:'
-        return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}You:'
+            return f'{instr}\n\n{seed_turns}wise being:'
+        return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}wise being:'
