@@ -39,8 +39,6 @@ class TurkLikeGptAgent:
         else:
             few_shot_example = ""
         p = prompt_compose(instr, few_shot_example, self.sturns)
-        print("#" * 30)
-        print(p)
         if self.turn_idx == 0:
             resp = query_completion_api(p)
         else:
