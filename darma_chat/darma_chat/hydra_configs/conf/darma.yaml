@@ -25,14 +25,11 @@ mephisto:
     botbackend: gpt  # blenderbot or gpt
 
     translator:
-      activation: null # pre, post, pre+post, null
-
-      preprocess: nllb_api
+      activation: pre # pre, post, pre+post, null
+      preprocess: rtg_api
       preprocess_args:
-        api_url: http://rtg.isi.edu/nllb/translate
-        src_lang: fra_Latn
-        tgt_lang: eng_Latn
-
+        # TODO: change the URL to DARMA hosted service
+        api_url: http://rtg.isi.edu/many-eng/v1/translate
       postprocess: nllb_api
       postprocess_args:
         api_url: http://rtg.isi.edu/nllb/translate
