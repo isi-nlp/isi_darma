@@ -15,7 +15,7 @@ def get_username(redditor_obj: Redditor):
     Get the username of a redditor
     Redditor object reference: https://praw.readthedocs.io/en/latest/code_overview/models/redditor.html#praw.models.Redditor
     """
-	return redditor_obj.author if redditor_obj else ''
+	return redditor_obj.author.name if redditor_obj else ''
 
 
 def get_id_hash(redditor_obj: Redditor):
