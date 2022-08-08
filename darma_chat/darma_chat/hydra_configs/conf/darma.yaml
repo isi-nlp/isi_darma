@@ -22,7 +22,7 @@ mephisto:
     block_qualification: darma_onboarding_block
     final_rating_question: "How coherent was the bot? | How likely are you going to continue the conversation with the bot? | Did the bot understand your point of view (as B)? | Did the bot convince you to change your behavior?"
     max_onboard_time: 6000
-    botbackend: gpt  # blenderbot or gpt
+    botbackend: blenderbot  # blenderbot or gpt
 
     translator:
       activation: pre # pre, post, pre+post, null
