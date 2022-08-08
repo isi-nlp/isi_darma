@@ -127,7 +127,7 @@ class BasicBot(ModerationBot):
             create_json_thread(last_comment, False, botReply)
 
         else:
-            self.logger.debug(f'Not moderation self-comment -> {last_comment.body} with username: {get_username(last_comment)}')
+            self.logger.debug(f'Not moderating self-comment with username: {get_username(last_comment)}')
 
 
     def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
