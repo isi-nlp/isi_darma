@@ -41,6 +41,7 @@ def main():
 		except prawcore.exceptions.ServerError as server_error:
 			moderation_bot.logger.warning(f"Reddit Server error: {server_error}. Waiting for 30 seconds.")
 			time.sleep(30)
+			continue
 
 		except Exception as e:
 			moderation_bot.logger.error(f"Exception occurred while streaming posts and comments: {e}", exc_info=True)
