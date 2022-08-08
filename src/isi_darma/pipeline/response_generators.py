@@ -61,7 +61,7 @@ class SpolinBotRG(ResponseGenerator):
 		return random.sample(comtype_responses, 1)[0]
 
 	@staticmethod
-	def read_responses(path : str = "isi_darma/data/response_templates/responses.json"):
+	def read_responses(path : str = "/isi_darma/isi_darma/src/isi_darma/data/response_templates/responses.json"):
 		"""
 		Read the json file for bot info.
 		"""
