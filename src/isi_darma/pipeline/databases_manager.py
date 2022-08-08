@@ -50,7 +50,7 @@ class DatabaseManager:
         Check if the hash is in the list of moderated hashes
         """
         is_moderated = obj_id in self.moderated_db.keys()
-        self.logger.info(f"Hash {obj_id} is {'present' if is_moderated else 'not present'} in the moderated database")
+        self.logger.info(f"Id {obj_id} is {'present' if is_moderated else 'not present'} in the moderated database")
 
         return is_moderated
 
