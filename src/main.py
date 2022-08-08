@@ -43,7 +43,7 @@ def main():
 			time.sleep(30)
 
 		except Exception as e:
-			moderation_bot.logger.error(f"Exception occurred while streaming posts and comments: {e}")
+			moderation_bot.logger.error(f"Exception occurred while streaming posts and comments: {e}", exc_info=True)
 			continue
 
 
