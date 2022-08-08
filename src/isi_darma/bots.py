@@ -80,9 +80,6 @@ class BasicBot(ModerationBot):
                 continue
             self.moderate_comment_thread(last_comment)
 
-        else:
-            self.logger.info(f'Already moderated submission with hash value: {submission_hash} !!!')
-
 
     def moderate_post(self, submission):
         """
