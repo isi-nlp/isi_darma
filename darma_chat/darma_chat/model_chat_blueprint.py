@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from threading import Semaphore, Condition
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -257,6 +258,7 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'chat_data_folder': args.blueprint.chat_data_folder,
                 'consent_data_folder': args.blueprint.consent_data_folder,
                 'translator': args.blueprint.translator if 'translator' in args.blueprint else None,
+                'botbackend': args.blueprint.botbackend,
             }
         )
 
@@ -346,6 +348,10 @@ class ModelChatBlueprintArgs(BaseModelChatBlueprintArgs):
     translator: Dict[str, Any] = field(
         default_factory=dict,
         metadata = {"help": "settings to enable machine translation integration"}
+    )
+    botbackend: str = field(
+        default='blenderbot',
+        metadata = {"help": "Chatbot backend name; supported: blenderbot, gpt"}
     )
 
 @register_mephisto_abstraction()

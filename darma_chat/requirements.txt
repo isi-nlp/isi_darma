@@ -9,3 +9,4 @@ colorama==0.4.3
 rtg==0.7
 transformers==4.20.1
 numpy>=1.21.0
+openai==0.22

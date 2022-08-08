@@ -92,6 +92,17 @@ Here, we map frontend customizations and the corresponding scripts that need to 
     - Survey questions: 
       - set `final_rating_question` with your question. For multiple questions, separate them by "|" in a single string. 
 
+## Bot backend
+
+The following two backends are supported.
+1. Blenderbot (default)
+    Explicitly enable this by setting `mephisto.bleuprint.botbackend: blenderbot` in the YAML file.
+
+2. OpenAI GPT  
+  Enable this by setting `mephisto.bleuprint.botbackend: gpt` in the YAML file.
+  This backend requires API key to authenticate with OpenAI services. Please run `export OPENAI_KEY="<keyhere>"` before launching the service.   
+  The API key can be obtained from https://beta.openai.com/account/api-keys
+
 
 
 ## Seed conversation customizations 
@@ -109,6 +120,8 @@ Here, we map frontend customizations and the corresponding scripts that need to 
     -  `DarmaContextGenerator` inside `utils.py` is responsible for loading the seed conversation data (context info), which is supplied to the `_run_initial_turn()` method. 
     -  A static variable keeps track of the index. 
     -  Currently, only one assignment is created for a single conversation seed.  
+
+
 
 ## Enabling MT
 

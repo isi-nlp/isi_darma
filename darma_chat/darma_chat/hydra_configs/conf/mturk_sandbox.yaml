@@ -23,10 +23,12 @@ mephisto:
     annotation_question: "Choose one."
     onboarding_qualification: darma_onboarding
     block_qualification: darma_onboarding_block
-    final_rating_question: "How coherent was E? | How responsive was E to what you wrote? | Did E understand your point of view (as B)? | Did E convince you to change your behavior?"
+    final_rating_question: "How coherent was the bot? | How likely are you going to continue the conversation with the bot? | Did the bot understand your point of view (as B)? | Did the bot convince you to change your behavior?"
     max_onboard_time: 6000
+    botbackend: blenderbot  # blenderbot or gpt
+
     translator:
-      activation: 'pre+post' # pre, post, pre+post, null
+      activation: null # pre, post, pre+post, null
 
       preprocess: nllb_api
       preprocess_args:
