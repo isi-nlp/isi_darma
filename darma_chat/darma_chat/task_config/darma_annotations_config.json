@@ -1,0 +1,13 @@
+{
+    "config": {
+        "agree": {
+            "name": " I agree.",
+            "description": "You agree to providing consent to perform our tasks."
+        },
+        "disagree": {
+            "name": " I do not agree.",
+            "description": "You do not wish to provide consent to perform our tasks."
+        }
+    },
+    "show_line_breaks": false
+}

@@ -1,0 +1,55 @@
+#@package _global_
+defaults:
+  - /mephisto/blueprint: model_chat_blueprint
+  - /mephisto/architect: heroku
+  - /mephisto/provider: mturk_sandbox
+mephisto:
+  provider:
+    requester_name: mturk_sandbox  # Or whatever ID you provided with `mephisto register mturk_sandbox`
+  blueprint:
+    chat_data_folder: ${task_dir}/model_chat/
+    consent_data_folder: ${task_dir}/consent/
+    model_opt_path: ${task_dir}/task_config/darma_model_opts.yaml
+    num_turns: 6 # reduced for now for testing
+    task_model_parallel: true
+    check_acceptability: false
+    conversation_start_mode: "custom" # seed with our data 
+    seed_conversation_source: ${task_dir}/test_text.json
+    conversations_needed_string: "blender_90M:10" # 10 means the number of conversations to evaluate for this model. It is ignored in our script
+    left_pane_text_path: ${task_dir}/task_config/darma_left_pane_text.html 
+    task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
+    onboard_task_data_path: ${task_dir}/task_config/darma_onboard_task_data.json
+    annotations_config_path: ${task_dir}/task_config/darma_annotations_config.json
+    annotation_question: "Choose one."
+    onboarding_qualification: darma_onboarding
+    block_qualification: darma_onboarding_block
+    final_rating_question: "How coherent was E? | How responsive was E to what you wrote? | Did E understand your point of view (as B)? | Did E convince you to change your behavior?"
+    max_onboard_time: 6000
+    translator:
+      activation: 'pre+post' # pre, post, pre+post, null
+
+      preprocess: nllb_api
+      preprocess_args:
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: fra_Latn
+        tgt_lang: eng_Latn
+
+      postprocess: nllb_api
+      postprocess_args:
+        api_url: http://rtg.isi.edu/nllb/translate
+        src_lang: eng_Latn
+        tgt_lang: fra_Latnr
+
+  task:
+    allowed_concurrent: 1
+    assignment_duration_in_seconds: 6000
+    submission_timeout: 6000
+    max_num_concurrent_units: 0  # 0 means infinite; set this to a positive integer to limit concurrent HITs and prevent crashes
+    maximum_units_per_worker: 3
+    task_name: darma_chat
+    task_reward: 3
+    task_tags: "chat,conversation,dialog,partner"
+    task_title: "Evaluate a moderator chatbot"
+    task_description: "Evaluate a moderator chatbot after conversing with it given a conversation."
+mturk:
+  worker_blocklist_paths: null
