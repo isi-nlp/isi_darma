@@ -93,7 +93,7 @@ class BasicBot(ModerationBot):
         translated_dialogue = self.translator.rtg(first_turn)
         self.moderate(translated_dialogue, submission)
 
-        botReply = self.moderate(translated_dialogue, submission)
+        botReply = self.moderate(translated_dialogue, submission, type="post")
         create_json_thread(submission, True, botReply)
 
 
@@ -127,7 +127,7 @@ class BasicBot(ModerationBot):
             self.logger.debug(f'Not moderating self-comment with username: {get_username(last_comment)}')
 
 
-    def moderate(self, dialogue_str: str, obj_to_reply=None) -> str:
+    def moderate(self, dialogue_str: str, obj_to_reply=None, type="comment") -> str:
         """
         Moderates a dialogue from comments or posts
         Optionally, a reddit object can be passed in to reply to.
@@ -154,7 +154,9 @@ class BasicBot(ModerationBot):
                 self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
                 # Response sampled from templates
-                parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
+                if type == "post": parent_username = "others"
+                else: parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
+
                 best_response = self.response_generator.get_random_comtype_resp([parent_username])
                 self.logger.info(f'Author username: {author_username} and parent username: {parent_username}')
                 self.logger.info(f'Templated response to toxic user: {best_response}')
