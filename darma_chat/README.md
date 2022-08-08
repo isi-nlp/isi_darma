@@ -14,7 +14,7 @@ This task is adapted from `https://github.com/isi-nlp/ParlAI/tree/main/parlai/cr
 1. Run `pip install -e .`
     > This installs  mephisto, parlai etc
 
-1. check either of `darma_chat -h` or `python -m darma_chat -h` works. If they dont work, the previous step has failed, go and fix it
+1. check either of `darma-chat -h` or `python -m darma_chat -h` works. If they dont work, the previous step has failed, go and fix it
 
 1. Configure Mephisto
     ```bash
