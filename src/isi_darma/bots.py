@@ -91,7 +91,6 @@ class BasicBot(ModerationBot):
 
         first_turn = f"{title} {post_body}".strip()
         translated_dialogue = self.translator.rtg(first_turn)
-        self.moderate(translated_dialogue, submission)
 
         botReply = self.moderate(translated_dialogue, submission, type="post")
         create_json_thread(submission, True, botReply)
