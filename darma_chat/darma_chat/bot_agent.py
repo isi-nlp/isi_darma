@@ -56,8 +56,6 @@ class TurkLikeAgent:
         act_out['id'] = "BOT"
         assert ('episode_done' not in act_out) or (not act_out['episode_done'])
         self.turn_idx += 1
-        print("#" * 30)
-        print(act_out)
         return {**act_out, 'episode_done': False}
 
     def observe(self, observation, increment_turn: bool = True):
