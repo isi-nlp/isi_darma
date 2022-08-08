@@ -13,8 +13,15 @@ class TurkLikeGptAgent(TurkLikeAgent):
     def __init__(self, *args, api_key='', engine=DEF_ENGINE, **kwargs):
         super().__init__(*args, **kwargs)
         self.sturns = ''
-        openai.api_key = api_key or os.environ.get('OPENAI_KEY', '')
         self.engine = engine
+        if not api_key:
+            api_key = os.environ.get('OPENAI_KEY', '')
+        if not api_key:
+            raise Exception("OpenAI API key is not set."
+                            " Please 'export OPENAI_KEY=<key>' and rerun."
+                            " You may obtain key from https://beta.openai.com/account/api-keys")
+        openai.api_key = api_key
+
 
     def act(self, timeout=None):
         instr = "Respond to the last user using nonviolent communication"

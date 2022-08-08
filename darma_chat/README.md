@@ -100,7 +100,9 @@ The following two backends are supported.
 
 2. OpenAI GPT  
   Enable this by setting `mephisto.bleuprint.botbackend: gpt` in the YAML file.
-  This backend requires API key to authenticate with OpenAI services. Please run `export OPENAI_KEY="<keyhere>"` before launching the service
+  This backend requires API key to authenticate with OpenAI services. Please run `export OPENAI_KEY="<keyhere>"` before launching the service.   
+  The API key can be obtained from https://beta.openai.com/account/api-keys
+
 
 
 ## Seed conversation customizations 
