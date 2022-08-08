@@ -11,9 +11,10 @@ SUBREDDIT = "darma_test"
 def main():
 	parser = ArgumentParser()
 	parser.add_argument("--test", "-t", action="store_true")
+	parser.add_argument("--passive", "-p", action="store_true")
 	args = parser.parse_args()
 
-	moderation_bot = BasicBot(test=args.test)
+	moderation_bot = BasicBot(test=args.test, passive=args.passive)
 
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
