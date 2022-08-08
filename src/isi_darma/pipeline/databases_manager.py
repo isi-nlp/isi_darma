@@ -15,8 +15,12 @@ class DatabaseManager:
     def read_db(self, path):
         self.logger.info(f"Reading database from {path}")
         with open(path, 'r') as f:
-            return json.load(f)
-
+            try:
+                return json.load(f)
+            except json.decoder.JSONDecodeError as e:
+                self.logger.error(f"Error reading database from {path}", exc_info=True)
+                self.logger.debug(f"Returning empty database")
+                return {}
 
     def add_optout_user(self, username: str, dialogue_str: str):
         self.optout_db[username] = { "dialogue": dialogue_str }
