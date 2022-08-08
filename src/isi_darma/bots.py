@@ -21,7 +21,7 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, test=False) -> None:
+    def __init__(self, reddit_client=None, test=False, passive=False) -> None:
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
@@ -32,6 +32,8 @@ class BasicBot(ModerationBot):
         else:
             self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
+
+        self.passive = passive # whether to moderate comments or not
         self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
         self.reddit_client = reddit_client
         self.response_generator = SpolinBotRG(self.logger)
@@ -187,7 +189,7 @@ class BasicBot(ModerationBot):
             final_response = ""
 
         # Final response sent as reply in reddit thread/post
-        if not self.test and final_response and obj_to_reply:
+        if (not self.test or not self.passive) and final_response and obj_to_reply:
             obj_to_reply.reply(final_response)
             self.databases.add_to_moderated(get_id(obj_to_reply), author_username, dialogue_str)
             self.logger.info(f'Response sent to toxic user: {get_username(obj_to_reply)}')
