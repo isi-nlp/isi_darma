@@ -47,7 +47,7 @@ class SpolinBotRG(ResponseGenerator):
 	def get_random_comtype_resp(usernames: List[str] = None):
 
 		if usernames is None:
-			usernames = ['others']
+			usernames = ['les autres']
 
 		usernames = ",".join(usernames)
 
