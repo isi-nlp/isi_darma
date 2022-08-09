@@ -191,6 +191,8 @@ class BasicBot(ModerationBot):
         elif opt_out:
             self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
             self.databases.add_optout_user(author_username, dialogue_str)
+            obj_to_reply.reply(self.bot_responses['opt_out_complete_fr'])
+            self.logger.info(f'Opt-out complete message sent to new user: {author_username}')
             final_response = ""
 
         else:
