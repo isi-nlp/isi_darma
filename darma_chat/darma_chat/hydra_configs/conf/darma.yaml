@@ -12,7 +12,7 @@ mephisto:
     task_model_parallel: true
     check_acceptability: false
     conversation_start_mode: "custom" # seed with our data 
-    seed_conversation_source: ${task_dir}/test_text.json
+    seed_conversation_source: ${task_dir}/data/france_final_threads_9may_to_20july.json
     conversations_needed_string: "blender_90M:10"
     left_pane_text_path: ${task_dir}/task_config/darma_left_pane_text.html 
     task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
@@ -31,6 +31,7 @@ mephisto:
         # TODO: change the URL to DARMA hosted service
         api_url: http://rtg.isi.edu/many-eng/v1/translate
       postprocess: nllb_api
+
       postprocess_args:
         api_url: http://rtg.isi.edu/nllb/translate
         src_lang: eng_Latn
