@@ -199,7 +199,6 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         if self.task_turn_idx == 0:
             self._run_initial_turn()
-            self.task_turn_idx += 1
             return
 
         """Otherwise, we proceed accordingly"""
@@ -458,16 +457,12 @@ class ModelChatWorld(BaseModelChatWorld):
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
                 }
-                # if turn["speaker_id"] == self.target_user:
-                #     msg['id'] = self.agent.agent_id
-                # else:
-                #     msg['id'] = self.bot.agent_id
 
                 self.dialog.append(msg)
                 self.agent.observe(validate(msg))
                 self.bot.observe(validate(msg))
 
-                # bot responds to the last turn
+                # let bot respond to the last turn
                 if idx == len(dialogue) - 1:
                     first_bot_act = self.bot.act()
                     first_bot_act = Compatibility.backward_compatible_force_set(
@@ -482,6 +477,8 @@ class ModelChatWorld(BaseModelChatWorld):
                         'id': "BOT",
                     }
                     self.dialog.append(bot_utterance_data)
+
+                self.task_turn_idx += 1
         else:
             raise ValueError(
                 f"Conversation start mode {self.opt['conversation_start_mode']} "
