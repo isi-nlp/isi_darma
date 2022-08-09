@@ -209,11 +209,4 @@ class BasicBot(ModerationBot):
         else:
             self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
 
-        # Send out response when user opts out of moderation
-        if opt_out and not no_mod_user and obj_to_reply:
-            obj_to_reply.reply(self.bot_responses['opt_out_complete_fr'])
-            self.logger.info(f'Opt-out complete message sent to new user: {author_username}')
-
-
-
         return final_response
