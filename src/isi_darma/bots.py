@@ -163,6 +163,10 @@ class BasicBot(ModerationBot):
                 if type == "post": parent_username = "others"
                 else: parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
 
+                # Change parent username to "others" if it's a self-reply
+                if parent_username == author_username: parent_username = "others"
+
+                # Response sampled from templates
                 best_response = self.response_generator.get_random_comtype_resp([parent_username])
                 self.logger.info(f'Author username: {author_username} and parent username: {parent_username}')
                 self.logger.info(f'Templated response to toxic user: {best_response}')
