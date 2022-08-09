@@ -445,6 +445,10 @@ class ModelChatWorld(BaseModelChatWorld):
 
             # make each turn in the context be from the bot except for the target user
             self.target_user = self.context_info["target_user"]
+
+            # update min number of turns by adding the number of turns in the seed dialogue 
+            self.num_turns = self.num_turns + len(dialogue)
+            
             for idx, turn in enumerate(dialogue):
 
                 msg = {

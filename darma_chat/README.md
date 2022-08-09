@@ -88,7 +88,7 @@ Here, we map frontend customizations and the corresponding scripts that need to 
   - message box: `frontend/components/message.jsx`
   - Post-conversation survey: 
     - Selection choices: 
-      - `parlai/crowdsourcing/tasks/darma_chat/frontend/components/response_panes.jsx` under `function RatingSelector`
+      - `darma_chat/frontend/components/response_panes.jsx` under `function RatingSelector`
     - Survey questions: 
       - set `final_rating_question` with your question. For multiple questions, separate them by "|" in a single string. 
 
@@ -198,3 +198,6 @@ __The following MT backends are supported__
 it possibly because you have changed default branch as something other than `master`
 So here is how to set the default as master:
   `git config --global init.defaultBranch master`
+- Q: How can I adjust the number of turns that the users must converse with before seeing the final survey? 
+  - A: Adjust the `num_turns` value in the configuration file. Note that the length of the seed conversation will be added to the `num_turns` that you provide in this config file in `ModelChatWorld._run_initial_turn()` in `world.py`, which updates the max number of turns that get passed on to the front end. 
+  The condition `(lastMessageIdx >= taskConfig.min_num_turns * 2)` in `ResponseComponent` in `response_panes.jsx` invokes the final survey. 
