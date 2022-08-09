@@ -32,7 +32,6 @@ class BasicBot(ModerationBot):
         else:
             self.logger = setup_logger('test', 'logs/test.log', test=self.test)
 
-
         self.passive = passive # whether to moderate comments or not
         self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
         self.reddit_client = reddit_client
@@ -156,7 +155,6 @@ class BasicBot(ModerationBot):
                 initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
                 self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
-                # Response sampled from templates
                 if type == "post": parent_username = "others"
                 else: parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
 
@@ -187,7 +185,7 @@ class BasicBot(ModerationBot):
             final_response = ""
 
         else:
-            self.logger.info(f'{author_username} already moderated this post/comment')
+            self.logger.info(f'Already moderated this post/comment with id {post_id} for {author_username}. Skipping moderation.')
             final_response = ""
 
         # Final response sent as reply in reddit thread/post
