@@ -86,6 +86,7 @@ Here, we map frontend customizations and the corresponding scripts that need to 
   - title: 
     - simply update `task_title` in `darma.yaml`
   - message box: `frontend/components/message.jsx`
+    - color specification: `MaybeCheckboxChatMessage` 
   - Post-conversation survey: 
     - Selection choices: 
       - `darma_chat/frontend/components/response_panes.jsx` under `function RatingSelector`
@@ -199,5 +200,4 @@ it possibly because you have changed default branch as something other than `mas
 So here is how to set the default as master:
   `git config --global init.defaultBranch master`
 - Q: How can I adjust the number of turns that the users must converse with before seeing the final survey? 
-  - A: Adjust the `num_turns` value in the configuration file. Note that the length of the seed conversation will be added to the `num_turns` that you provide in this config file in `ModelChatWorld._run_initial_turn()` in `world.py`, which updates the max number of turns that get passed on to the front end. 
-  The condition `(lastMessageIdx >= taskConfig.min_num_turns * 2)` in `ResponseComponent` in `response_panes.jsx` invokes the final survey. 
+  - A: Adjust the `num_turns` value in the configuration file. The condition in `(n_bot_turns >= taskConfig.min_num_turns + 1)` in `ResponseComponent` in `response_panes.jsx` invokes the final survey, where `n_bot_turns` tracks the number of responses from users in the conversation history. `MaybeCheckboxChatMessage` in `message.jsx` adds the `bot-message` class to messages from the bot, which is used to count the number of interactions in `n_bot_turns`. 
