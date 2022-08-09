@@ -137,8 +137,13 @@ class BasicBot(ModerationBot):
         self.logger.debug(f'Toxicity score for "{dialogue_str}" = {toxicity} with behavior type = {behav_type}')
         moderation_strategy = self.determine_moderation_strategy(dialogue_str)
         author_username = get_username(obj_to_reply) if obj_to_reply else "test_author"
-        opt_out = check_for_opt_out(dialogue_str)
-        no_mod_user = self.databases.search_optout_db(author_username)
+
+        # Do not worry about users opt-ing out of moderation when in passive mode
+        if not self.passive:
+            opt_out = check_for_opt_out(dialogue_str)
+            no_mod_user = self.databases.search_optout_db(author_username)
+        else:
+            opt_out, no_mod_user = False, False
 
         # Extract post id from object and check if already in database
         if type == 'post': post_id = get_post_id(obj_to_reply)
