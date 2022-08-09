@@ -18,7 +18,7 @@ def get_username(redditor_obj: Redditor):
 	return redditor_obj.author.name if redditor_obj else ''
 
 
-def get_id(redditor_obj: Redditor):
+def get_post_id(redditor_obj: Redditor):
 	return redditor_obj.id if redditor_obj else ''
 
 

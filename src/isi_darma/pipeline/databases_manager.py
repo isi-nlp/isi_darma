@@ -42,7 +42,7 @@ class DatabaseManager:
                                         }
         with open(self.moderated_hashes_path, "w") as f:
             f.write(json.dumps(self.moderated_db))
-        self.logger.info(f"Id - {obj_id} added to the moderated database.")
+        self.logger.info(f"Post Id - {obj_id} added to the moderated database.")
 
 
     def search_moderated(self, obj_id: str) -> bool:

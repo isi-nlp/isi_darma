@@ -5,7 +5,7 @@ from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
 from isi_darma.pipeline.response_generators import SpolinBotRG
 from isi_darma.pipeline.translators import Translator
 from isi_darma.pipeline.databases_manager import DatabaseManager
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out, get_id
+from isi_darma.utils import load_credentials, get_username, check_for_opt_out, get_post_id
 from isi_darma.utils import get_replied_to, create_json_thread
 
 class ModerationBot(ABC):
@@ -141,8 +141,10 @@ class BasicBot(ModerationBot):
         opt_out = check_for_opt_out(dialogue_str)
         no_mod_user = self.databases.search_optout_db(author_username)
 
-        obj_id = get_id(obj_to_reply)
-        already_moderated = self.databases.search_moderated(obj_id)
+        # Extract post id from object and check if already in database
+        if type == 'post': post_id = get_post_id(obj_to_reply)
+        else: post_id = get_post_id(obj_to_reply.submission)
+        already_moderated = self.databases.search_moderated(post_id)
 
         # Check if user has opted out of moderation now or earlier
         if not already_moderated and not opt_out and not no_mod_user:
@@ -191,7 +193,17 @@ class BasicBot(ModerationBot):
         # Final response sent as reply in reddit thread/post
         if (not self.test or not self.passive) and final_response and obj_to_reply:
             obj_to_reply.reply(final_response)
-            self.databases.add_to_moderated(get_id(obj_to_reply), author_username, dialogue_str)
-            self.logger.info(f'Response sent to toxic user: {get_username(obj_to_reply)}')
+            self.databases.add_to_moderated(post_id, author_username, dialogue_str)
+            self.logger.info(f'Response sent to toxic user: {author_username}')
+
+        else:
+            self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
+
+        # Send out response when user opts out of moderation
+        if opt_out and not no_mod_user and obj_to_reply:
+            obj_to_reply.reply(self.bot_responses['opt_out_complete_fr'])
+            self.logger.info(f'Opt-out complete message sent to new user: {author_username}')
+
+
 
         return final_response
