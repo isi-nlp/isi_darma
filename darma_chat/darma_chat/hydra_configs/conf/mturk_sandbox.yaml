@@ -5,7 +5,7 @@ defaults:
   - /mephisto/provider: mturk_sandbox
 mephisto:
   provider:
-    requester_name: mturk_sandbox  # Or whatever ID you provided with `mephisto register mturk_sandbox`
+    requester_name: jm_sandbox  # Or whatever ID you provided with `mephisto register mturk_sandbox`
   blueprint:
     chat_data_folder: ${task_dir}/model_chat/
     consent_data_folder: ${task_dir}/consent/
