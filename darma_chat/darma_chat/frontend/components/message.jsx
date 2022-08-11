@@ -11,17 +11,21 @@ import React from "react";
 import { Checkboxes } from './inputs.jsx';
 
 function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", checkbox = null }) {
-  const floatToSide = isSelf ? "right" : "left";
-  let alertStyle = isSelf ? "alert-info" : "alert-warning";
+  // color scheme for alert classes can be referenced here: https://getbootstrap.com/docs/4.0/components/alerts/ 
+  const floatToSide = isSelf ? "right" : "left"; // the target speaker's messages are shown to the right while all others are are shown on the left 
+  let alertStyle = isSelf ? "alert-info" : "alert-warning"; // the target speaker's messages are in blue while all others are in yellow 
+  let message_class = "non-bot-message" // differentiate between bot responses and all other responses to keep track of number of interactions
 
-  if (agentName == "BOT"){
+  // set box color to green if the response is coming from the bot
+  if (agentName == "Moderator"){
     alertStyle = "alert-success"
+    message_class = "bot-message" // differentiate between bot responses and all other responses to keep track of number of interactions
   }
 
   return (
     <div className="row" style={{ marginLeft: "0", marginRight: "0" }}>
       <div
-        className={"alert message " + alertStyle}
+        className={"alert message " + alertStyle + " " + message_class}
         role="alert"
         style={{ float: floatToSide }}
       >

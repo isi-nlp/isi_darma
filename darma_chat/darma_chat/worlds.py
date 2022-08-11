@@ -142,9 +142,6 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
     def __init__(self, opt, agent, bot,  mt: Optional[DialogTranslator]=None):
         super().__init__(opt, agent)
 
-        # num_turns turns for a single side, and really it appears to be
-        # (num_turns + 1) * 2 total b/c of the "Hi!" and first bot utterance
-
         num_turns = opt['num_turns']
         max_resp_time = opt['max_resp_time']
 
@@ -156,7 +153,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         self.agent.agent_id = 'Speaker 1'
         # self.agent.agent_id = ""
-        self.bot.agent_id = 'BOT'
+        self.bot.agent_id = 'Moderator'
         # self.bot.agent_id = ""
         self.target_user = ""
 
@@ -175,9 +172,6 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         # below are timeout protocols
         self.max_resp_time = max_resp_time  # in secs
-        log.info(
-            f'Creating {self.__class__.__name__} for tag {self.tag} with {num_turns} turns.'
-        )
 
     def __add_problem_data_to_utterance(self, p, turn_idx: int):
         """
@@ -193,13 +187,9 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         self.dialog[turn_idx]['problem_data'] = p
 
     def parley(self):
-        log.info(f'{self.__class__.__name__}:{self.tag}: is at turn'
-                 '{self.task_turn_idx}, with {self.num_turns} pairs of turns needed...'
-        )
 
         if self.task_turn_idx == 0:
             self._run_initial_turn()
-            self.task_turn_idx += 1
             return
 
         """Otherwise, we proceed accordingly"""
@@ -281,7 +271,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 return
             else:
                 # if idx == 1:
-                #     user_name= "BOT"
+                #     user_name= "Moderator"
                 # else:
                 #     user_name = self.target_user
                 utterance_data = {
@@ -445,6 +435,7 @@ class ModelChatWorld(BaseModelChatWorld):
 
             # make each turn in the context be from the bot except for the target user
             self.target_user = self.context_info["target_user"]
+            
             for idx, turn in enumerate(dialogue):
 
                 msg = {
@@ -454,16 +445,12 @@ class ModelChatWorld(BaseModelChatWorld):
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
                 }
-                # if turn["speaker_id"] == self.target_user:
-                #     msg['id'] = self.agent.agent_id
-                # else:
-                #     msg['id'] = self.bot.agent_id
 
                 self.dialog.append(msg)
                 self.agent.observe(validate(msg))
                 self.bot.observe(validate(msg))
 
-                # bot responds to the last turn
+                # let bot respond to the last turn
                 if idx == len(dialogue) - 1:
                     first_bot_act = self.bot.act()
                     first_bot_act = Compatibility.backward_compatible_force_set(
@@ -475,9 +462,11 @@ class ModelChatWorld(BaseModelChatWorld):
                     bot_utterance_data = {
                         'agent_idx': 1,
                         'text': first_bot_act['text'],
-                        'id': "BOT",
+                        'id': "Moderator",
                     }
                     self.dialog.append(bot_utterance_data)
+
+                self.task_turn_idx += 1
         else:
             raise ValueError(
                 f"Conversation start mode {self.opt['conversation_start_mode']} "

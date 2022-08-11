@@ -243,11 +243,12 @@ function ResponseComponent({ taskConfig, appSettings, onMessageSend, active }) {
     hasAnyAnnotations(lastMessageAnnotations) & active
   );
 
-  // const computedActive = true 
+  // use number of bot turns as a measure of number of interactions made with user 
+  const n_bot_turns = document.querySelectorAll('.bot-message').length
 
-  if (lastMessageIdx >= taskConfig.min_num_turns * 2) {
+  if (n_bot_turns >= taskConfig.min_num_turns + 1) { // + 1 is needed as the Moderator will first respond based on the given conversation context 
     return (
-      <FinalSurvey
+      <FinalSurvey   
         onMessageSend={onMessageSend}
         taskConfig={taskConfig}
         active={computedActive}

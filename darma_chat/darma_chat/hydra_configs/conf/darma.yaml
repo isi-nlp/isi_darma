@@ -8,7 +8,7 @@ mephisto:
     chat_data_folder: ${task_dir}/model_chat/
     consent_data_folder: ${task_dir}/consent/
     model_opt_path: ${task_dir}/task_config/darma_model_opts.yaml
-    num_turns: 6 # reduced for now for testing
+    num_turns: 6 # number of interactions before final survey is shown. 
     task_model_parallel: true
     check_acceptability: false
     conversation_start_mode: "custom" # seed with our data 
