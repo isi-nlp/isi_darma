@@ -1,8 +1,18 @@
 from abc import ABC, abstractmethod
+import logging as log
+from typing import List
+
 import requests
 from transformers import AutoTokenizer, AutoModelForSeq2SeqLM
+from spacy.lang.en import English
 
-import logging as log
+
+nlp = English()
+nlp.add_pipe('sentencizer')
+
+
+def split_sentences(text:str) -> List[str]:
+    return [x.text for x in nlp(text).sents]
 
 
 class BaseTranslator(ABC):
@@ -17,7 +27,7 @@ class BaseTranslator(ABC):
 
 class RtgApiTranslator(BaseTranslator):
 
-    def __init__(self, api_url='http://rtg.isi.edu/many-eng/v1/translate') -> None:
+    def __init__(self, api_url: str) -> None:
         self.api_url = api_url
 
     def _translate(self, req_data, out_key='translation'):
@@ -33,9 +43,9 @@ class RtgApiTranslator(BaseTranslator):
                 f'Translation failed {response.status_code} -> {response.reason}')
 
     def translate(self, text: str, src_lang='mul', tgt_lang='eng') -> str:
-        req_data = {'source': [text]}
+        req_data = {'source': split_sentences(text)}
         try:
-            return self._translate(req_data=req_data)[0]
+            return ' '.join(self._translate(req_data=req_data))
         except Exception as e:
             log.error(f'MT API Error:: {e}. Returning source.')
             return text
@@ -49,11 +59,11 @@ class NLLBApiTranslator(RtgApiTranslator):
         self.tgt_lang = tgt_lang
 
     def translate(self, text: str, src_lang=None, tgt_lang=None) -> str:
-        req_data = dict(source=[text],
+        req_data = dict(source=split_sentences(text),
                         src_lang=src_lang or self.src_lang,
                         tgt_lang=tgt_lang or self.tgt_lang)
         try:
-            return self._translate(req_data=req_data)[0]
+            return ' '.join(self._translate(req_data=req_data))
         except Exception as e:
             log.error(f'MT API Error:: {e}. Returning source.')
             return text
