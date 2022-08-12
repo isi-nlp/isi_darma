@@ -350,7 +350,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             )
         else:
             violations_string = None
-
+        model_agent = self.bot.model_agent
         data = {
             'dialog': self.dialog,
             'workers': [get_mturk_id_from_mephisto_wrapper(self.agent)],
@@ -361,8 +361,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             'task_description': {
                 'annotations_config': self.opt['annotations_config'],
                 'model_nickname': self.bot.worker_id,
-                'model_file': self.bot.model_agent.opt.get('model_file'),
-                'model_opt': self.bot.model_agent.opt,
+                'model_file': model_agent and model_agent.opt and model_agent.opt.get('model_file'),
+                'model_opt': model_agent and model_agent.opt,
             },
         }
         # TODO: once the analysis scripts are fully switched over to DataBrowser, remove
