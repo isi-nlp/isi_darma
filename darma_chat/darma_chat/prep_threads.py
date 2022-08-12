@@ -7,8 +7,11 @@ import argparse
 import json
 import logging as log
 from functools import lru_cache
+from io import StringIO
 from tqdm.auto import tqdm
+from markdown import Markdown
 from darma_chat.translator import RtgApiTranslator
+
 
 log.basicConfig(level=log.INFO)
 
@@ -16,6 +19,37 @@ ANON_IDS = list('ABCDEFGHIJKLMNOPQRSTUVWXYZ')
 DEF_MT_API = 'http://54.68.184.232:6060/many-eng/v1/translate'
 
 mt: RtgApiTranslator = None
+
+def unmark_element(element, stream=None):
+    if stream is None:
+        stream = StringIO()
+    if element.text:
+        stream.write(element.text)
+    for sub in element:
+        unmark_element(sub, stream)
+    if element.tail:
+        stream.write(element.tail)
+    return stream.getvalue()
+
+
+Markdown.output_formats["plain"] = unmark_element
+unmarker = Markdown(output_format="plain")
+unmarker.stripTopLevelTags = False
+
+
+
+def unmarkdown(text: str):
+    try:
+        return unmarker.convert(text)
+    except Exception as e:
+        log.error(f"Error while remove markdown tags {e}")
+        return text
+
+def unmarkdwon_thread(thread):
+    """Convert markdown to plaintext"""
+    for msg in thread['conversation']:
+        msg['text'] = unmarkdown(msg['text'])
+
 
 def anonymize_thread(thread):
     """Anonymize thread (in-place)"""
@@ -67,6 +101,7 @@ def main():
     total_msgs = 0
     with tqdm(threads, 'threads', unit='thread') as pbar:
         for thread in pbar:
+            unmarkdwon_thread(thread)
             anonymize_thread(thread)
             if args['mt']:
                 translate_thread(thread)
