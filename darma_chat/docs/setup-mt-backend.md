@@ -30,14 +30,50 @@ You may run `sudo su darma` to switch from ubuntu to darma user, and add your ss
 
 
 ### RTG 
-
-Service file: `/home/darma/apps/rtg-many-eng/rtg-500engv1.service`
-
 `sudo systemctl (status|start|stop|enable) rtg-500engv1`
+
+Service file is at `/home/darma/apps/rtg-many-eng/rtg-500engv1.service`
+
+It has the following contents
+```ini
+[Unit]
+    Description=RTG 500-1 server
+    After=network.target
+
+ [Service]
+    User=darma
+    Group=darma
+    WorkingDirectory=/home/darma/apps/rtg-many-eng
+    Environment="PATH=/home/darma/.conda/envs/rtg/bin"
+    ExecStart=/home/darma/.conda/envs/rtg/bin/uwsgi --http 0.0.0.0:6060 --module rtg.serve.app:app --pyargv "rtg500eng-tfm9L6L768d-bsz720k-stp200k-ens05 -b /many-eng/v1"
+
+[Install]
+    WantedBy=multi-user.targe
+
+```
 
 
 ### NLLB
 
-Service file: `/home/darma/apps/nllb-serve/nllb-serve.service`
-
 `sudo systemctl (status|start|stop|enable) nllb-serve`
+
+Service file: `/home/darma/apps/nllb-serve/nllb-serve.service`
+It has the following contents
+```ini
+[Unit]
+    Description=NLLB 200-200 MT server
+    After=network.target
+
+ [Service]
+    User=darma
+    Group=darma
+    WorkingDirectory=/home/darma/apps/nllb-serve
+    Environment="PATH="/home/darma/.conda/envs/rtg/bin"
+    ExecStart=/home/darma/.conda/envs/rtg/bin/uwsgi --http 0.0.0.0:6062 --module nllb_serve.app:app --pyargv "-b /nllb"
+
+[Install]
+    WantedBy=multi-user.target
+```
+
+
+
