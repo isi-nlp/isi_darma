@@ -14,7 +14,8 @@ mephisto:
     task_model_parallel: true
     check_acceptability: false
     conversation_start_mode: "custom" # seed with our data 
-    seed_conversation_source: ${task_dir}/data/test_text.json
+    #seed_conversation_source: ${task_dir}/data/test_text.json
+    seed_conversation_source: ${task_dir}/data/france_sample.json
     conversations_needed_string: "blender_90M:10" # 10 means the number of conversations to evaluate for this model. It is ignored in our script
     left_pane_text_path: ${task_dir}/task_config/darma_left_pane_text.html 
     task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
@@ -28,7 +29,7 @@ mephisto:
     botbackend: blenderbot  # blenderbot or gpt
 
     translator:
-      activation: pre # pre, post, pre+post, null
+      activation: pre+post # pre, post, pre+post, null
       preprocess: rtg_api
       preprocess_args:
         # TODO: change the URL to DARMA hosted service
