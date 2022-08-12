@@ -280,6 +280,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                     'text': acts[idx]['text'].split('<br>')[0],
                     'id': acts[idx].get('id', 'NULL_ID'),  # In case model doesn't set id
                 }
+                if 'text_orig' in acts[idx]:
+                    utterance_data['text_orig'] = acts[idx]['text_orig']
                 self.dialog.append(utterance_data)
                 if idx == 0:
                     # Human has just responded. Any problem data received now will be
@@ -442,6 +444,7 @@ class ModelChatWorld(BaseModelChatWorld):
                     'episode_done': False,
                     'id': turn['speaker_id'],
                     'text': turn['text'],
+                    'text_orig': turn.get('text_orig'),
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
                 }

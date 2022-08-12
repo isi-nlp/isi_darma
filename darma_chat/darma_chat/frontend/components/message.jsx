@@ -10,7 +10,7 @@ import React from "react";
 
 import { Checkboxes } from './inputs.jsx';
 
-function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", checkbox = null }) {
+function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", messageOrig="", checkbox = null }) {
   // color scheme for alert classes can be referenced here: https://getbootstrap.com/docs/4.0/components/alerts/ 
   const floatToSide = isSelf ? "right" : "left"; // the target speaker's messages are shown to the right while all others are are shown on the left 
   let alertStyle = isSelf ? "alert-info" : "alert-warning"; // the target speaker's messages are in blue while all others are in yellow 
@@ -33,8 +33,10 @@ function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", c
           {/* <span dangerouslySetInnerHTML={{ __html: message }}></span> */}
           <b>{agentName}</b>: <span dangerouslySetInnerHTML={{ __html: message }}></span>
         </span>
+          {messageOrig && <div ckassName="alert alert-light"><details><summary>▶</summary><p>{messageOrig}</p></details></div>}
         {checkbox}
       </div>
+
     </div>
   );
 }
@@ -86,6 +88,7 @@ function RenderChatMessage({ message, mephistoContext, appContext, idx }) {
       message={message.text}
       taskData={message.task_data}
       messageId={message.message_id}
+      messageOrig={message.text_orig}
       // checkbox={checkboxes}
     />
   );
