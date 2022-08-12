@@ -201,3 +201,8 @@ So here is how to set the default as master:
   `git config --global init.defaultBranch master`
 - Q: How can I adjust the number of turns that the users must converse with before seeing the final survey? 
   - A: Adjust the `num_turns` value in the configuration file. The condition in `(n_bot_turns >= taskConfig.min_num_turns + 1)` in `ResponseComponent` in `response_panes.jsx` invokes the final survey, where `n_bot_turns` tracks the number of responses from users in the conversation history. `MaybeCheckboxChatMessage` in `message.jsx` adds the `bot-message` class to messages from the bot, which is used to count the number of interactions in `n_bot_turns`. 
+
+-  Browser issues:  
+   - Use _Google Chrome_ for the best results (i.e., fewer issues). 
+   - Disable cache: Developer tools > Network (tab) > Disable cache 
+   - Clear cookies; Altenatively, open in private/incognito window
