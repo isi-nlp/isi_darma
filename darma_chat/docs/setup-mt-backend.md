@@ -9,8 +9,8 @@ Sign-in URL: https://708591782446.signin.aws.amazon.com/console
 * Instance-ID: `i-050bc291661a69353`	
 * IP address: `54.68.184.232`. 
   > This is a static elastic IP. 
-    They charge money for the static address if the node is _not_ running.  
-    Please release the address when this project is completed.
+    AWS charges money for static addresses if the nodes are _not_ running.  
+    Please release this address when this project is completed.
 
 
 ## Start / Stop Services
