@@ -203,16 +203,20 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 acts[idx] = agent.act(timeout=self.max_resp_time)
                 if self.mt:
                     text = acts[idx]['text']
-                    acts[idx]['text_orig'] = text
-                    mt_fn = self.mt.maybe_preprocess if idx == 0\
-                        else self.mt.maybe_postprocess
-                    text = mt_fn(text)
-                    # agent's act is a custom datatype, which requires force_set
-                    # but bot's act is a dict, which dont have force_set()
-                    if hasattr(acts[idx], 'force_set'):
-                        acts[idx].force_set('text', text)
-                    else:
-                        acts[idx]['text'] = mt_fn(text)
+                    text_mt = None
+                    if idx == 0 and self.mt.pre_translator:
+                        text_mt = self.mt.maybe_preprocess(text)
+                    elif self.mt.post_translator:
+                        text_mt = self.mt.maybe_postprocess(text)
+                    if text_mt and text_mt != text:
+                        # only include text_orig when MT is enabled; otherwise the frontend display's duplicates
+                        acts[idx]['text_orig'] = text
+                        # agent's act is a custom datatype, which requires force_set
+                        # but bot's act is a dict, which dont have force_set()
+                        if hasattr(acts[idx], 'force_set'):
+                            acts[idx].force_set('text', text_mt)
+                        else:
+                            acts[idx]['text'] = text_mt
                 if agent == self.bot and\
                     hasattr(self.bot, 'agent_id') and self.bot.agent_id:
                     # Set speaker name as self.bot_agent_id otherwise, at frontend bot name such as "TransformerGenerator" would appear
@@ -280,6 +284,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                     'text': acts[idx]['text'].split('<br>')[0],
                     'id': acts[idx].get('id', 'NULL_ID'),  # In case model doesn't set id
                 }
+                if 'text_orig' in acts[idx]:
+                    utterance_data['text_orig'] = acts[idx]['text_orig']
                 self.dialog.append(utterance_data)
                 if idx == 0:
                     # Human has just responded. Any problem data received now will be
@@ -344,7 +350,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             )
         else:
             violations_string = None
-
+        model_agent = self.bot.model_agent
         data = {
             'dialog': self.dialog,
             'workers': [get_mturk_id_from_mephisto_wrapper(self.agent)],
@@ -355,8 +361,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             'task_description': {
                 'annotations_config': self.opt['annotations_config'],
                 'model_nickname': self.bot.worker_id,
-                'model_file': self.bot.model_agent.opt.get('model_file'),
-                'model_opt': self.bot.model_agent.opt,
+                'model_file': model_agent and model_agent.opt and model_agent.opt.get('model_file'),
+                'model_opt': model_agent and model_agent.opt,
             },
         }
         # TODO: once the analysis scripts are fully switched over to DataBrowser, remove
@@ -435,13 +441,13 @@ class ModelChatWorld(BaseModelChatWorld):
 
             # make each turn in the context be from the bot except for the target user
             self.target_user = self.context_info["target_user"]
-            
             for idx, turn in enumerate(dialogue):
 
                 msg = {
                     'episode_done': False,
                     'id': turn['speaker_id'],
                     'text': turn['text'],
+                    'text_orig': turn.get('text_orig'),
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
                 }
@@ -456,12 +462,22 @@ class ModelChatWorld(BaseModelChatWorld):
                     first_bot_act = Compatibility.backward_compatible_force_set(
                         first_bot_act, 'id', self.bot.agent_id
                     )
-
+                    if self.mt and self.mt.post_translator:
+                        text = first_bot_act['text']
+                        first_bot_act['text_orig'] = text
+                        text = self.mt.maybe_postprocess(text)
+                        # agent's act is a custom datatype, which requires force_set
+                        # but bot's act is a dict, which dont have force_set()
+                        if hasattr(first_bot_act, 'force_set'):
+                            first_bot_act.force_set('text', text)
+                        else:
+                            first_bot_act['text'] = text
                     self.agent.observe(validate(first_bot_act))
 
                     bot_utterance_data = {
                         'agent_idx': 1,
                         'text': first_bot_act['text'],
+                        'text_orig': first_bot_act.get('text_orig'),
                         'id': "Moderator",
                     }
                     self.dialog.append(bot_utterance_data)

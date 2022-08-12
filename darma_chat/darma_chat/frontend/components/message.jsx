@@ -10,7 +10,7 @@ import React from "react";
 
 import { Checkboxes } from './inputs.jsx';
 
-function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", checkbox = null }) {
+function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", messageOrig="", checkbox = null, }) {
   // color scheme for alert classes can be referenced here: https://getbootstrap.com/docs/4.0/components/alerts/ 
   const floatToSide = isSelf ? "right" : "left"; // the target speaker's messages are shown to the right while all others are are shown on the left 
   let alertStyle = isSelf ? "alert-info" : "alert-warning"; // the target speaker's messages are in blue while all others are in yellow 
@@ -33,6 +33,10 @@ function MaybeCheckboxChatMessage({ isSelf, duration, agentName, message = "", c
           {/* <span dangerouslySetInnerHTML={{ __html: message }}></span> */}
           <b>{agentName}</b>: <span dangerouslySetInnerHTML={{ __html: message }}></span>
         </span>
+          {messageOrig && <div style={{display: "inline"}}><details style={{display: "inline"}}>
+                <summary style={{display: "inline", paddingLeft: "1.5em"}}>▶</summary>
+                <i>{messageOrig}</i>
+               </details></div>}
         {checkbox}
       </div>
     </div>
@@ -75,6 +79,11 @@ function RenderChatMessage({ message, mephistoContext, appContext, idx }) {
       />
     </div>;
   }
+  var show_text = message.text
+  var hide_text =  message.text_orig
+  if (message.fake_start && hide_text) { // reversed for fake start
+    [show_text, hide_text] = [hide_text, show_text]
+  }
   return (
     <MaybeCheckboxChatMessage
       isSelf={isHuman}
@@ -83,9 +92,10 @@ function RenderChatMessage({ message, mephistoContext, appContext, idx }) {
           ? currentAgentNames[message.id]
           : message.id
       }
-      message={message.text}
+      message={show_text}
       taskData={message.task_data}
       messageId={message.message_id}
+      messageOrig={hide_text}
       // checkbox={checkboxes}
     />
   );
