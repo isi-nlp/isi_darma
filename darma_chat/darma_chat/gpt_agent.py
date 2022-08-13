@@ -52,7 +52,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
     @staticmethod
     def query_completion_api(prompt, engine=DEF_ENGINE,
-                             frequency_penalty=0, presence_penalty=0, temperature=0):
+                             frequency_penalty=0, presence_penalty=0, temperature=0.7):
         response = openai.Completion.create(
             model=engine,
             prompt=prompt,
@@ -60,7 +60,8 @@ class TurkLikeGptAgent(TurkLikeAgent):
             max_tokens=512,
             top_p=1,
             frequency_penalty=frequency_penalty,
-            presence_penalty=presence_penalty
+            presence_penalty=presence_penalty,
+            stop=["user A:", "user B:", "user C:", "user D:"]
         )
         return response
 
