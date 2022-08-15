@@ -48,7 +48,7 @@ It has the following contents
     ExecStart=/home/darma/.conda/envs/rtg/bin/uwsgi --http 0.0.0.0:6060 --module rtg.serve.app:app --pyargv "rtg500eng-tfm9L6L768d-bsz720k-stp200k-ens05 -b /many-eng/v1"
 
 [Install]
-    WantedBy=multi-user.targe
+    WantedBy=multi-user.target
 
 ```
 
