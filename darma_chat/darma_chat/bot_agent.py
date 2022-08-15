@@ -53,7 +53,7 @@ class TurkLikeAgent:
             final_message_text = normalize_reply(act_out['text'])
 
         act_out['text'] = final_message_text
-        act_out['id'] = "BOT"
+        act_out['id'] = "Moderator"
         assert ('episode_done' not in act_out) or (not act_out['episode_done'])
         self.turn_idx += 1
         return {**act_out, 'episode_done': False}
