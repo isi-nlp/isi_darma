@@ -78,10 +78,12 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 		else:
 			myComments = currComment.replies._comments
 			for x in myComments:
-				if x.author is not None:
+
+				try:
 					myAuthor = x.author.fullname
-				else:
+				except AttributeError:
 					myAuthor = "[Author of deleted post.]"
+
 				addComment = [myAuthor, x.body]
 				commentList.append(addComment)
 				get_child_comments(x, commentList, botReply, postedComment)
@@ -108,9 +110,15 @@ def create_json_thread(comment, is_submission, bot_reply, subreddit = "darma_tes
 	my_comments = this_submission.comments._comments
 
 	for this_comment in my_comments:
-		my_author = "[Author of deleted post.]"
+
+		try:
+			my_author = this_comment.author.fullname
+		except AttributeError:
+			my_author = "[Author of deleted post.]"
+
 		if this_comment.author is not None:
 			my_author = this_comment.author.fullname
+
 		add_comment = [my_author, this_comment.body]
 		comment_list.append(add_comment)
 		get_child_comments(this_comment, comment_list, bot_reply, comment)
