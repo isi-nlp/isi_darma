@@ -18,6 +18,17 @@ The "new_hit" object is where the settings of the task, such as task compensatio
 
 Add the HTML of the task here, starting after line 3.
 
+## .env file
+
+In addition, please make a file called ".env" (environment file) that has the environmental variables for:
+1. aws_access_key_id
+2. aws_secret_access_key
+
+In this format:
+
+`access_key="[YOUR ACCESS KEY ID HERE!]"`
+`secret_key="[YOUR SECRET ACCESS KEY HERE]"`
+
 ## Launching the Task
 
 To launch the task, run:
