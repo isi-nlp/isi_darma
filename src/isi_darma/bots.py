@@ -25,6 +25,7 @@ class BasicBot(ModerationBot):
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
+        self.sub = sub
 
         # Setup logger based on the 'test' flag
         if not self.test:
@@ -94,7 +95,7 @@ class BasicBot(ModerationBot):
         translated_dialogue = self.translator.rtg(first_turn)
 
         botReply = self.moderate(translated_dialogue, submission, type="post")
-        create_json_thread(submission, True, botReply)
+        create_json_thread(submission, True, botReply, subreddit=self.sub)
 
 
     def moderate_comment_thread(self, dialogue):
@@ -121,7 +122,7 @@ class BasicBot(ModerationBot):
 
             self.logger.debug(f"Received Translated dialogue: {translated_dialogue}")
             botReply = self.moderate(translated_dialogue, last_comment)
-            create_json_thread(last_comment, False, botReply)
+            create_json_thread(last_comment, False, botReply, subreddit=self.sub)
 
         else:
             self.logger.debug(f'Not moderating self-comment with username: {get_username(last_comment)}')

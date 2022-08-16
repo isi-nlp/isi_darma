@@ -89,7 +89,7 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 					addComment = ["DarmaBot", botReply]
 					commentList.append(addComment)
 
-def create_json_thread(comment, is_submission, bot_reply):
+def create_json_thread(comment, is_submission, bot_reply, subreddit = "darma_test"):
 	"""
 	Records entire conversation tree into JSON format
 	"""
@@ -137,7 +137,7 @@ def create_json_thread(comment, is_submission, bot_reply):
 
 	size = len(os.listdir(json_outputs_path))
 
-	json_outputs_path = os.path.join(json_outputs_path, "conversationDump" + str(size) + ".json")
+	json_outputs_path = os.path.join(json_outputs_path, f"{subreddit}_conversationDump" + str(size) + ".json")
 	with open(json_outputs_path, "w") as write_file:
 		json.dump(data, write_file, indent=4)
 	write_file.close()
