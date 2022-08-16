@@ -12,6 +12,7 @@ def main():
 	parser = ArgumentParser()
 	parser.add_argument("--test", "-t", action="store_true")
 	parser.add_argument("--passive", "-p", action="store_true")
+	parser.add_argument("--subreddit", "-s", default=SUBREDDIT, required=False)
 	args = parser.parse_args()
 
 	moderation_bot = BasicBot(test=args.test, passive=args.passive)
@@ -19,7 +20,8 @@ def main():
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
 
-	subreddit = reddit_client.subreddit(SUBREDDIT)
+	sub = SUBREDDIT if args.subreddit is None else args.subreddit
+	subreddit = reddit_client.subreddit(sub)
 	posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
 	cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
 	moderation_bot.logger.info("Instantiated Subreddit stream for posts and comments")
