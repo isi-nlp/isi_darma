@@ -15,12 +15,14 @@ def main():
 	parser.add_argument("--subreddit", "-s", default=SUBREDDIT, required=False)
 	args = parser.parse_args()
 
-	moderation_bot = BasicBot(test=args.test, passive=args.passive)
+	# Set the subreddit to be moderated
+	sub = SUBREDDIT if args.subreddit is None else args.subreddit
+
+	moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub)
 
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
 
-	sub = SUBREDDIT if args.subreddit is None else args.subreddit
 	subreddit = reddit_client.subreddit(sub)
 	posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
 	cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)

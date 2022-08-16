@@ -21,16 +21,16 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, test=False, passive=False) -> None:
+    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test') -> None:
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
 
         # Setup logger based on the 'test' flag
         if not self.test:
-            self.logger = setup_logger('app', 'logs/app.log', test=self.test)
+            self.logger = setup_logger(f'app_{sub}', f'logs/app_{sub}.log', test=self.test)
         else:
-            self.logger = setup_logger('test', 'logs/test.log', test=self.test)
+            self.logger = setup_logger(f'test_{sub}', f'logs/test_{sub}.log', test=self.test)
 
         self.passive = passive # whether to moderate comments or not
         self.logger.info("\n\n\n -------- STARTING NEW INSTANCE -------- \n\n\n")
