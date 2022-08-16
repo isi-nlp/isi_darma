@@ -78,9 +78,10 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 		else:
 			myComments = currComment.replies._comments
 			for x in myComments:
-				myAuthor = "[Author of deleted post.]"
 				if x.author is not None:
 					myAuthor = x.author.fullname
+				else:
+					myAuthor = "[Author of deleted post.]"
 				addComment = [myAuthor, x.body]
 				commentList.append(addComment)
 				get_child_comments(x, commentList, botReply, postedComment)
