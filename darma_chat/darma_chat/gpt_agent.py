@@ -48,7 +48,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
         act_out = {}
         act_out['text'] = final_message_text
-        act_out['id'] = "BOT"
+        act_out['id'] = "Moderator"
         self.turn_idx += 1
         return {**act_out, 'episode_done': False}
 

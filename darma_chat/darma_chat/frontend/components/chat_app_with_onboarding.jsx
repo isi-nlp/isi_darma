@@ -76,7 +76,11 @@ function CustomOnboardingChatApp({
   function playNotifSound() {
     let audio = new Audio("./notif.mp3");
     audio.volume = appSettings.volume;
+    try {
     audio.play();
+    } catch(err) {
+      console.log("Couldnt play sound; possibly because user has not interacted with page yet")
+    }
   }
 
   function trackAgentName(agentName) {
