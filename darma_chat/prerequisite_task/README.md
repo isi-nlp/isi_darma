@@ -3,6 +3,8 @@
 There are two files in this repository.
 1. create_tasks.py
 2. darma_prerequisite.xml
+3. .env
+4. get_results.py
 
 ## create_tasks.py
 
@@ -20,7 +22,7 @@ Add the HTML of the task here, starting after line 3.
 
 ## .env file
 
-In addition, please make a file called ".env" (environment file) that has the environmental variables for:
+Please make a file called ".env" (environment file) that has the environmental variables for:
 1. aws_access_key_id
 2. aws_secret_access_key
 
@@ -28,6 +30,10 @@ In this format:
 
 `access_key="[YOUR ACCESS KEY ID HERE!]"`
 `secret_key="[YOUR SECRET ACCESS KEY HERE]"`
+
+## get_results.py
+
+This returns the results for the task. Make sure to replace the hit_id on line 25 for the hit that you want to get the results from.
 
 ## Launching the Task
 
