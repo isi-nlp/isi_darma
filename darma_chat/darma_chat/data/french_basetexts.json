@@ -1,4 +1,5 @@
-{
+[
+  {
     "conversation": [
       {
         "speaker_id": "A",
@@ -27,8 +28,8 @@
       }
     ],
     "target_user": "C"
-},
- {
+  },
+  {
     "conversation": [
       {
         "speaker_id": "A",
@@ -57,7 +58,7 @@
       }
     ],
     "target_user": "C"
- },
+  },
   {
     "conversation": [
       {
@@ -153,4 +154,4 @@
     ],
     "target_user": "C"
   }
-}
+]
