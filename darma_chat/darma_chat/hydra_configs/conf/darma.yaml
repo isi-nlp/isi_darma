@@ -18,7 +18,7 @@ mephisto:
     task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
     onboard_task_data_path: ${task_dir}/task_config/darma_onboard_task_data.json
     annotations_config_path: ${task_dir}/task_config/darma_annotations_config.json
-    onboarding_qualification: darma_onboarding
+    #onboarding_qualification: darma_onboarding  # comment this to disable onboarding
     block_qualification: darma_onboarding_block
     final_rating_question: "How coherent was the bot? | How likely are you going to continue the conversation with the bot? | Did the bot understand your point of view (as B)? | Did the bot convince you to change your behavior?"
     max_onboard_time: 6000
