@@ -73,7 +73,9 @@ class TurkLikeGptAgent(TurkLikeAgent):
             )
 
             # Toxicity Classification
-            # We want to make sure the generation is safe
+            # https://beta.openai.com/docs/models/content-filter
+            # 0: safe, 1: sensitive, 2: unsafe
+            # We want to make sure the generation is not unsafe
             response_text = response.choices[0].text.strip()
             classification_response = openai.Completion.create(
                 model="content-filter-alpha",
@@ -88,6 +90,11 @@ class TurkLikeGptAgent(TurkLikeAgent):
             # vs. should be discarded as a false positive
             toxic_threshold = -0.355
 
+
+            # If the filter returns 0 or 1, you should accept that as the filter's outcome. 
+            # If the filter returns 2, you should accept this outcome only if its logprob is greater than -0.355.
+            # If the logprob for 2 is beneath -0.355 (for example, -0.4), 
+            # then you should use as output whichever of 0 or 1 has a logprob closer to 0.
             if output_label == "2":
                 # If the model returns "2", return its confidence in 2 or other output-labels
                 logprobs = classification_response["choices"][0]["logprobs"]["top_logprobs"][0]
