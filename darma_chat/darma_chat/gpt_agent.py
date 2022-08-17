@@ -24,9 +24,15 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
 
     def act(self, timeout=None):
-        instr = "The following is a conversation with a wise and loving being who has an understanding of how nonviolent communication work. This being is dedicated to building a more civil online environment."
-        if self.turn_idx == 0:
-            few_shot_example = "user A: Does this look like a normal poop? Worried\nuser B: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\nuser A: Get fucked\nwise being: it sounds like you're worried about your poop and you're wondering if it is normal. Can you tell me more about it?"
+        instr = "The following is a conversation with a wise and loving being who has an understanding"\
+                    " of how nonviolent communication work. This being is dedicated to building a more civil online environment."
+        # instr = "The following is a conversation with a moderation bot. The bot is dedicated to building a more civil online environment."
+        if self.turn_idx == -1: # make it never happen
+            few_shot_example = "user A: Does this look like a normal poop? Worried\n"\
+                                "user B: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\n"\
+                                "user A: Get fucked\n"\
+                                "wise being: it sounds like you're worried about your poop and you're wondering if it is normal. "\
+                                "Can you tell me more about it?"
         else:
             few_shot_example = ""
         p = self.prompt_compose(instr, few_shot_example, self.sturns)
@@ -36,7 +42,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
             resp = self.query_completion_api(p, engine=self.engine)
         else:
             resp = self.query_completion_api(
-                p, engine=self.engine, frequency_penalty=1, presence_penalty=1, temperature=1)
+                p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = resp.choices[0].text
         final_message_text = final_message_text.strip()
         self.sturns += f"wise being: {final_message_text}\n"
