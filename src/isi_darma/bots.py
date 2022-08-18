@@ -212,6 +212,6 @@ class BasicBot(ModerationBot):
         else:
             self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
             self.logger.debug(f'Flags: already_moderated = {already_moderated}, opt_out = {opt_out}, no_mod_user = {no_mod_user}')
-            self.logger.debug(f'Final response: {final_response}.')
+            self.logger.debug(f'Final response: {final_response if final_response else "<empty>"}')
 
         return final_response
