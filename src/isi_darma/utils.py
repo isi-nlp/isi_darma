@@ -61,11 +61,15 @@ def check_for_opt_out(comment_str: str) -> bool:
 	return False
 
 
+# TODO: List of changes needed in data collection:
+# 1. Save the structure of the thread in the json - refer Apoorva's code and use as plug & play
+# 2. Save the comment/post id in the json
+# 3. Save the french comment and the translation in the json structure
 def get_replied_to(comment) -> str:
 		this_comment = comment
 
 		if isinstance(this_comment.parent(), type(comment)) or isinstance(this_comment.parent(), type(comment.submission)):
-			return this_comment.parent().author.name
+			return " towards " + this_comment.parent().author.name
 		else:
 			return ""
 
@@ -152,5 +156,5 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 	filename = f"{json_outputs_path}/{subreddit}_conversationDump{size}.json"
 	with open(filename, "w") as write_file:
 		json.dump(data, write_file, indent=4)
-
+	write_file.close()
 	logger.debug(f"Saved conversation to {filename}")
