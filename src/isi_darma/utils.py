@@ -144,12 +144,12 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 
 	data = {"conversation": my_conversation, "target_user": comment.author.fullname}
 
-	json_outputs_path = "/isi_darma/isi_darma/src/isi_darma/data/conversations"
-	if not os.path.isdir(json_outputs_path):
-		os.makedirs(json_outputs_path, exist_ok=True)
+	json_outputs_path = "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data/conversations"
+	if not os.path.exists(json_outputs_path):
+		os.makedirs(json_outputs_path)
 
 	size = len(os.listdir(json_outputs_path))
-	filename = f"{json_outputs_path}/{subreddit}__conversationDump{size}.json"
+	filename = f"{json_outputs_path}/{subreddit}_conversationDump{size}.json"
 	with open(filename, "w") as write_file:
 		json.dump(data, write_file, indent=4)
 
