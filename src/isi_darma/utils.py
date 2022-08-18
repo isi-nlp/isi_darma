@@ -61,15 +61,19 @@ def check_for_opt_out(comment_str: str) -> bool:
 	return False
 
 
+# TODO: List of changes needed in data collection:
+# 1. Save the structure of the thread in the json - refer Apoorva's code and use as plug & play
+# 2. Save the comment/post id in the json
+# 3. Save the french comment and the translation in the json structure
 def get_replied_to(comment) -> str:
 		this_comment = comment
 
 		if isinstance(this_comment.parent(), type(comment)) or isinstance(this_comment.parent(), type(comment.submission)):
-			return this_comment.parent().author.name
+			return " towards " + this_comment.parent().author.name
 		else:
 			return ""
 
-def get_child_comments(logger, currComment, commentList, botReply, postedComment):
+def get_child_comments(currComment, commentList, botReply, postedComment):
 		"""
 		Helper method for create_json_thread()
 		"""
@@ -77,31 +81,19 @@ def get_child_comments(logger, currComment, commentList, botReply, postedComment
 			return
 		else:
 			myComments = currComment.replies._comments
-
 			for x in myComments:
-
-				try:
+				myAuthor = "[Author of deleted post.]"
+				if x.author is not None:
 					myAuthor = x.author.fullname
-					addComment = [myAuthor, x.body]
-				except AttributeError:
-					myAuthor = "[Author of deleted post.]"
-					addComment = [myAuthor, "<empty>"]
-					logger.debug(f"Looking for author of deleted post/comment. Comment set to - {addComment}")
-					commentList.append(addComment)
-					return
-
+				addComment = [myAuthor, x.body]
 				commentList.append(addComment)
-				get_child_comments(logger, x, commentList, botReply, postedComment)
+				get_child_comments(x, commentList, botReply, postedComment)
 
 				if x == postedComment:
 					addComment = ["DarmaBot", botReply]
 					commentList.append(addComment)
 
-# TODO: List of changes needed in data collection:
-# 1. Save the structure of the thread in the json - refer Apoorva's code and use as plug & play
-# 2. Save the comment/post id in the json
-# 3. Save the french comment and the translation in the json structure
-def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "darma_test"):
+def create_json_thread(comment, is_submission, bot_reply):
 	"""
 	Records entire conversation tree into JSON format
 	"""
@@ -119,18 +111,12 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 	my_comments = this_submission.comments._comments
 
 	for this_comment in my_comments:
-
-		try:
+		my_author = "[Author of deleted post.]"
+		if this_comment.author is not None:
 			my_author = this_comment.author.fullname
-			addComment = [my_author, this_comment.body]
-		except AttributeError:
-			my_author = "[Author of deleted post.]"
-			addComment = [my_author, "<empty>"]
-			logger.debug(f"Looking for author of deleted post/comment. Comment set to - {addComment}")
-
 		add_comment = [my_author, this_comment.body]
 		comment_list.append(add_comment)
-		get_child_comments(logger, this_comment, comment_list, bot_reply, comment)
+		get_child_comments(this_comment, comment_list, bot_reply, comment)
 
 		if this_comment == comment:
 			add_comment = ["DarmaBot", bot_reply]
@@ -139,18 +125,22 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 	my_conversation = []
 
 	for x in comment_list:
-		new_utterance = {"speaker_id": x[0], "text": x[1]}
+		new_utterance = {}
+		new_utterance["speaker_id"] = x[0]
+		new_utterance["text"] = x[1]
 		my_conversation.append(new_utterance)
 
-	data = {"conversation": my_conversation, "target_user": comment.author.fullname}
+	data = {}
+	data["conversation"] = my_conversation
+	data["target_user"] = comment.author.fullname
 
-	json_outputs_path = "conversations_jsons"
-	if not os.path.exists(json_outputs_path):
-		os.makedirs(json_outputs_path)
+	json_outputs_path = "conversations"
+	if not os.path.isdir(json_outputs_path):
+		os.mkdir(json_outputs_path)
 
 	size = len(os.listdir(json_outputs_path))
-	filename = f"{json_outputs_path}/{subreddit}_conversationDump{size}.json"
-	with open(filename, "w") as write_file:
-		json.dump(data, write_file, indent=4)
+	json_outputs_path = os.path.join(json_outputs_path, "conversationDump" + str(size) + ".json")
 
-	logger.debug(f"Saved conversation to {filename}")
+	with open(json_outputs_path, "w") as write_file:
+		json.dump(data, write_file, indent=4)
+	write_file.close()
