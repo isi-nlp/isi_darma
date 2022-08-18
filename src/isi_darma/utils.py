@@ -93,7 +93,7 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 					addComment = ["DarmaBot", botReply]
 					commentList.append(addComment)
 
-def create_json_thread(comment, is_submission, bot_reply):
+def create_json_thread(logger, comment, is_submission, bot_reply):
 	"""
 	Records entire conversation tree into JSON format
 	"""
@@ -144,3 +144,4 @@ def create_json_thread(comment, is_submission, bot_reply):
 	with open(json_outputs_path, "w") as write_file:
 		json.dump(data, write_file, indent=4)
 	write_file.close()
+	logger.debug(f'Saved conversation to {json_outputs_path}')
