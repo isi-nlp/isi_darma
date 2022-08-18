@@ -16,13 +16,14 @@ class Translator:
 
     def rtg(self, comment_str: str) -> str:
         source = {'source': [comment_str]}
-        self.logger.debug(f'Sending source to RTG for translation: {source}')
+        self.logger.debug(f'Sending source to RTG for translation...')
 
         try:
             response = post(self.RTG_API, json=source)
             if response.ok:
                 response = response.json()
-                self.logger.info(f'Received translation from RTG -> {response["translation"]}')
+                self.logger.info(f'Received Translated dialogue from RTG: {response["translation"]}')
+
                 return response["translation"][0]
             else:
                 self.logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
