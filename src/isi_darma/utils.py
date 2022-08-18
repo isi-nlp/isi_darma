@@ -94,8 +94,9 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 
 # TODO: List of changes needed in data collection:
 # 1. Save the structure of the thread in the json - refer Apoorva's code and use as plug & play
-# 2. Save the french comment and the translation in the json structure
-def create_json_thread(comment, is_submission, bot_reply, subreddit = "darma_test"):
+# 2. Save the comment/post id in the json
+# 3. Save the french comment and the translation in the json structure
+def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "darma_test"):
 	"""
 	Records entire conversation tree into JSON format
 	"""
