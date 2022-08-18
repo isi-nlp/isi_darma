@@ -6,6 +6,10 @@ There are two files in this repository.
 3. .env
 4. get_results.py
 
+## Setup 
+
+pip install python-dotenv boto3 xmltodict
+
 ## create_tasks.py
 
 This file contains the script to launch the prerequisite task.
@@ -27,9 +31,11 @@ Please make a file called ".env" (environment file) that has the environmental v
 2. aws_secret_access_key
 
 In this format:
+```
+access_key="[YOUR ACCESS KEY ID HERE!]"
+secret_key="[YOUR SECRET ACCESS KEY HERE]"
+```
 
-`access_key="[YOUR ACCESS KEY ID HERE!]"`
-`secret_key="[YOUR SECRET ACCESS KEY HERE]"`
 
 ## get_results.py
 
