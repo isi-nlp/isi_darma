@@ -148,7 +148,7 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 
 	data = {"conversation": my_conversation, "target_user": comment.author.fullname}
 
-	json_outputs_path = "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/isi_darma/data/conversations"
+	json_outputs_path = "/isi_darma/isi_darma/src/isi_darma/data/conversations"
 	if not os.path.exists(json_outputs_path):
 		os.makedirs(json_outputs_path)
 
