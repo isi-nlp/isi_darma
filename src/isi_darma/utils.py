@@ -123,7 +123,7 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 		if this_comment.author is not None:
 			my_author = this_comment.author.fullname
 
-		add_comment = [my_author, this_comment.body]
+		add_comment = [my_author, this_comment.body, this_comment.id]
 		comment_list.append(add_comment)
 		get_child_comments(this_comment, comment_list, bot_reply, comment)
 
@@ -135,9 +135,7 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 	my_conversation = []
 
 	for x in comment_list:
-		new_utterance = {}
-		new_utterance["speaker_id"] = x[0]
-		new_utterance["text"] = x[1]
+		new_utterance = {"speaker_id": x[0], "text": x[1], "comment_id": x[2]}
 		my_conversation.append(new_utterance)
 
 	data = {}
