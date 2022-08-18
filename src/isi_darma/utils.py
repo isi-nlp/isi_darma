@@ -87,6 +87,8 @@ def get_child_comments(logger, currComment, commentList, botReply, postedComment
 					myAuthor = "[Author of deleted post.]"
 					addComment = [myAuthor, "<empty>"]
 					logger.debug(f"Looking for author of deleted post/comment. Comment set to - {addComment}")
+					commentList.append(addComment)
+					return
 
 				commentList.append(addComment)
 				get_child_comments(logger, x, commentList, botReply, postedComment)
