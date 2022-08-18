@@ -113,7 +113,7 @@ class BasicBot(ModerationBot):
             # dialogue_text = get_dialogue_text(dialogue)
             # self.logger.debug(f"Retrieved dialogue: {dialogue_text}")
 
-            source_language = self.detect_language(last_comment.body)
+            # source_language = self.detect_language(last_comment.body)
             self.logger.debug(f"Translating all turns in dialogue")
             translated_dialogue = self.translator.rtg(last_comment.body)
 
