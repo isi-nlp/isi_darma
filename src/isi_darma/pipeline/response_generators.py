@@ -52,11 +52,11 @@ class SpolinBotRG(ResponseGenerator):
 		usernames = ",".join(usernames)
 
 		comtype_responses = [
-			f"Veuillez cesser de faire cela et vous comporter correctement!",
-			f"Vous avez eu un comportement de ce genre en répondant à {usernames}",
-			f"Je me sens contrarié parce que même si je ne connais pas {usernames}, le langage que vous avez utilisé pour communiquer avec eux me bouleverserait.",
-			f"Est-ce parce que vous êtes en colère contre {usernames} parce qu'ils ont des croyances différentes des vôtres?",
-			f"Voulez-vous que {usernames} changent d'opinion et peut-être convaincre d'autres personnes qui partagent actuellement leurs opinions de changer également?"
+			("template1", f"Veuillez cesser de faire cela et vous comporter correctement!"),
+			 ("template2", f"Vous avez eu un comportement de ce genre en répondant à {usernames}"),
+			  ("template3", f"Je me sens contrarié parce que même si je ne connais pas {usernames}, le langage que vous avez utilisé pour communiquer avec eux me bouleverserait."),
+			   ("template4", f"Est-ce parce que vous êtes en colère contre {usernames} parce qu'ils ont des croyances différentes des vôtres?"),
+			    ("template5", f"Voulez-vous que {usernames} changent d'opinion et peut-être convaincre d'autres personnes qui partagent actuellement leurs opinions de changer également?")
 		]
 		return random.sample(comtype_responses, 1)[0]
 
