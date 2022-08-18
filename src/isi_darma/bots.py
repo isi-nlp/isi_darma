@@ -187,7 +187,7 @@ class BasicBot(ModerationBot):
 
         # User has previously opted out of moderation
         elif no_mod_user:
-            self.logger.info(f'User {author_username} in opt-out list. No moderation to be done.')
+            self.logger.info(f'User {author_username} in opt-out list. No moderation to be done.\n\n')
             final_response = ""
 
         # User opted-out of moderation, add to database
@@ -196,22 +196,22 @@ class BasicBot(ModerationBot):
             self.databases.add_optout_user(author_username, dialogue_str)
             opt_out_response = f"D'accord, {author_username}, {self.bot_responses['opt_out_complete_fr']}"
             obj_to_reply.reply(opt_out_response)
-            self.logger.info(f'Opt-out complete message sent to new user: {author_username} with message: {opt_out_response}')
+            self.logger.info(f'Opt-out complete message sent to new user: {author_username} with message: {opt_out_response}\n\n')
             final_response = ""
 
         else:
-            self.logger.info(f'Already moderated this post/comment with id {post_id} for {author_username}. Skipping moderation.')
+            self.logger.info(f'Already moderated this post/comment with id {post_id} for {author_username}. Skipping moderation.\n\n')
             final_response = ""
 
         # Final response sent as reply in reddit thread/post
         if (not self.test and not self.passive) and final_response and obj_to_reply:
             obj_to_reply.reply(final_response)
             self.databases.add_to_moderated(post_id, author_username, dialogue_str)
-            self.logger.info(f'Response sent to toxic user: {author_username}')
+            self.logger.info(f'Response sent to toxic user: {author_username}\n')
 
         else:
             self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
             self.logger.debug(f'Flags: already_moderated = {already_moderated}, opt_out = {opt_out}, no_mod_user = {no_mod_user}')
-            self.logger.debug(f'Final response: {final_response if final_response else "<empty>"}')
+            self.logger.debug(f'Final response: {final_response if final_response else "<empty>"}\n\n')
 
         return final_response
