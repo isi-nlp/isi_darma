@@ -204,7 +204,7 @@ class BasicBot(ModerationBot):
             final_response = ""
 
         # Final response sent as reply in reddit thread/post
-        if (not self.test or not self.passive) and final_response and obj_to_reply:
+        if (not self.test and not self.passive) and final_response and obj_to_reply:
             obj_to_reply.reply(final_response)
             self.databases.add_to_moderated(post_id, author_username, dialogue_str)
             self.logger.info(f'Response sent to toxic user: {author_username}')
