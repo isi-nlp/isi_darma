@@ -143,7 +143,7 @@ def create_json_thread(comment, is_submission, bot_reply, subreddit = "darma_tes
 	data["conversation"] = my_conversation
 	data["target_user"] = comment.author.fullname
 
-	json_outputs_path = "json_outputs"
+	json_outputs_path = "/isi_darma/isi_darma/src/isi_darma/data/conversations"
 	if not os.path.isdir(json_outputs_path):
 		os.mkdir(json_outputs_path)
 
