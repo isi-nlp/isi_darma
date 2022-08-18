@@ -122,11 +122,11 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 
 		try:
 			my_author = this_comment.author.fullname
+			addComment = [my_author, this_comment.body]
 		except AttributeError:
 			my_author = "[Author of deleted post.]"
-
-		if this_comment.author is not None:
-			my_author = this_comment.author.fullname
+			addComment = [my_author, "<empty>"]
+			logger.debug(f"Looking for author of deleted post/comment. Comment set to - {addComment}")
 
 		add_comment = [my_author, this_comment.body]
 		comment_list.append(add_comment)
