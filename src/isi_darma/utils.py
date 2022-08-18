@@ -69,7 +69,7 @@ def get_replied_to(comment) -> str:
 		else:
 			return ""
 
-def get_child_comments(currComment, commentList, botReply, postedComment):
+def get_child_comments(logger, currComment, commentList, botReply, postedComment):
 		"""
 		Helper method for create_json_thread()
 		"""
@@ -77,16 +77,19 @@ def get_child_comments(currComment, commentList, botReply, postedComment):
 			return
 		else:
 			myComments = currComment.replies._comments
+
 			for x in myComments:
 
 				try:
 					myAuthor = x.author.fullname
+					addComment = [myAuthor, x.body]
 				except AttributeError:
 					myAuthor = "[Author of deleted post.]"
+					addComment = [myAuthor, "<empty>"]
+					logger.debug(f"Looking for author of deleted post/comment. Comment set to - {addComment}")
 
-				addComment = [myAuthor, x.body]
 				commentList.append(addComment)
-				get_child_comments(x, commentList, botReply, postedComment)
+				get_child_comments(logger, x, commentList, botReply, postedComment)
 
 				if x == postedComment:
 					addComment = ["DarmaBot", botReply]
@@ -125,7 +128,7 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 
 		add_comment = [my_author, this_comment.body]
 		comment_list.append(add_comment)
-		get_child_comments(this_comment, comment_list, bot_reply, comment)
+		get_child_comments(logger, this_comment, comment_list, bot_reply, comment)
 
 		if this_comment == comment:
 			add_comment = ["DarmaBot", bot_reply]
