@@ -75,18 +75,24 @@ def translate_thread(thread):
         msg['text'] = translate_text(msg['text'])
 
 
-def add_bool_arg(parser, key, default=True, help:str=None):
-    parser.add_argument(f'--{key}', action='store_true', help=help, default=default)
-    parser.add_argument(f'--no-{key}', dest=key, action='store_false', help=help, default=not default)
+def add_bool_arg(parser: argparse.ArgumentParser, key, default=True, help:str=None):
+    grp = parser.add_mutually_exclusive_group()
+    grp.add_argument(f'--{key}', action='store_true', help=help, default=default)
+    grp.add_argument(f'--no-{key}', dest=key, action='store_false', help=help, default=not default)
     #parser.set_defaults(key=default)
 
 def main():
     parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
     parser.add_argument('-i', '--inp', required=True, help="Input file path")
     parser.add_argument('-o', '--out', required=True, help="Output path")
-    parser.add_argument('-mt-api', '--mt-api', help="MT API URL",
-                        default=DEF_MT_API)
-    add_bool_arg(parser, key='mt', help='Machine translate text')
+    add_bool_arg(parser, key='anonymize',
+                 help='Anonymize thread', default=False)
+    add_bool_arg(parser, key='unmarkdown',
+                 help='Remove markdown tags from text', default=True)
+    add_bool_arg(parser, key='mt',
+                 help='Machine translate text', default=True)
+    parser.add_argument('-mt-api', '--mt-api',
+                        help="MT API URL", default=DEF_MT_API)
 
     args = vars(parser.parse_args())
     log.info(f"{args['inp']} --> {args['out']}")
@@ -97,12 +103,14 @@ def main():
     with open(args['inp'], encoding='utf', errors='replace') as inp:
         threads = json.load(inp)
     log.info(f'Found {len(threads)} in {args["inp"]}')
-
+    log.info(f"{args}")
     total_msgs = 0
     with tqdm(threads, 'threads', unit='thread') as pbar:
         for thread in pbar:
-            unmarkdwon_thread(thread)
-            anonymize_thread(thread)
+            if args['unmarkdown']:
+                unmarkdwon_thread(thread)
+            if args['anonymize']:
+                anonymize_thread(thread)
             if args['mt']:
                 translate_thread(thread)
             msg_count = len(thread['conversation'])
