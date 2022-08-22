@@ -96,6 +96,7 @@ def main():
 
     args = vars(parser.parse_args())
     log.info(f"{args['inp']} --> {args['out']}")
+    log.info(f"{args}")
 
     global mt
     mt = RtgApiTranslator(api_url=args['mt_api'])
@@ -103,7 +104,6 @@ def main():
     with open(args['inp'], encoding='utf', errors='replace') as inp:
         threads = json.load(inp)
     log.info(f'Found {len(threads)} in {args["inp"]}')
-    log.info(f"{args}")
     total_msgs = 0
     with tqdm(threads, 'threads', unit='thread') as pbar:
         for thread in pbar:
@@ -115,6 +115,9 @@ def main():
                 translate_thread(thread)
             msg_count = len(thread['conversation'])
             pbar.set_postfix_str(f'msgs total:{total_msgs} this:{msg_count}')
+            if total_msgs == 0:
+                log.info("Sample thread after transformation")
+                log.info(json.dumps(thread, indent=2, ensure_ascii=False))
             total_msgs += msg_count
 
     with open(args['out'], 'w', encoding='utf', errors='replace') as out:
