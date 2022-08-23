@@ -114,7 +114,7 @@ function OnboardingQuestion({
     return (
         <div className="alert alert-info" style={{ float: `${turnIdx % 2 == 0 ? "right" : "left"}`, display: 'table' }}>
 
-            <h1 style="textAlign:center;"> Informed Consent For Research </h1>
+            <h1 style={{textAlign: "center"}}> Informed Consent For Research </h1>
 
             <h3>Introduction</h3>
             <div>
@@ -231,7 +231,7 @@ function OnboardingQuestion({
                 </p>
 
                 <p>
-                    This study is conducted on Amazon Mechanical Turk (MTurk) and it adheres to Amazon’s MTurk Privacy Policy. To understand the privacy and confidentiality limitations associated with using MTurk, we strongly advise you to familiarize yourself with Amazon’s privacy policies (https://www.mturk.com/mturk/privacynotice) and Amazon.com’s warning to workers page https://www.mturk.com/mturk/contact). 
+                    This study is conducted on Amazon Mechanical Turk (MTurk) and it adheres to Amazon's MTurk Privacy Policy. To understand the privacy and confidentiality limitations associated with using MTurk, we strongly advise you to familiarize yourself with Amazon's privacy policies (https://www.mturk.com/mturk/privacynotice) and Amazon.com's warning to workers page https://www.mturk.com/mturk/contact. 
                 </p>
             </div>
 
@@ -341,7 +341,21 @@ function OnboardingQuestion({
                 </div>
             </p>
 
+            <h1 style={{textAlign: "center"}}> Task Instructions </h1>
 
+            <div>
+                <h3>Below are the task instructions. Please be sure to read them carefully. You can also read the task instructions by clicking the link.</h3>
+                <a href="https://drive.google.com/file/d/158yqu9PQZdamk_07jqlTHsUZp2aeNt47/view?usp=sharing" style={{textAlign: "center"}}>(Link to task instructions.)</a>
+            </div>
+
+            <br/>
+
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial1a.png" style={{maxWidth: "100%"}}></img>
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial2a.png" style={{maxWidth: "100%"}}></img>
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial3.png" style={{maxWidth: "100%"}}></img>
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial4a.png" style={{maxWidth: "100%"}}></img>
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial5.png" style={{maxWidth: "100%"}}></img>
+            <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial6.png" style={{maxWidth: "100%"}}></img>
 
         </div>
     )
