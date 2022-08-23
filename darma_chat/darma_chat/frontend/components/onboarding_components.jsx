@@ -13,7 +13,6 @@ const DEFAULT_MIN_CORRECT = 1;
 const DEFAULT_MAX_INCORRECT = 0;
 const DEFAULT_MAX_FAILURES_ALLOWED = 100;
 var onboardingFailuresCount = 0;
-var myCode = "abc123!"
 
 var renderOnboardingFail = function () {
     // Update the UI
@@ -125,15 +124,6 @@ function OnboardingQuestion({
 
             <p>
                 
-            </p>
-                
-            <p>
-                <ErrorBoundary>
-                    <label for="inputtextarea">Input code here:</label>
-                    <textarea id="inputtextarea">
-
-                    </textarea>
-                </ErrorBoundary>
             </p>
 
             <h4>
