@@ -115,18 +115,6 @@ function OnboardingQuestion({
         <div className="alert alert-info" style={{ float: `${turnIdx % 2 == 0 ? "right" : "left"}`, display: 'table' }}>
 
             <h4>
-                Prerequisite Task
-            </h4>
-
-            <p>
-                Please use the link below to go to another Mechanical Turk task. This prerequisite task will include a statement of consent that you must read, more specific instructions and examples about what you will be working on, and a language and understanding task to ensure your fluency in both English and French and your understanding of the instructions. At the end of the prerequisite task, you will be given a code. Please copy and paste the code into the text area below. Then, affirm that you've read the statement of consent.        
-            </p>
-
-            <p>
-                
-            </p>
-
-            <h4>
                 STATEMENT OF CONSENT
             </h4>
             <p>
