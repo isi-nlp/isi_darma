@@ -172,6 +172,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         # below are timeout protocols
         self.max_resp_time = max_resp_time  # in secs
+        self._start_time = time.time()
 
     def __add_problem_data_to_utterance(self, p, turn_idx: int):
         """
@@ -283,6 +284,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                     # Get rid of annotations HTML if it's the bot response
                     'text': acts[idx]['text'].split('<br>')[0],
                     'id': acts[idx].get('id', 'NULL_ID'),  # In case model doesn't set id
+                    'time': time.time(),
                 }
                 if 'text_orig' in acts[idx]:
                     utterance_data['text_orig'] = acts[idx]['text_orig']
@@ -313,7 +315,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         """
         Runs logic for the first turn of the human and the bot.
         """
-        pass
+        self._start_time = time.time()
+
 
     def _postprocess_acts(self, acts: List[dict], agent_idx: int):
         """
@@ -351,6 +354,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         else:
             violations_string = None
         model_agent = self.bot.model_agent
+        time_now = time.time()
         data = {
             'dialog': self.dialog,
             'workers': [get_mturk_id_from_mephisto_wrapper(self.agent)],
@@ -364,6 +368,11 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 'model_file': model_agent and model_agent.opt and model_agent.opt.get('model_file'),
                 'model_opt': model_agent and model_agent.opt,
             },
+            'time': {
+                'start': self._start_time,
+                'end': time_now,
+                'total': f'{time_now - self._start_time:.3f} sec'
+            }
         }
         # TODO: once the analysis scripts are fully switched over to DataBrowser, remove
         #  the 'workers' and 'assignment_ids' keys, which will now be duplicated in the
@@ -427,6 +436,7 @@ class ModelChatWorld(BaseModelChatWorld):
         conversation mode, show "Hi!" to the human and the bot and let the bot respond
         accordingly.
         """
+        super()._run_initial_turn()
 
         control_msg = {"episode_done": False}
         if self.opt['conversation_start_mode'] == "empty":
@@ -450,6 +460,7 @@ class ModelChatWorld(BaseModelChatWorld):
                     'text_orig': turn.get('text_orig'),
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
+                    'time': time.time(),
                 }
 
                 self.dialog.append(msg)
@@ -479,6 +490,7 @@ class ModelChatWorld(BaseModelChatWorld):
                         'text': first_bot_act['text'],
                         'text_orig': first_bot_act.get('text_orig'),
                         'id': "Moderator",
+                        'time': time.time(),
                     }
                     self.dialog.append(bot_utterance_data)
 
