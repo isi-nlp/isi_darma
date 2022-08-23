@@ -22,7 +22,7 @@ mephisto:
     onboard_task_data_path: ${task_dir}/task_config/darma_onboard_task_data.json
     annotations_config_path: ${task_dir}/task_config/darma_annotations_config.json
     annotation_question: "Choose one."
-    #onboarding_qualification: darma_onboarding # comment this to disable onboarding
+    onboarding_qualification: darma_onboarding # comment this to disable onboarding
     block_qualification: darma_onboarding_block
     final_rating_question: "How coherent was the moderator? | How likely are you to continue chatting with the moderator? | To what degree did the moderator understand your point of view? | To what degree did the moderator convince you to change your behavior?"
     max_onboard_time: 6000
