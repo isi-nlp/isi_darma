@@ -12,7 +12,7 @@ mephisto:
     task_model_parallel: true
     check_acceptability: false
     conversation_start_mode: "custom" # seed with our data 
-    seed_conversation_source: ${task_dir}/data/france_sample.json  # remember top set "translator.activation: pre+post"
+    seed_conversation_source: ${task_dir}/data/french_basetexts.json  # remember top set "translator.activation: pre+post"
     conversations_needed_string: "blender_90M:10"
     left_pane_text_path: ${task_dir}/task_config/darma_left_pane_text.html 
     task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
