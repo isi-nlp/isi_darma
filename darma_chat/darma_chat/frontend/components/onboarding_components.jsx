@@ -74,13 +74,12 @@ var handleOnboardingSubmit = function ({ onboardingData, currentTurnAnnotations,
     const max_incorrect = onboardingData.hasOwnProperty("max_incorrect") ? onboardingData.max_incorrect : DEFAULT_MAX_INCORRECT;
     const max_failures_allowed = onboardingData.hasOwnProperty("max_failures_allowed") ? onboardingData.max_failures_allowed : DEFAULT_MAX_FAILURES_ALLOWED;
 
-    var userTextCode = document.getElementById("inputtextarea").value
+    var readInstructions = document.getElementById("instruction_confirm")
 
-    if (userTextCode != myCode){
-        alert("The code you inputed was incorrect. Please try again.")
-    }
-    else if (signed_name == ""){
-        alert("You must provide your full name as the signature.")
+    console.log(readInstructions)
+
+    if (!readInstructions.checked){
+        alert("Please make sure you've read the instructions.")
     }
     else if (countCorrect >= min_correct && countIncorrect <= max_incorrect) {
         onSubmit({ annotations: currentTurnAnnotations, success: true, signature: signed_name, date: getCurrentDate() });
@@ -356,6 +355,15 @@ function OnboardingQuestion({
             <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial4a.png" style={{maxWidth: "100%"}}></img>
             <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial5.png" style={{maxWidth: "100%"}}></img>
             <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial6.png" style={{maxWidth: "100%"}}></img>
+
+            <b>
+                Please check this checkbox to confirm that you have read the above instructions.
+            </b>
+
+            <br/>
+            
+            <input type="checkbox" id="instruction_confirm" name="instruction_confirm" value="init_false"></input>
+            <label for="instruction_confirm">  I have read the instructions. </label>
 
         </div>
     )
