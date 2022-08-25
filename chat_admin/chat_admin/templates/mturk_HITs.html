@@ -8,11 +8,12 @@
       <p>Found {{ data['HITs'] | length }} HITs </p>
       <ul class="list-group">
         {% for HIT in data['HITs'] %}
-        <li class="list-group-item">
-          <span class="text-muted">{{ loop.index }} ― </span> 
-          <a href="/mturk/HIT/{{ HIT['HITId'] }}">
-            {{ HIT['HITId'] }} | {{ HIT['Title'] }}
-          </a>
+        {% set hit_id = HIT['HITId'] %}
+        <li id="{{hit_id}}" class="list-group-item">
+          <span class="text-muted">{{ loop.index }} ― </span>
+
+          <a href="/mturk/HIT/{{ hit_id }}">
+            {{ hit_id }} | {{ HIT['Title'] }}</a>
           <details style="display: inline">
             <summary>⤵</summary>
             {% for key, value in HIT.items() %}
@@ -21,6 +22,7 @@
             </ul>
             {% endfor %}
           </details>
+          <button onclick="delete_hit('{{hit_id}}')">Delete</button>
         </li>
         {% endfor %}
         </li>
@@ -28,4 +30,23 @@
     </div>
   </div>
 </div>
+<script>
+  function delete_hit(hit_id) {
+    console.log('Going to delete HIT ' + hit_id)
+    $.ajax({
+      url: "/mturk/HIT/" + hit_id,
+      type: 'DELETE',
+      success: function(result) {
+          console.log('Delete Success')
+          console.log(result)
+          $('#'+hit_id).hide()
+      },
+      error: function(result) {
+        alert("Error while deleting the hit: " + hit_id )
+        console.log('Error while deleting HIT')
+        console.log(result)
+      },
+  });
+  }
+</script>
 {% endblock %}

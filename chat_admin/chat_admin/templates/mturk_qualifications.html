@@ -14,10 +14,10 @@
 
       <ul class="list-group">
         {% for qtype in qtypes %}
-        <li class="list-group-item">
+        {% set qual_id = qtype['QualificationTypeId'] %}
+        <li id='{{qual_id}}' class="list-group-item">
           <span>{{loop.index}} ― </span>
-           <a href="qualification/{{ qtype['QualificationTypeId'] }}">
-            {{ qtype['QualificationTypeId'] }} | {{ qtype['Name'] }}
+           <a href="qualification/{{ qual_id }}">{{ qual_id }} | {{ qtype['Name'] }}
           </a>
           <details>
             <summary>⤵</summary>
@@ -27,6 +27,7 @@
               {% endfor %}
             </ul>
           </details>
+          <button onclick="delete_qualification('{{qual_id }}')"> Delete</button>
         </li>
         {% endfor %}
         </li>
@@ -34,4 +35,25 @@
     </div>
   </div>
 </div>
+
+
+<script>
+  function delete_qualification(qual_id) {
+    console.log('Going to delete qualification  ' + qual_id)
+    $.ajax({
+      url: "/mturk/qualification/" + qual_id,
+      type: 'DELETE',
+      success: function(result) {
+          console.log('Delete Success')
+          console.log(result)
+          $('#'+qual_id).hide()
+      },
+      error: function(result) {
+        alert("Error while deleting the qualification: " + qual_id )
+        console.log('Error while deleting qualification')
+        console.log(result)
+      },
+  });
+  }
+</script>
 {% endblock %}

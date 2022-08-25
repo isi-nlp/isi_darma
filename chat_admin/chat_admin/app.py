@@ -127,14 +127,15 @@ class DashboardService:
         with open(chat_file, encoding='utf8', errors='replace') as fobj:
             return json.load(fobj)
 
-    def list_qualification_types(self, max_results=100, query: str='darma'):
+    def list_qualification_types(self, max_results=100, query: str=''):
         data = self.mturk.list_qualification_types(
             MustBeRequestable=True, MustBeOwnedByCaller=True,
             MaxResults=max_results)
         qtypes = data['QualificationTypes']
-        query = query.lower()
-        qtypes = [qt for qt in qtypes
-                  if query in qt['Name'].lower() or query in qt['Description']]
+        if query:
+            query = query.lower()
+            qtypes = [qt for qt in qtypes
+                    if query in qt['Name'].lower() or query in qt['Description']]
         return qtypes
 
     def list_HITS(self, qual_id:str, max_results=100):
@@ -217,11 +218,20 @@ def attach_admin_dashboard(config):
         data = dboard.list_HITS(qual_id=qual_id,max_results=100)
         return render_template('mturk_HITs.html', data=data, qual_id=qual_id)
 
+    @bp.route("/mturk/qualification/<qual_id>", methods=["DELETE"])
+    def delete_qualification(qual_id):
+        data = dboard.mturk.delete_qualification_type(QualificationTypeId=qual_id)
+        return jsonify(data), 200
+
     @bp.route("/mturk/HIT/<HIT_id>", methods=["GET"])
     def mturk_assignments(HIT_id):
         data = dboard.list_assignments(HIT_id=HIT_id,max_results=100)
         return jsonify(data), 200
 
+    @bp.route("/mturk/HIT/<HIT_id>", methods=["DELETE"])
+    def delete_hit(HIT_id):
+        data = dboard.mturk.delete_hit(HITId=HIT_id)
+        return jsonify(data), 200
 
     @bp.route('/about')
     def about():
