@@ -41,14 +41,22 @@ mturk:
   profile: default    # the [default] profile in ~/.aws/credentials file
 ```
 
+* `chat_dir` -- path to directory having JSON files stored by Mephisto.
+* If `sandbox` is set to `true`, `endpoint_url` will be used otherwise default url is picked up by aws client.
+* `profile` value is the name of credential profile in `~/.aws/credentials` to use.
+
+
 
 **CLI options:**
 
 ```
-$ nllb-serve -h
-usage: nllb-serve [-h] [-d] [-p PORT] [-ho HOST] [-b BASE] [-mi MODEL_ID] [-msl MAX_SRC_LEN]
+$ python -m chat_admin -h
+usage: chat-admin [-h] [-d] [-p PORT] [-ho HOST] [-b BASE] config
 
-Deploy NLLB model to a RESTful server
+Deploy a chat admin UI
+
+positional arguments:
+  config                Path to config file
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -57,8 +65,4 @@ optional arguments:
   -ho HOST, --host HOST
                         Host address to bind. (default: 0.0.0.0)
   -b BASE, --base BASE  Base prefix path for all the URLs. E.g., /v1 (default: None)
-  -mi MODEL_ID, --model_id MODEL_ID
-                        model ID; see https://huggingface.co/models?other=nllb (default: facebook/nllb-200-distilled-600M)
-  -msl MAX_SRC_LEN, --max-src-len MAX_SRC_LEN
-                        max source len; longer seqs will be truncated (default: 250)
 ```
