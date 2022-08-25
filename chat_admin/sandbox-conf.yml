@@ -1,0 +1,7 @@
+
+#chat_dir: ../darma_chat/darma_chat/model_chat
+chat_dir: model-chat-from-darma
+mturk:
+  sandbox: true
+  endpoint_url: https://mturk-requester-sandbox.us-east-1.amazonaws.com
+  profile: default # the [default] profile in ~/.aws/credentials file

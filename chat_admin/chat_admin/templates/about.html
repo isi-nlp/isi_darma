@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <section class="container">
+    <h2>{% block title %} About {% endblock %}</h2>
+    <br />
+     USC ISI Darma Chat Administrator</a>
+    <ul>
+      <li><a href="https://github.com/isi-nlp/isi_darma">https://github.com/isi-nlp/isi_darma</a></li>
+    </ul>
+  </section>
+
+  <section class="container">
+    <h2 id="sysinfo"> System Info</h2>
+      <table class="table float-left">
+        {% for key, value in sys_info.items() %}
+        <tr>
+          <th> {{ key }} </th>
+          <td> {{ value }} </td>
+        </tr>
+        {% endfor %}
+      </table>
+
+  </section>
+</div>
+
+{% endblock %}

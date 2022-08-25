@@ -1,0 +1,37 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="text-center">{% block title %} MTurk Qualifications {% endblock %}</h1>
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-body">
+          <p><b>Endpoint: </b><code> {{meta['endpoint_url']}}</code></p>
+          <p>Found {{ qtypes | length}} Qualification Types </p>
+        </div>
+      </div>
+
+      <ul class="list-group">
+        {% for qtype in qtypes %}
+        <li class="list-group-item">
+          <span>{{loop.index}} ― </span>
+           <a href="qualification/{{ qtype['QualificationTypeId'] }}">
+            {{ qtype['QualificationTypeId'] }} | {{ qtype['Name'] }}
+          </a>
+          <details>
+            <summary>⤵</summary>
+            <ul>
+              {% for key, value in qtype.items() if key != 'QualificationTypeId' %}
+              <li><b>{{key}}</b>: {{value}}</li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

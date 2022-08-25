@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <h3 class="text-center">{% block title %} MTurk > Qualification: {{ qual_id }} >All Hits {% endblock %}</h3>
+  <div class="row">
+    <div class="col-12">
+      <p>Found {{ data['HITs'] | length }} HITs </p>
+      <ul class="list-group">
+        {% for HIT in data['HITs'] %}
+        <li class="list-group-item">
+          <span class="text-muted">{{ loop.index }} ― </span> 
+          <a href="/mturk/HIT/{{ HIT['HITId'] }}">
+            {{ HIT['HITId'] }} | {{ HIT['Title'] }}
+          </a>
+          <details style="display: inline">
+            <summary>⤵</summary>
+            {% for key, value in HIT.items() %}
+            <ul>
+              <li><b>{{key}}</b>: {{value}}</li>
+            </ul>
+            {% endfor %}
+          </details>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}

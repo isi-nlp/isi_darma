@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<section style="background-color: #eee;">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../">All chats</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{chat_id}}</li>
+        </ol>
+    </nav>
+    <div class="container-fluid px-5">
+        <div class="row">
+            <div class="col-md-6 col-lg-7 col-xl-8 border-right">
+                <ul class="list-unstyled">
+                    {% for msg in data['dialog'] %}
+                    <li class="d-flex justify-content-between mb-1">
+                        <div class="card
+                        {% if msg['agent_idx'] == 0 and not msg['fake_start']  %} alert-info {% endif %}
+                        {% if msg['id'] == 'Moderator' %} alert-warning {% endif %}
+                        ">
+                            <div class="card-header d-flex justify-content-between p-2">
+                                <p class="fw-bold mb-0"> {{ msg['id'] }}</p>
+                                <p class="text-muted small mb-0"><i class="far fa-clock"></i>
+                                    {% if 'time' in msg %} {{ msg['time'] | ctime }} {% else %} (time not found) {% endif %}
+                                </p>
+                            </div>
+                            <div class="card-body" style="padding: 0.5em">
+                                <p class="mb-0">{{ msg['text'] }}</p>
+                                {% if 'text_orig' in msg %}
+                                <p class="mb-0 text-muted">{{ msg['text_orig'] }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+            <div class="col-md-6 col-lg-5 col-xl-4 mb-4 border-left">
+                    <h2> Info </h2>
+                    <ul class="list">
+                        <li class="list-item"> <b> Time:</b>
+                            {% if 'time' in data %}
+                            {{ data['time']['total'] }}<br />
+                            <small class="text-muted">
+                            Started: {{data['time']['start'] | ctime }} <br />
+                            Ended: {{ data['time']['end'] | ctime}}
+                            </small>
+                            {% else %}
+                            (Not found. Possibly this data was collected in earlier version)
+                            {% endif %}
+                        </li>
+                        {% for key, val in data.items() if key not in ('dialog', 'time', 'task_description') %}
+                        <li> <b>{{ key }}:</b> {{ val | flat_single }}</li>
+                        {% endfor %}
+                    </ul>
+                    <hr />
+                    <div>
+                        <button type="button button" class="col-4 btn btn-success"> Pay</button>
+                        <span class="col-1"></span>
+                        <button type="button" class="col-4 btn btn-info"> Qualify</button>
+                    </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock%}

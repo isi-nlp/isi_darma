@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <h1 class="text-center">{% block title %} Chat Admin {% endblock %}</h1>
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-body">
+          <span>Found {{chats | length }} chats </span>
+        </div>
+      </div>
+      <ul class="list-group">
+        {% for name, meta in chats %}
+        <li class="list-group-item">
+          <a href="review/{{ name }}">{{ name }}</a>
+          <small class="font-weight-light text-muted"> {{ meta['size'] }}; </small>
+          <small class="text-muted font-italic font-weight-lighter">Modified on {{ meta['modified'] }}</small>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+{% endblock %}
