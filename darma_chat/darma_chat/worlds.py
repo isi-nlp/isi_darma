@@ -21,6 +21,7 @@ from parlai.core.worlds import validate
 from parlai.crowdsourcing.utils.acceptability import AcceptabilityChecker
 from parlai.crowdsourcing.utils.worlds import CrowdOnboardWorld, CrowdTaskWorld
 from parlai.crowdsourcing.utils.mturk import get_mturk_id_from_mephisto_wrapper
+from mephisto.abstractions.providers.mturk.mturk_agent import MTurkAgent
 
 from darma_chat.bot_agent import TurkLikeAgent
 from darma_chat.gpt_agent import TurkLikeGptAgent
@@ -100,7 +101,7 @@ class ModelChatOnboardWorld(CrowdOnboardWorld):
             return ONBOARD_FAIL
 
         self.annotations = act['task_data'].get('annotations')
-        log.info('Onboarding annotation results: ', self.annotations)
+        log.info(f'Onboarding annotation results: {self.annotations}')
 
         if act['task_data']['success']:
             log.info(
@@ -226,8 +227,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 log.info(f'Got act for agent idx {idx}, act was: {acts[idx]} '
                          'and self.task_turn_idx: {self.task_turn_idx}.')
 
-            if acts[idx].get('task_data', {}).get('final_rating') is not None:
-
+            final_rating = acts[idx].get('task_data', {}).get('final_rating')
+            if final_rating:
                 self.chat_done = True
                 # agent ends chat after exceeding minimum number of turns
 
@@ -239,7 +240,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 p = acts[idx]['task_data'].get('problem_data_for_prior_message')
                 if p is not None:
                     self.__add_problem_data_to_utterance(p, turn_idx=turn_idx)
-                self.dialog[turn_idx]['final_rating'] = acts[idx]['task_data']['final_rating']
+                self.dialog[turn_idx]['final_rating'] = final_rating
 
                 # Save the final chat data
                 date_folder = time.strftime('%Y_%m_%d')
@@ -249,6 +250,14 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 chat_data_path = os.path.join(chat_data_subfolder,
                     f'{time_string}_{np.random.randint(0, 1000)}_{self.task_type}.json')
                 self.final_chat_data = self.get_final_chat_data()
+                if 'final_rating_question' in self.opt:
+                    rating_qs = self.opt['final_rating_question'].split('|')
+                    rating_ans = final_rating.split('|')
+                    if len(rating_qs) != len(rating_ans):
+                        log.error(f'Rating Q-A mismatch:\n Qs {rating_qs}\nAs: {rating_ans}')
+                    else:
+                        final_rating = list(zip(rating_qs, rating_ans))
+                self.final_chat_data['final_rating'] = final_rating
                 self.agent.mephisto_agent.state.messages.append({
                         'final_chat_data': self.final_chat_data,
                         'data': {},
@@ -354,10 +363,19 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         else:
             violations_string = None
         model_agent = self.bot.model_agent
+
+        def __get_mturk_data():
+            if not isinstance(self.agent.mephisto_agent, MTurkAgent):
+                return None
+            agent = self.agent.mephisto_agent
+            return dict(assignment_id=agent.mturk_assignment_id,
+                        sandbox='_sandbox' in agent.provider_type,
+                        worker_id=agent.get_worker().get_mturk_worker_id())
+
         time_now = time.time()
         data = {
             'dialog': self.dialog,
-            'workers': [get_mturk_id_from_mephisto_wrapper(self.agent)],
+            'workers': [self.agent.mephisto_agent.get_worker().worker_name],
             'bad_workers': [],
             'acceptability_violations': (violations_string,),
             'hit_ids': [self.agent.mephisto_agent.task_run_id],
@@ -372,7 +390,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 'start': self._start_time,
                 'end': time_now,
                 'total': f'{time_now - self._start_time:.3f} sec'
-            }
+            },
+            'mturk': __get_mturk_data(),
         }
         # TODO: once the analysis scripts are fully switched over to DataBrowser, remove
         #  the 'workers' and 'assignment_ids' keys, which will now be duplicated in the
