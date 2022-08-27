@@ -311,7 +311,8 @@ def parse_args():
     parser.add_argument('config', type=Path, help='Path to config file', default='conf.yml')
     parser.add_argument("-d", "--debug", action="store_true", help="Run Flask server in debug mode")
     parser.add_argument("-p", "--port", type=int, help="port to run server on", default=6060)
-    parser.add_argument("-ho", "--host", help="Host address to bind.", default='0.0.0.0')
+    # for security reasons we only bind it to loopback
+    #parser.add_argument("-ho", "--host", help="Host address to bind.", default='127.0.0.1')
     parser.add_argument("-b", "--base", help="Base prefix path for all the URLs. E.g., /v1")
     args = vars(parser.parse_args())
     return args
@@ -340,7 +341,7 @@ if cli_args.get('base'):
 def main():
     log.info(f"System Info: ${sys_info}")
     # CORS(app)  # TODO: insecure
-    app.run(port=cli_args["port"], host=cli_args["host"])
+    app.run(port=cli_args["port"], host='127.0.0.1')
     # A very useful tutorial is found at:
     # https://www.digitalocean.com/community/tutorials/how-to-make-a-web-application-using-flask-in-python-3
 

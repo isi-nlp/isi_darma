@@ -62,7 +62,10 @@ optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Run Flask server in debug mode (default: False)
   -p PORT, --port PORT  port to run server on (default: 6060)
-  -ho HOST, --host HOST
-                        Host address to bind. (default: 0.0.0.0)
   -b BASE, --base BASE  Base prefix path for all the URLs. E.g., /v1 (default: None)
 ```
+
+NOTES:
+* Authentication is not yet built into admin web UI.
+* Currently service  binds to loopback interface `127.0.0.1`. This is intentional, as only the requests coming from same node are accepted.
+When this web UI is deployed on server, use ssh tunnel (e.g. `ssh -L 6060:localhost:6060 <server>`) to establish connection with server. This way, ssh takes care of authentication and only people with ssh access to server can access the admin UI.
