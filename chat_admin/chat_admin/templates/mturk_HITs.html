@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../">MTurk</a></li>
+      <li class="breadcrumb-item active" aria-current="page">HITs</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-6">
+      <h3>HITs</h3>
+      <div role="alert" class="alert {% if data['HITs'] %}  alert-success {% else %}  alert-danger {% endif %}">
+        Showing {{ data['HITs'] | length }} HITs </div>
+      <ul class="list-group">
+        {% for HIT in data['HITs'] %}
+        {% set hit_id = HIT['HITId'] %}
+        <li id="{{hit_id}}" class="list-group-item">
+          <span class="text-muted">{{ loop.index }} ― </span>
+
+          <a href="/mturk/HIT/{{ hit_id }}">
+            {{ hit_id }} | {{ HIT['Title'] }}</a>
+          <details style="display: inline">
+            <summary>⤵</summary>
+            {% for key, value in HIT.items() %}
+            <ul>
+              <li><b>{{key}}</b>: {{value}}</li>
+            </ul>
+            {% endfor %}
+          </details>
+          <button type="button" class="btn btn-danger btn-sm float-right"
+            onclick="delete_hit('{{hit_id}}')">Delete</button>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+</div>
+<script>
+  function delete_hit(hit_id) {
+    console.log('Going to delete HIT ' + hit_id)
+    $.ajax({
+      url: "/mturk/HIT/" + hit_id,
+      type: 'DELETE',
+      success: function (result) {
+        console.log('Delete Success')
+        console.log(result)
+        $('#' + hit_id).hide()
+      },
+      error: function (result) {
+        alert("Error while deleting the hit: " + hit_id)
+        console.log('Error while deleting HIT')
+        console.log(result)
+      },
+    });
+  }
+</script>
+{% endblock %}

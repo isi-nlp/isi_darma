@@ -1,0 +1,4 @@
+include README.md
+graft chat_admin/static
+graft chat_admin/templates
+global-exclude *.pyc

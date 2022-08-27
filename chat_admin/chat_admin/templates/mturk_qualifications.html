@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../">MTurk</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Qualifications</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-8">
+      <div class="card">
+        <div class="card-body">
+          <p><b>Endpoint: </b><code> {{meta['endpoint_url']}}</code></p>
+          <div role="alert" class="alert alert-success">Found {{ qtypes | length}} Qualification Types </div>
+        </div>
+      </div>
+
+      <ul class="list-group">
+        {% for qtype in qtypes %}
+        {% set qual_id = qtype['QualificationTypeId'] %}
+        <li id='{{qual_id}}' class="list-group-item">
+          <span>{{loop.index}} ― </span>
+           <a href="./{{ qual_id }}">{{ qual_id }} | {{ qtype['Name'] }}
+          </a>
+          <button type="button" class="float-right btn btn-danger btn-sm" onclick="delete_qualification('{{qual_id }}')"> Delete</button>
+          <details>
+            <summary>⤵</summary>
+            <ul>
+              {% for key, value in qtype.items() if key != 'QualificationTypeId' %}
+              <li><b>{{key}}</b>: {{value}}</li>
+              {% endfor %}
+            </ul>
+          </details>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+{% endblock %}

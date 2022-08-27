@@ -5,10 +5,19 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "python -m darma_chat",
+            "name": "local",
             "type": "python",
             "request": "launch",
             "module": "darma_chat",
+            "console": "integratedTerminal",
+            "justMyCode": true
+        },
+        {
+            "name": "mturk_sandbox",
+            "type": "python",
+            "request": "launch",
+            "module": "darma_chat",
+            "args": ["conf=mturk_sandbox"],
             "console": "integratedTerminal",
             "justMyCode": true
         },

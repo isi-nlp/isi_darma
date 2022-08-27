@@ -259,6 +259,7 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'consent_data_folder': args.blueprint.consent_data_folder,
                 'translator': args.blueprint.translator if 'translator' in args.blueprint else None,
                 'botbackend': args.blueprint.botbackend,
+                'final_rating_question': args.blueprint.get('final_rating_question'),
             }
         )
 
