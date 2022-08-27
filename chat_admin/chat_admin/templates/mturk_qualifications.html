@@ -2,13 +2,18 @@
 
 {% block content %}
 <div class="container-fluid">
-  <h1 class="text-center">{% block title %} MTurk Qualifications {% endblock %}</h1>
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="../">MTurk</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Qualifications</li>
+    </ol>
+  </nav>
   <div class="row">
     <div class="col-8">
       <div class="card">
         <div class="card-body">
           <p><b>Endpoint: </b><code> {{meta['endpoint_url']}}</code></p>
-          <p>Found {{ qtypes | length}} Qualification Types </p>
+          <div role="alert" class="alert alert-success">Found {{ qtypes | length}} Qualification Types </div>
         </div>
       </div>
 
@@ -17,8 +22,9 @@
         {% set qual_id = qtype['QualificationTypeId'] %}
         <li id='{{qual_id}}' class="list-group-item">
           <span>{{loop.index}} ― </span>
-           <a href="qualification/{{ qual_id }}">{{ qual_id }} | {{ qtype['Name'] }}
+           <a href="./{{ qual_id }}">{{ qual_id }} | {{ qtype['Name'] }}
           </a>
+          <button type="button" class="float-right btn btn-danger btn-sm" onclick="delete_qualification('{{qual_id }}')"> Delete</button>
           <details>
             <summary>⤵</summary>
             <ul>
@@ -27,7 +33,6 @@
               {% endfor %}
             </ul>
           </details>
-          <button onclick="delete_qualification('{{qual_id }}')"> Delete</button>
         </li>
         {% endfor %}
         </li>
@@ -36,24 +41,4 @@
   </div>
 </div>
 
-
-<script>
-  function delete_qualification(qual_id) {
-    console.log('Going to delete qualification  ' + qual_id)
-    $.ajax({
-      url: "/mturk/qualification/" + qual_id,
-      type: 'DELETE',
-      success: function(result) {
-          console.log('Delete Success')
-          console.log(result)
-          $('#'+qual_id).hide()
-      },
-      error: function(result) {
-        alert("Error while deleting the qualification: " + qual_id )
-        console.log('Error while deleting qualification')
-        console.log(result)
-      },
-  });
-  }
-</script>
 {% endblock %}

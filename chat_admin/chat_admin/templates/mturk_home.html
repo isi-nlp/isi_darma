@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item active" aria-current="page">MTurk</li>
+        </ol>
+    </nav>
+    <div class="row">
+        <div class="col-12"></div>
+        <div class="card class-12">
+            <div class="card-body">
+                <p><b>Endpoint: </b><code> {{meta['endpoint_url']}}</code></p>
+            </div>
+        </div>
+        <ul class="list-group col-12">
+            <li class="list-group-item"><a href="./qualification">All Qualifications</li>
+            <li class="list-group-item"><a href="./HIT">All Hits</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

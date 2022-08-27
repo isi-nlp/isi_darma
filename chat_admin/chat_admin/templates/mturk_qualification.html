@@ -5,14 +5,15 @@
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
       <li class="breadcrumb-item"><a href="../">MTurk</a></li>
-      <li class="breadcrumb-item active" aria-current="page">HITs</li>
+      <li class="breadcrumb-item"><a href="../qualification">Qualification</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ qual_id }}</li>
     </ol>
   </nav>
   <div class="row">
     <div class="col-6">
       <h3>HITs</h3>
       <div role="alert" class="alert {% if data['HITs'] %}  alert-success {% else %}  alert-danger {% endif %}">
-        Showing {{ data['HITs'] | length }} HITs </div>
+        Found {{ data['HITs'] | length }} HITs </div>
       <ul class="list-group">
         {% for HIT in data['HITs'] %}
         {% set hit_id = HIT['HITId'] %}
@@ -36,24 +37,22 @@
         </li>
       </ul>
     </div>
+    <div class="col-5">
+      <h3>Workers</h3>
+      <div role="alert" class="alert {% if data['workers'] %}  alert-success {% else %}  alert-danger {% endif %}">
+        Found {{ data['workers'] | length }} workers </div>
+        <ol class="list-group">
+          {% for worker in data['workers'] %}
+          {% set worker_id = worker['WorkerId'] %}
+            <li id="{{worker_id}}" class="list-group-item">
+                <code>{{worker_id}}</code>
+                <small>Status: {{worker['Status']}} | {{worker['GrantTime']}} </small>
+                <button type="button" onclick="disqualify('{{worker_id}}', '{{qual_id}}')" class="btn btn-sm btn-danger float-right">Revoke</button>
+            </li>
+          {% endfor %}
+        </ol>
+    </div>
+
+  </div>
 </div>
-<script>
-  function delete_hit(hit_id) {
-    console.log('Going to delete HIT ' + hit_id)
-    $.ajax({
-      url: "/mturk/HIT/" + hit_id,
-      type: 'DELETE',
-      success: function (result) {
-        console.log('Delete Success')
-        console.log(result)
-        $('#' + hit_id).hide()
-      },
-      error: function (result) {
-        alert("Error while deleting the hit: " + hit_id)
-        console.log('Error while deleting HIT')
-        console.log(result)
-      },
-    });
-  }
-</script>
 {% endblock %}
