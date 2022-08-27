@@ -144,19 +144,19 @@ class DashboardService:
                     if query in qt['Name'].lower() or query in qt['Description']]
         return qtypes
 
-    @cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
+    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_HITS(self, qual_id:str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_hits_for_qualification_type(
             QualificationTypeId=qual_id,
             MaxResults=max_results)
 
-    @cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
+    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_workers_for_qualtype(self, qual_id:str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_workers_with_qualification_type(
             QualificationTypeId=qual_id,
             MaxResults=max_results)
 
-    @cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
+    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_all_hits(self, max_results=AWS_MAX_RESULTS, next_token=None):
         args = dict(MaxResults=max_results)
         if next_token:
@@ -164,7 +164,7 @@ class DashboardService:
         return self.mturk.list_hits(**args)
 
 
-    @cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
+    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_assignments(self, HIT_id: str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_assignments_for_hit(
             HITId=HIT_id, MaxResults=max_results)

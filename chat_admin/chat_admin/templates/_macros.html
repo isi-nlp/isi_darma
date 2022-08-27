@@ -7,8 +7,8 @@
     <li><small> Submitted on {{asgn['SubmitTime']}} </small></li>
 </ul>
 {% if asgn['AssignmentStatus'] == 'Submitted' %}
-<form method="POST" action="/mturk/assignment/{{asgn['assignment_id']}}/approve">
-    <button type="submit" value="Submit" class="col-2 mb-2 btn btn-success">Approve and Pay</button>
+<form method="POST" action="/mturk/assignment/{{asgn['AssignmentId']}}/approve">
+    <button type="submit" value="Submit" class="col-2 mb-2 btn btn-success btn-sm">Approve and Pay</button>
     <span class="col-1"></span>
 </form>
 {% elif asgn['AssignmentStatus'] == 'Approved'  %}
