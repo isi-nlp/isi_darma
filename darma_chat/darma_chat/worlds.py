@@ -114,7 +114,7 @@ class ModelChatOnboardWorld(CrowdOnboardWorld):
             os.makedirs(consent_data_folder, exist_ok=True)
             consent_datapath = os.path.join(
                 consent_data_folder, "consent_log.jsonl")
-            with open(consent_datapath, 'w+') as f_jsonl:
+            with open(consent_datapath, 'a') as f_jsonl:
                 act['worker_id'] = self.worker_id
                 data_str = json.dumps(act)
                 f_jsonl.write(data_str + "\n")
