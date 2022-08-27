@@ -19,12 +19,12 @@ python -m chat_admin -h
 ```bash
 
 # add -d for debug
-python -m path-to-config.yml -d 
+python -m chat_admin path-to-config.yml -d 
 ```
 
 # Deployment
 ```bash
-python -m path-to-config.yml
+python -m chat_admin path-to-config.yml
 ```
 
 This starts a service on http://localhost:6060 by default.
