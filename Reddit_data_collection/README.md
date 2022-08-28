@@ -59,10 +59,12 @@ kill -9 <pid>
 
 ## **2. Reporting stats on the data collected**
 **Notebook: Stats_reporting_notebook.ipynb**
-(See notebook for details)
+
+**Google sheet with stats: [reddit_live_streamed_data](https://docs.google.com/spreadsheets/d/1-hg9-o_x-K--JzjOr-cx4-2jPOsEDG5uB83DHPouAMQ/edit?usp=sharing)**
+
 - Uploading the master log csv files downloaded from the **reddit data** server, in the notebook, for both comments and posts.
 - Collecting the number of records and number of words.
-
+(See notebook for details)
 ## **3. Collecting comments again after delay to capture comment moderation** 
 **Notebook: Removed_com_collection_notebook.ipynb**
 
