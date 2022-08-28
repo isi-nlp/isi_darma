@@ -320,7 +320,7 @@ function OnboardingQuestion({
                 <br/>
 
                 <b>
-                    Do you agree with this informed consent form? 
+                    Do you agree with the statement above? 
                 </b>
                 <ErrorBoundary>
                     <Checkboxes 
@@ -357,7 +357,7 @@ function OnboardingQuestion({
             <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial6.png" style={{maxWidth: "100%"}}></img>
 
             <b>
-                Please check this checkbox to confirm that you have read the above instructions.
+                Please check this checkbox to confirm that you have read the above instructions and that you are qualified and able to do the task.
             </b>
 
             <br/>
