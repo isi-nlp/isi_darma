@@ -19,7 +19,6 @@ import flask
 from flask import Flask, request, send_from_directory, Blueprint
 import boto3
 from ruamel.yaml import YAML
-from cachetools import cached, LRUCache, TTLCache
 
 
 from .utils import max_RSS, format_bytes
@@ -144,37 +143,25 @@ class DashboardService:
                     if query in qt['Name'].lower() or query in qt['Description']]
         return qtypes
 
-    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_HITS(self, qual_id:str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_hits_for_qualification_type(
             QualificationTypeId=qual_id,
             MaxResults=max_results)
 
-    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_workers_for_qualtype(self, qual_id:str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_workers_with_qualification_type(
             QualificationTypeId=qual_id,
             MaxResults=max_results)
 
-    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_all_hits(self, max_results=AWS_MAX_RESULTS, next_token=None):
         args = dict(MaxResults=max_results)
         if next_token:
             args['NextToken'] = next_token
         return self.mturk.list_hits(**args)
 
-
-    #@cached(cache=TTLCache(maxsize=AWS_CACHE_MAXSIZE, ttl=AWS_CACHE_TTL))
     def list_assignments(self, HIT_id: str, max_results=AWS_MAX_RESULTS):
         return self.mturk.list_assignments_for_hit(
             HITId=HIT_id, MaxResults=max_results)
-
-    def approve_assignment(self, assignment_id):
-        # this will pay the worker
-        raise Exception('Not implemented yet')
-        #log.info(f'Approving assingment {assignment_id}')
-        #self.mturk.approve_assignment(AssignmentId=assignment_id)
-
 
     def qualify_worker(self, worker_id: str, qual_id: str, send_email=True):
         log.info(f"Qualifying worker: {worker_id} for {qual_id}")

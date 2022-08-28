@@ -19,7 +19,7 @@ python -m chat_admin -h
 ```bash
 
 # add -d for debug
-python -m chat_admin path-to-config.yml -d 
+python -m chat_admin path-to-config.yml -d
 ```
 
 # Deployment
@@ -37,12 +37,11 @@ Here is an example
 chat_dir: ../darma_chat/darma_chat/model_chat
 mturk:
   sandbox: true
-  endpoint_url: https://mturk-requester-sandbox.us-east-1.amazonaws.com
   profile: default    # the [default] profile in ~/.aws/credentials file
 ```
 
-* `chat_dir` -- path to directory having JSON files stored by Mephisto.
-* If `sandbox` is set to `true`, `endpoint_url` will be used otherwise default url is picked up by aws client.
+* `chat_dir` -- path to directory having JSON files stored by `darma_chat`.
+* If `sandbox` is set to `true`,  sandbox endpoint is used
 * `profile` value is the name of credential profile in `~/.aws/credentials` to use.
 
 
@@ -65,7 +64,7 @@ optional arguments:
   -b BASE, --base BASE  Base prefix path for all the URLs. E.g., /v1 (default: None)
 ```
 
-NOTES:
+## Security Notes:
 * Authentication is not yet built into admin web UI.
-* Currently service  binds to loopback interface `127.0.0.1`. This is intentional, as only the requests coming from same node are accepted.
-When this web UI is deployed on server, use ssh tunnel (e.g. `ssh -L 6060:localhost:6060 <server>`) to establish connection with server. This way, ssh takes care of authentication and only people with ssh access to server can access the admin UI.
+* Currently, the web server  binds to loopback interface `127.0.0.1`. This is intentional, as only the requests coming from same node are accepted.
+* If this web UI is deployed on a remote server, use ssh tunnel (e.g. `ssh -L 6060:localhost:6060 <server>`) to establish connection with server. This way, ssh takes care of authentication and only people with ssh access to the remote server can access the admin UI.
