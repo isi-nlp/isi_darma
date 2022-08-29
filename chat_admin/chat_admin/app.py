@@ -155,7 +155,7 @@ class MTurkService:
 
 
     def get_assignment(self, assignment_id):
-        return self.client.client.get_assignment(AssignmentId=assignment_id)['Assignment']
+        return self.client.get_assignment(AssignmentId=assignment_id)['Assignment']
 
     def list_qualification_types(self, max_results=AWS_MAX_RESULTS, query: str=''):
         data = self.client.list_qualification_types(
