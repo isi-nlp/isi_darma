@@ -1,17 +1,18 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% set mturk_where = meta['mturk_where'] %}
 <div class="container-fluid">
     <nav aria-label="breadcrumb">
         <ol class="breadcrumb">
-            <li class="breadcrumb-item active" aria-current="page">MTurk</li>
+            <li class="breadcrumb-item active" aria-current="page">MTurk ({{mturk_where}})</li>
         </ol>
     </nav>
     <div class="row">
         <div class="col-12"></div>
         <div class="card class-12">
             <div class="card-body">
-                <p><b>Endpoint: </b><code> {{meta['endpoint_url']}}</code></p>
+                <p><b>Endpoint: </b><code> {{meta['mturk_endpoint_url']}}</code></p>
             </div>
         </div>
         <ul class="list-group col-12">

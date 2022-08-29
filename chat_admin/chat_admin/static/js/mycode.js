@@ -1,7 +1,7 @@
-function delete_qualification(qual_id) {
-    console.log('Going to delete qualification  ' + qual_id)
+function delete_qualification(qual_id, where) {
+    console.log('Going to delete qualification  ' + qual_id + ' where:' + where)
     $.ajax({
-      url: "/mturk/qualification/" + qual_id,
+      url: `/mturk/${where}/qualification/${qual_id}`,
       type: 'DELETE',
       success: function(result) {
           console.log('Delete Success')
@@ -16,11 +16,10 @@ function delete_qualification(qual_id) {
   });
 }
 
-
-function delete_hit(hit_id) {
-    console.log('Going to delete HIT ' + hit_id)
+function delete_hit(hit_id, where) {
+    console.log('Going to delete HIT ' + hit_id + ' where :' + where)
     $.ajax({
-      url: "/mturk/HIT/" + hit_id,
+      url: `/mturk/${where}/HIT/${hit_id}`,
       type: 'DELETE',
       success: function (result) {
         console.log('Delete Success')
@@ -35,10 +34,10 @@ function delete_hit(hit_id) {
     });
   }
 
-function disqualify(worker_id, qual_id){
-  console.log(`Going to disqualify ${worker_id} from ${qual_id}`)
+function disqualify(worker_id, qual_id, where){
+  console.log(`Going to disqualify ${worker_id} from ${qual_id} ; where: ${where}`)
   $.ajax({
-    url: `/mturk/worker/${worker_id}/qualification/${qual_id}`,
+    url: `/mturk/${where}/worker/${worker_id}/qualification/${qual_id}`,
     type: 'DELETE',
     success: function (result) {
       console.log(`Worker ${worker_id} removed from qualification ${qual_id}`)

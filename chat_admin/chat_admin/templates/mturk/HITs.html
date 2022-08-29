@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% set mturk_where = meta['mturk_where'] %}
 <div class="container-fluid">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="../">MTurk</a></li>
+      <li class="breadcrumb-item"><a href="../">MTurk ({{mturk_where}})</a></li>
       <li class="breadcrumb-item active" aria-current="page">HITs</li>
     </ol>
   </nav>
@@ -19,7 +20,7 @@
         <li id="{{hit_id}}" class="list-group-item">
           <span class="text-muted">{{ loop.index }} ― </span>
 
-          <a href="/mturk/HIT/{{ hit_id }}">
+          <a href="../HIT/{{ hit_id }}">
             {{ hit_id }} | {{ HIT['Title'] }}</a>
           <details style="display: inline">
             <summary>⤵</summary>
@@ -30,30 +31,12 @@
             {% endfor %}
           </details>
           <button type="button" class="btn btn-danger btn-sm float-right"
-            onclick="delete_hit('{{hit_id}}')">Delete</button>
+            onclick="delete_hit('{{hit_id}}', '{{mturk_where}}')">Delete</button>
         </li>
         {% endfor %}
         </li>
       </ul>
     </div>
+  </div>
 </div>
-<script>
-  function delete_hit(hit_id) {
-    console.log('Going to delete HIT ' + hit_id)
-    $.ajax({
-      url: "/mturk/HIT/" + hit_id,
-      type: 'DELETE',
-      success: function (result) {
-        console.log('Delete Success')
-        console.log(result)
-        $('#' + hit_id).hide()
-      },
-      error: function (result) {
-        alert("Error while deleting the hit: " + hit_id)
-        console.log('Error while deleting HIT')
-        console.log(result)
-      },
-    });
-  }
-</script>
 {% endblock %}

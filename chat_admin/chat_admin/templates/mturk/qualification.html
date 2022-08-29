@@ -1,10 +1,11 @@
 {% extends 'base.html' %}
 
 {% block content %}
+{% set mturk_where = meta['mturk_where'] %}
 <div class="container-fluid">
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
-      <li class="breadcrumb-item"><a href="../">MTurk</a></li>
+      <li class="breadcrumb-item"><a href="../">MTurk ({{mturk_where}})</a></li>
       <li class="breadcrumb-item"><a href="../qualification">Qualification</a></li>
       <li class="breadcrumb-item active" aria-current="page">{{ qual_id }}</li>
     </ol>
@@ -20,7 +21,7 @@
         <li id="{{hit_id}}" class="list-group-item">
           <span class="text-muted">{{ loop.index }} ― </span>
 
-          <a href="/mturk/HIT/{{ hit_id }}">
+          <a href="../HIT/{{ hit_id }}">
             {{ hit_id }} | {{ HIT['Title'] }}</a>
           <details style="display: inline">
             <summary>⤵</summary>
@@ -31,7 +32,7 @@
             {% endfor %}
           </details>
           <button type="button" class="btn btn-danger btn-sm float-right"
-            onclick="delete_hit('{{hit_id}}')">Delete</button>
+            onclick="delete_hit('{{hit_id}}', '{{mturk_where}}')">Delete</button>
         </li>
         {% endfor %}
         </li>
@@ -47,7 +48,7 @@
             <li id="{{worker_id}}" class="list-group-item">
                 <code>{{worker_id}}</code>
                 <small>Status: {{worker['Status']}} | {{worker['GrantTime']}} </small>
-                <button type="button" onclick="disqualify('{{worker_id}}', '{{qual_id}}')" class="btn btn-sm btn-danger float-right">Revoke</button>
+                <button type="button" onclick="disqualify('{{worker_id}}', '{{qual_id}}', '{{mturk_where}}')" class="btn btn-sm btn-danger float-right">Revoke</button>
             </li>
           {% endfor %}
         </ol>

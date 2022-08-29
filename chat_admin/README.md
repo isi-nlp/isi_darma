@@ -35,14 +35,11 @@ This starts a service on http://localhost:6060 by default.
 Here is an example
 ```yaml
 chat_dir: ../darma_chat/darma_chat/model_chat
-mturk:
-  sandbox: true
-  profile: default    # the [default] profile in ~/.aws/credentials file
+mturk_profile: default    # the [default] profile in ~/.aws/credentials file
 ```
 
 * `chat_dir` -- path to directory having JSON files stored by `darma_chat`.
-* If `sandbox` is set to `true`,  sandbox endpoint is used
-* `profile` value is the name of credential profile in `~/.aws/credentials` to use.
+* If `mturk_profile` value is the name of credential profile in `~/.aws/credentials` to be used for authentication with AWS/mturk APIs.
 
 
 
@@ -61,7 +58,6 @@ optional arguments:
   -h, --help            show this help message and exit
   -d, --debug           Run Flask server in debug mode (default: False)
   -p PORT, --port PORT  port to run server on (default: 6060)
-  -b BASE, --base BASE  Base prefix path for all the URLs. E.g., /v1 (default: None)
 ```
 
 ## Security Notes:
