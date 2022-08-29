@@ -146,7 +146,12 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 		new_utterance = {"speaker_id": x[0], "text": x[1]}
 		my_conversation.append(new_utterance)
 
-	data = {"conversation": my_conversation, "target_user": comment.author.fullname}
+	data = {
+				"conversation": my_conversation,
+				"target_user" : comment.author.fullname,
+				"comment_id": comment.id,
+				"post_id": comment.submission.id
+	}
 
 	json_outputs_path = "/isi_darma/isi_darma/src/isi_darma/data/conversations"
 	if not os.path.exists(json_outputs_path):
