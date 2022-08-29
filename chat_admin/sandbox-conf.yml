@@ -1,6 +1,4 @@
 
 chat_dir: ../darma_chat/darma_chat/model_chat
 #chat_dir: model-chat-from-darma
-mturk:
-  sandbox: true
-  profile: default # the [default] profile in ~/.aws/credentials file
+mturk_profile: default # the [default] profile in ~/.aws/credentials file

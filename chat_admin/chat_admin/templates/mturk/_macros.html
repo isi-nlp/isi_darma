@@ -1,13 +1,15 @@
-{% macro render_assignment(asgn, qtypes=None) %}
+{% macro render_assignment(asgn, qtypes=None, where='sandbox') %}
 <b>{{asgn['AssignmentId']}}</b>
+    <span class="badge badge-success float-right">{% if asgn.get('sandbox') %}[Sandbox] {%else%} [Live] {%endif%}</span>
 <ul class="list-group">
     <li><i>Worker</i>: <code>{{asgn['WorkerId']}}</code> | Status: {{asgn['AssignmentStatus']}}</li>
-    <!-- <li><b>HIT</b>: <a href="/mturk/HIT/{{asgn['HITId']}}"><code>{{asgn['HITId']}}</code></a> -->
-    </li>
+    <li><b>HIT</b>: <a href="/mturk/{{where}}/HIT/{{asgn['HITId']}}"><code>{{asgn['HITId']}}</code></a></li>
     <li><small> Submitted on {{asgn['SubmitTime']}} </small></li>
+    {% if 'ApprovalTime' in asgn %} <li><small> Approved on {{asgn['ApprovalTime']}} </small></li>{%endif%}
+    {% if 'AcceptTime' in asgn %} <li><small> Accepted on {{asgn['AcceptTime']}} </small></li> {%endif%}
 </ul>
 {% if asgn['AssignmentStatus'] == 'Submitted' %}
-<form method="POST" action="/mturk/assignment/{{asgn['AssignmentId']}}/approve">
+<form method="POST" action="/mturk/{{where}}/assignment/{{asgn['AssignmentId']}}/approve">
     <button type="submit" value="Submit" class="col-2 mb-2 btn btn-success btn-sm">Approve and Pay</button>
     <span class="col-1"></span>
 </form>
@@ -18,8 +20,7 @@
 {% endif %}
 
 {% if qtypes %}
-
-<form method="POST" action="/mturk/worker/{{asgn['WorkerId']}}/qualification">
+<form method="POST" action="/mturk/{{where}}/worker/{{asgn['WorkerId']}}/qualification">
     <div class="form-group" style="display: flex;">
         <label for="change-qualification" class="col">Assign Qualification to worker
             <code>{{asgn['WorkerId']}}</code></label>
@@ -36,5 +37,7 @@
 {% else %}
     <p class="alert alert-warning"> (No qualifications are available)</p>
 {%endif%}
+
+{{ asgn }}
 
 {% endmacro %}

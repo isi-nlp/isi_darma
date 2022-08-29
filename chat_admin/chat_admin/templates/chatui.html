@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% from '_macros.html' import render_assignment %} 
+{% from 'mturk/_macros.html' import render_assignment %} 
 
 {% block content %}
 
@@ -57,7 +57,7 @@
                 <hr/>
                 {% if 'mturk' in data and 'assignment_id' in data['mturk'] %}
                 <div class="col">
-                    {{ render_assignment(data['mturk'], qtypes) }}
+                    {{ render_assignment(data['mturk'], where=mturk_where) }}
                 </div>
                 {% else %}
                 <div class="card p-4" >
