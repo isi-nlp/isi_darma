@@ -155,7 +155,7 @@ class MTurkService:
 
 
     def get_assignment(self, assignment_id):
-        return self.client.get_assignment(AssignmentId=assignment_id)['Assignment']
+        return self.client.client.get_assignment(AssignmentId=assignment_id)['Assignment']
 
     def list_qualification_types(self, max_results=AWS_MAX_RESULTS, query: str=''):
         data = self.client.list_qualification_types(
@@ -354,7 +354,8 @@ def parse_args():
         prog="chat-admin",
         description="Deploy a chat admin UI",
         formatter_class=ArgumentDefaultsHelpFormatter)
-    parser.add_argument('config', type=Path, help='Path to config file', default='conf.yml')
+    parser.add_argument('-c', '--config', type=Path, help='Path to config file',
+                        default=Path('conf.yml'))
     parser.add_argument("-d", "--debug", action="store_true", help="Run Flask server in debug mode")
     parser.add_argument("-p", "--port", type=int, help="port to run server on", default=6060)
     # for security reasons we only bind it to loopback
@@ -367,7 +368,7 @@ def parse_args():
 # uwsgi --http 127.0.0.1:5000 --module chat_app.app:app # --pyargv "--foo=bar"
 cli_args = parse_args()
 config_file: Path = cli_args['config']
-assert config_file.exists() and config_file.is_file(), f'{config_file} is not a valid config file'
+assert config_file.exists() and config_file.is_file(), f'Expected config YAML file at {config_file}, but it is not found'
 config = yaml.load(config_file)
 
 attach_admin_dashboard(config=config, router=bp)
