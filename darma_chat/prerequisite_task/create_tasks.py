@@ -61,11 +61,27 @@ def addonoffarg(parser, arg, dest=None, default=True, help="TODO"):
 QUALS = {}
 QUALS["US"] =  {
           'QualificationTypeId': '00000000000000000071',
-          'Comparator': 'EqualTo',
+          'Comparator': 'In',
           'LocaleValues': [
               {
                   'Country': 'US',
               },
+              {
+                  'Country': 'DZ', # algeria
+              },
+              {
+                  'Country': 'CA', # canada
+              },
+              {
+                  'Country': 'FR', # france
+              },
+              {
+                  'Country': 'HT', # haiti
+              },
+              {
+                  'Country': 'BE', # belgium
+              }
+            
           ],
       }
 QUALS["ADULT"] = {
@@ -93,6 +109,8 @@ QUALS["FRENCH"] =   {
               ],
       }
 
+BOXBANLIST = ['FRENCH']
+
 def main():
   parser = argparse.ArgumentParser(description="create qualification task",
                                    formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -101,6 +119,7 @@ def main():
   parser.add_argument("--outfile", "-o", nargs='?', type=argparse.FileType('w'), default=sys.stdout, help="output file")
   parser.add_argument("--assignments", "-a", type=int, default=10,  help="number of assignments per HIT")
   parser.add_argument("--reward", "-r", type=float, default=0.5,  help="reward, in dollars")
+  parser.add_argument("--quals", "-q", nargs='+', choices=['US', 'ADULT', '95', 'FRENCH'], default=['US', 'ADULT', '95', 'FRENCH'], type=str, help="which qualifications to include") 
   parser.add_argument("--title", type=str, help="hit title", default="'Introduction to Pretend to be Toxic in a Chat Room (In French)")
   parser.add_argument("--description", type=str, help="hit description", default="(WARNING: This HIT contains explicit language in English and French. Worker discretion is advised.) You will view a conversation based on a Reddit subreddit involving a toxic user. A bot moderator will moderate the toxic user, and you will continue the conversation imitating the toxic user. This will be an introduction to the main task, and the first step in getting qualification for the main task.")
   parser.add_argument("--keywords", type=str, help="hit keywords", default='survey, dialogue, moderation, french')
@@ -133,9 +152,12 @@ def main():
                     sandbox=args.sandbox)
 
   
-  qr = [ QUALS["US"], QUALS["ADULT"], QUALS["95"]]
-  if not args.sandbox:
-    qr.append(QUALS["FRENCH"])
+  qr = []
+  for qual in args.quals:
+    if args.sandbox and qual in BOXBANLIST:
+      print(f"Not including {qual}; not enabled for sandbox.")
+    else:
+      qr.append(QUALS[qual])
 
   new_hit = mturk.create_hit(
       Title = args.title,
@@ -152,6 +174,8 @@ def main():
   url_prefix = "https://worker.mturk.com/mturk/preview?groupId="
   if args.sandbox:
     url_prefix="https://workersandbox.mturk.com/mturk/preview?groupId="
+  # clean up ugly XML
+  del new_hit['HIT']['Question']
   outfile.write(f"{url_prefix}{new_hit['HIT']['HITGroupId']}\n")
   outfile.write(new_hit['HIT']['HITId']+"\n")
   outfile.write(json.dumps(new_hit,indent=2, sort_keys=True, default=str)+"\n")

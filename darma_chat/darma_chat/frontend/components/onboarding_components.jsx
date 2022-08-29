@@ -74,13 +74,20 @@ var handleOnboardingSubmit = function ({ onboardingData, currentTurnAnnotations,
     const max_incorrect = onboardingData.hasOwnProperty("max_incorrect") ? onboardingData.max_incorrect : DEFAULT_MAX_INCORRECT;
     const max_failures_allowed = onboardingData.hasOwnProperty("max_failures_allowed") ? onboardingData.max_failures_allowed : DEFAULT_MAX_FAILURES_ALLOWED;
 
-    var readInstructions = document.getElementById("instruction_confirm")
-
-    console.log(readInstructions)
+    var readInstructions = document.getElementById("instruction_confirm");
+    var lang_conf = document.getElementById("language_confirm");  
+    var age_conf = document.getElementById("age_confirm");  
 
     if (!readInstructions.checked){
         alert("Please make sure you've read the instructions.")
     }
+    else if (!lang_conf.checked){
+        alert("Please confirm you can read and write the language indicated and agree to do so.")
+    }
+    else if (!age_conf.checked){
+        alert("Please confirm you are the proper age and understand the toxic nature of the data you will be exposed to.")
+    }
+
     else if (countCorrect >= min_correct && countIncorrect <= max_incorrect) {
         onSubmit({ annotations: currentTurnAnnotations, success: true, signature: signed_name, date: getCurrentDate() });
     }     
@@ -135,7 +142,7 @@ function OnboardingQuestion({
                         Being in this research study is voluntary - it is your choice.
                     </li>
                     <li>
-                        You are being asked to take part in this study because you are bilingual, speaking both  French and English fluently, and you are at least 18 years old. The purpose of this study is to assess the ability of artificial intelligence-based moderators ("bots") to affect online toxic behavior. Your participation in this study will last approximately 10 minutes per conversation you wish to participate in, but you will have multiple opportunities to participate. Procedures will include reading an existing partial online conversation, assuming the persona, attitude, opinion, and behavior of one of the participants in that conversation, and reacting naturally to another participant who tries to alter "your" behavior.  
+                        You are being asked to take part in this study because <b>you are bilingual, speaking both  French and English fluently, and you are at least 18 years old.</b> The purpose of this study is to assess the ability of artificial intelligence-based moderators ("bots") to affect online toxic behavior. Your participation in this study will last approximately 10 minutes per conversation you wish to participate in, but you will have multiple opportunities to participate. Procedures will include reading an existing partial online conversation, assuming the persona, attitude, opinion, and behavior of one of the participants in that conversation, and reacting naturally to another participant who tries to alter "your" behavior.  
                     </li>
                     <li>
                         There are risks from participating in this study. The most common risks are that you will feel uncomfortable imitating the personality of someone whose views or style are dissimilar from your own, or that you will feel reluctant to discuss the topics of the given conversation. More detailed information about the risks of this study can be found under the “Risk and Discomfort” section. 
@@ -357,13 +364,24 @@ function OnboardingQuestion({
             <img src="https://isidarmabucket1.s3.us-west-1.amazonaws.com/Tutorial6.png" style={{maxWidth: "100%"}}></img>
 
             <b>
-                Please check this checkbox to confirm that you have read the above instructions and that you are qualified and able to do the task.
+                Please check this checkboxes to confirm that you have read the above instructions and that you are qualified and able to do the task.
             </b>
 
             <br/>
             
             <input type="checkbox" id="instruction_confirm" name="instruction_confirm" value="init_false"></input>
             <label for="instruction_confirm">  I have read the instructions. </label>
+
+            <br/>
+
+            <input type="checkbox" id="language_confirm" name="language_confirm" value="init_false"></input>
+            <label for="language_confirm">  I can read and write fluently in French and I agree to write in French in this task. </label>
+
+            <br/>
+
+            <input type="checkbox" id="age_confirm" name="age_confirm" value="init_false"></input>
+            <label for="age_confirm">  I am 18 years or older and I understand that I may have to read and write using toxic language. </label>
+
 
         </div>
     )
