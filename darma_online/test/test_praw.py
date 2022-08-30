@@ -8,9 +8,9 @@ Usage: python test_praw.py <title> <body>
 """
 
 import praw 
-from isi_darma.utils import load_reddit_client
+from darma_online.utils import load_reddit_client
 import sys 
-from isi_darma.logging_setup import logger
+from darma_online.logging_setup import logger
 
 title, body = sys.argv[1], sys.argv[2]
 
