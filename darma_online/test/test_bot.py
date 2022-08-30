@@ -1,4 +1,4 @@
-from isi_darma.bots import BasicBot
+from darma_online.bots import BasicBot
 
 bot = BasicBot(test=True)
 dialogue = ["Hello", "I hate you", "You're such a jerk", "I will beat you up!", "Hey asshole!", "opt-out please"]

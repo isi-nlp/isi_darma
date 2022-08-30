@@ -1,8 +1,8 @@
 # temporary code for development 
 
-from isi_darma.utils import load_reddit_client
-from isi_darma.comments_utils import format_dialogue, get_dialogue_text
-from isi_darma.pipeline.response_generators import SpolinBotRG
+from darma_online.utils import load_reddit_client
+from darma_online.comments_utils import format_dialogue, get_dialogue_text
+from darma_online.pipeline.response_generators import SpolinBotRG
 from typing import List 
 
 reddit = load_reddit_client()
