@@ -42,8 +42,8 @@ class BasicBot(ModerationBot):
         self.CREDS = load_credentials(self.logger)
         self.current_dialogue = None
 
-        self.databases = DatabaseManager(self.logger, root = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data')
-        self.bot_responses = self.response_generator.read_responses( path = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data/response_templates/responses.json')
+        self.databases = DatabaseManager(self.logger, root = '/isi_darma/isi_darma/darma_online/src/darma_online/data')
+        self.bot_responses = self.response_generator.read_responses( path = '/isi_darma/isi_darma/darma_online/src/darma_online/data/response_templates/responses.json')
 
     @staticmethod
     def detect_language(text):
