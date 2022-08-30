@@ -18,11 +18,11 @@ def main():
 	# Set the subreddit to be moderated
 	sub = SUBREDDIT if args.subreddit is None else args.subreddit
 
-	# moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub)
+	moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub)
 
 	# BasicBot instance for r/france
-	sub = 'france'
-	moderation_bot = BasicBot(test=False, passive=True, sub=sub)
+	# sub = 'france'
+	# moderation_bot = BasicBot(test=False, passive=True, sub=sub)
 
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info("Instantiated Reddit Client")
