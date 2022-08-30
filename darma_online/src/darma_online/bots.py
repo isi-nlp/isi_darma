@@ -7,6 +7,7 @@ from darma_online.pipeline.translators import Translator
 from darma_online.pipeline.databases_manager import DatabaseManager
 from darma_online.utils import load_credentials, get_username, check_for_opt_out, get_post_id
 from darma_online.utils import get_replied_to, create_json_thread
+from prawcore.exceptions import Forbidden
 
 class ModerationBot(ABC):
 
@@ -206,9 +207,14 @@ class BasicBot(ModerationBot):
 
         # Final response sent as reply in reddit thread/post
         if (not self.test and not self.passive) and final_response and obj_to_reply:
-            obj_to_reply.reply(final_response)
-            self.databases.add_to_moderated(post_id, author_username, dialogue_str)
-            self.logger.info(f'Response sent to toxic user: {author_username}\n')
+
+            try:
+                obj_to_reply.reply(final_response)
+                self.databases.add_to_moderated(post_id, author_username, dialogue_str)
+                self.logger.info(f'Response sent to toxic user: {author_username}\n')
+
+            except Forbidden:
+                self.logger.info(f"Cannot send response to toxic user on {self.sub} - Forbidden")
 
         else:
             self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
