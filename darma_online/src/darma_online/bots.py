@@ -163,8 +163,8 @@ class BasicBot(ModerationBot):
                 initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
                 self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
-                if type == "post": parent_username = "les autres"
-                else: parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "other_test_user"
+                if type == "post": parent_username = "envers les autres"
+                else: parent_username = get_replied_to(obj_to_reply) if obj_to_reply else "envers other_test_user"
 
                 # Change parent username to "others" if it's a self-reply
                 if parent_username == author_username: parent_username = "les autres"
