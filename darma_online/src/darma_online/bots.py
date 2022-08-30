@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-from isi_darma.comments_utils import format_dialogue
-from isi_darma.logging_setup import setup_logger
-from isi_darma.pipeline.moderation_classifiers import PerspectiveAPIModerator
-from isi_darma.pipeline.response_generators import SpolinBotRG
-from isi_darma.pipeline.translators import Translator
-from isi_darma.pipeline.databases_manager import DatabaseManager
-from isi_darma.utils import load_credentials, get_username, check_for_opt_out, get_post_id
-from isi_darma.utils import get_replied_to, create_json_thread
+from darma_online.comments_utils import format_dialogue
+from darma_online.logging_setup import setup_logger
+from darma_online.pipeline.moderation_classifiers import PerspectiveAPIModerator
+from darma_online.pipeline.response_generators import SpolinBotRG
+from darma_online.pipeline.translators import Translator
+from darma_online.pipeline.databases_manager import DatabaseManager
+from darma_online.utils import load_credentials, get_username, check_for_opt_out, get_post_id
+from darma_online.utils import get_replied_to, create_json_thread
 
 class ModerationBot(ABC):
 
@@ -42,8 +42,8 @@ class BasicBot(ModerationBot):
         self.CREDS = load_credentials(self.logger)
         self.current_dialogue = None
 
-        self.databases = DatabaseManager(self.logger)
-        self.bot_responses = self.response_generator.read_responses()
+        self.databases = DatabaseManager(self.logger, root = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data')
+        self.bot_responses = self.response_generator.read_responses( path = '/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data/response_templates/responses.json')
 
     @staticmethod
     def detect_language(text):

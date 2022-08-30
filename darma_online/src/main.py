@@ -1,5 +1,5 @@
-from isi_darma.utils import load_reddit_client
-from isi_darma.bots import BasicBot
+from darma_online.utils import load_reddit_client
+from darma_online.bots import BasicBot
 
 import time
 import prawcore.exceptions
@@ -20,12 +20,8 @@ def main():
 
 	moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub)
 
-	# BasicBot instance for r/france
-	# sub = 'france'
-	# moderation_bot = BasicBot(test=False, passive=True, sub=sub)
-
 	reddit_client = load_reddit_client(moderation_bot.logger)
-	moderation_bot.logger.info("Instantiated Reddit Client")
+	moderation_bot.logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
 
 	subreddit = reddit_client.subreddit(sub)
 	posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)

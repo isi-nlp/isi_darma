@@ -7,7 +7,7 @@ import praw
 from typing import Dict
 from praw.models import Redditor
 
-CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/src/isi_darma/creds.yaml")
+CRED_FN = os.environ.get("CRED_FP", "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/creds.yaml")
 
 
 def get_username(redditor_obj: Redditor):
@@ -153,7 +153,7 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 				"post_id": comment.submission.id
 	}
 
-	json_outputs_path = "/isi_darma/isi_darma/src/isi_darma/data/conversations"
+	json_outputs_path = "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/src/darma_online/data/conversations"
 	if not os.path.exists(json_outputs_path):
 		os.makedirs(json_outputs_path)
 
