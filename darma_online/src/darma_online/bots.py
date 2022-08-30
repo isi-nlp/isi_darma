@@ -214,7 +214,7 @@ class BasicBot(ModerationBot):
                 self.logger.info(f'Response sent to toxic user: {author_username}\n')
 
             except Forbidden:
-                self.logger.info(f"Cannot send response to toxic user on {self.sub} - Forbidden")
+                self.logger.info(f"Cannot send response to toxic user on r/{self.sub} - Forbidden")
 
         else:
             self.logger.info(f'No Response sent. Test flag = {self.test}, passive flag = {self.passive}')
