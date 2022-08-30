@@ -49,7 +49,7 @@ def run_task(cfg: DictConfig, task_directory: str, world_module=None):
     shared_state = SharedModelChatTaskState(world_module=world_module)
 
     operator = Operator(db)
-    operator.validate_and_run_config(run_config=cfg.mephisto, shared_state=shared_state)
+    operator.launch_task_run(run_config=cfg.mephisto, shared_state=shared_state)
     operator.wait_for_runs_then_shutdown(
         skip_input=True, log_rate=cfg.monitoring_log_rate
     )
