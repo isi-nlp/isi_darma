@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from logging import Logger
 
+import json
 import random
 import requests
 from typing import List
@@ -43,13 +44,25 @@ class SpolinBotRG(ResponseGenerator):
 		return best_response
 
 	@staticmethod
-	def get_random_comtype_resp(usernames=['others']):
+	def get_random_comtype_resp(usernames: List[str] = None):
+
+		if usernames is None:
+			usernames = ['les autres']
+
 		usernames = ",".join(usernames)
+
 		comtype_responses = [
-			f'Please quit doing that and behave!',
-			f'You used this kind of behavior in response to {usernames}.',
-			f'You used this kind of behavior in response to {usernames}. I feel upset because even though I don’t know {usernames}, the language you used when communicating with them would make me upset.',
-			f'You used this kind of behavior in response to {usernames}. Is this because you are angry at {usernames} for having beliefs that are different from yours?',
-			f'You used this kind of behavior in response to {usernames}. Is this because you are angry at {usernames} for having beliefs that are  different from yours? Do you want {usernames} to change their opinions and perhaps convince others who currently share their opinions to also change?'
+			("template1", f"Veuillez cesser de faire cela et vous comporter correctement!"),
+			 ("template2", f"Vous avez eu un comportement de ce genre en répondant à {usernames}"),
+			  ("template3", f"Je me sens contrarié parce que même si je ne connais pas {usernames}, le langage que vous avez utilisé pour communiquer avec eux me bouleverserait."),
+			   ("template4", f"Est-ce parce que vous êtes en colère contre {usernames} parce qu'ils ont des croyances différentes des vôtres?"),
+			    ("template5", f"Voulez-vous que {usernames} changent d'opinion et peut-être convaincre d'autres personnes qui partagent actuellement leurs opinions de changer également?")
 		]
 		return random.sample(comtype_responses, 1)[0]
+
+	@staticmethod
+	def read_responses(path : str = "/darma_online/darma_online/src/darma_online/data/response_templates/responses.json"):
+		"""
+		Read the json file for bot info.
+		"""
+		return json.loads(open(path, "r").read())

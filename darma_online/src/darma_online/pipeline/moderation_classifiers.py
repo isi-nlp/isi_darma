@@ -66,7 +66,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 					"severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
 					"behav_types": {
 						"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
-						"ad-hominem attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+						"ad-hominem_attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
 						"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
 						"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
 					}

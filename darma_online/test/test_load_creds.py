@@ -1,4 +1,4 @@
-from isi_darma.utils import load_credentials
+from darma_online.utils import load_credentials
 
 
 def test_load_credentials(): 
