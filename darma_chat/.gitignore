@@ -6,3 +6,4 @@ build/
 outputs/
 model_chat
 .env
+darma_chat/consent
