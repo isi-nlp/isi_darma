@@ -2,7 +2,7 @@ import os
 import openai
 from darma_chat.bot_agent import TurkLikeAgent, logging
 
-DEF_ENGINE = 'text-davinci-002'  # TODO: get this from yaml file
+# DEF_ENGINE = 'text-davinci-002'  # TODO: get this from yaml file
 
 
 class TurkLikeGptAgent(TurkLikeAgent):
@@ -10,10 +10,10 @@ class TurkLikeGptAgent(TurkLikeAgent):
     Will act like a Turker but connects to OpenAI GPT API
     """
 
-    def __init__(self, *args, api_key='', engine=DEF_ENGINE, **kwargs):
+    def __init__(self, *args, api_key='', **kwargs):
         super().__init__(*args, **kwargs)
         self.sturns = ''
-        self.engine = engine
+        self.engine = self.opt['gpt_def_engine']
         if not api_key:
             api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
@@ -22,13 +22,22 @@ class TurkLikeGptAgent(TurkLikeAgent):
                             " You may obtain key from https://beta.openai.com/account/api-keys")
         openai.api_key = api_key
 
+        if self.opt['gpt_prompt'] == 'wisebeing':
+            # wise being prompt. This prompt performs the best
+            self.instruction = "The following is a conversation with a wise and loving being who has an understanding"\
+                    " of how nonviolent communication work. This being is dedicated to building a more civil online environment."
+            self.gpt_persona = 'wisebeing:'
+        elif self.opt['gpt_prompt'] == 'moderator':
+            # moderation bot prompt. This would make GPT-3 behave more like a tradditional moderation bot
+            self.instruction = "The following is a conversation with a moderation bot. The bot is dedicated to building a more civil online environment."
+            self.gpt_persona = 'moderation bot'
+        elif self.opt['gpt_prompt'] == 'sarcastic':
+            self.instruction = "Marv is a chatbot that reluctantly moderates with sarcastic responses"
+            self.gpt_persona = 'Marv'
 
     def act(self, timeout=None):
-        # wise being prompt. This prompt performs the best
-        instr = "The following is a conversation with a wise and loving being who has an understanding"\
-                    " of how nonviolent communication work. This being is dedicated to building a more civil online environment."
-        # moderation bot prompt. This would make GPT-3 behave more like a tradditional moderation bot
-        # instr = "The following is a conversation with a moderation bot. The bot is dedicated to building a more civil online environment."
+        instr = self.instruction
+        persona = self.gpt_persona
         if self.turn_idx == -1: # make it never happen. At the current stage, we don't want to use the few-show example
             few_shot_example = "user A: Does this look like a normal poop? Worried\n"\
                                 "user B: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\n"\
@@ -37,7 +46,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
                                 "Can you tell me more about it?"
         else:
             few_shot_example = ""
-        p = self.prompt_compose(instr, few_shot_example, self.sturns)
+        p = self.prompt_compose(instr, persona, few_shot_example, self.sturns)
         if self.turn_idx == 0:
             resp = self.query_completion_api(p, engine=self.engine)
         else:
@@ -56,7 +65,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
         self.sturns += f"user {observation['id']}: {observation['text']}\n"
 
     @staticmethod
-    def query_completion_api(prompt, engine=DEF_ENGINE,
+    def query_completion_api(prompt, engine,
                              frequency_penalty=0, presence_penalty=0, temperature=0.7):
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):
@@ -136,7 +145,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
         return timeout_response
 
     @staticmethod
-    def prompt_compose(instr, few_shot_example, seed_turns):
+    def prompt_compose(instr, persona, few_shot_example, seed_turns):
         if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}wise being:'
-        return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}wise being:'
+            return f'{instr}\n\n{seed_turns}{persona}:'
+        return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}{persona}:'
