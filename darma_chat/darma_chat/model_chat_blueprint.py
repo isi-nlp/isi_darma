@@ -261,7 +261,7 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'botbackend': args.blueprint.botbackend,
                 'final_rating_question': args.blueprint.get('final_rating_question'),
                 'gpt_prompt': args.blueprint.get('gpt_prompt'),
-                'gpt_def_engine': args.blueprint.get('gpt_def_engine')
+                'gpt_engine': args.blueprint.get('gpt_engine')
             }
         )
 
@@ -362,7 +362,7 @@ class ModelChatBlueprintArgs(BaseModelChatBlueprintArgs):
         metadata={"help": "GPT Prompt; supported: wisebeing, moderator, sarcastic"}
     )
 
-    gpt_def_engine: str = field(
+    gpt_engine: str = field(
         default='text-davinci-002',
         metadata={"help": "GPT model name"}
     )

@@ -13,7 +13,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
     def __init__(self, *args, api_key='', **kwargs):
         super().__init__(*args, **kwargs)
         self.sturns = ''
-        self.engine = self.opt['gpt_def_engine']
+        self.engine = self.opt['gpt_engine']
         if not api_key:
             api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
@@ -26,7 +26,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
             # wise being prompt. This prompt performs the best
             self.instruction = "The following is a conversation with a wise and loving being who has an understanding"\
                     " of how nonviolent communication work. This being is dedicated to building a more civil online environment."
-            self.gpt_persona = 'wisebeing:'
+            self.gpt_persona = 'wisebeing'
         elif self.opt['gpt_prompt'] == 'moderator':
             # moderation bot prompt. This would make GPT-3 behave more like a tradditional moderation bot
             self.instruction = "The following is a conversation with a moderation bot. The bot is dedicated to building a more civil online environment."

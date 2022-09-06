@@ -24,7 +24,7 @@ mephisto:
     max_onboard_time: 6000
     botbackend: gpt # gpt  # blenderbot or gpt
     gpt_prompt: sarcastic
-    gpt_def_engine: text-davinci-002
+    gpt_engine: text-davinci-002
 
     translator:
       activation: null #pre+post # pre, post, pre+post, null
