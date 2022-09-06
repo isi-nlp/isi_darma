@@ -3,6 +3,7 @@
 Serves (Mephisto) chat admin using Flask HTTP server
 """
 
+from asyncio.log import logger
 import os
 import profile
 import sys
@@ -337,9 +338,12 @@ def attach_admin_dashboard(config, router):
         if mturk_asgn_id:
             sandbox = chat_data['mturk'].get('sandbox', True)
             mturk = mturk_sanbdox.mturk if sandbox else mturk_live.mturk
-            assignment = mturk.get_assignment(assignment_id=mturk_asgn_id)
-            chat_data['mturk'].update(assignment)
-            params['qtypes'] = mturk.list_qualification_types(max_results=AWS_MAX_RESULTS)
+            try:
+                params['qtypes'] = mturk.list_qualification_types(max_results=AWS_MAX_RESULTS)
+                assignment = mturk.get_assignment(assignment_id=mturk_asgn_id)
+                chat_data['mturk'].update(assignment)
+            except Exception as e:
+                logger.exception(e)
             params['mturk_where'] = 'sandbox' if sandbox else 'live'
         return render_template('chatui.html', **params)
 
