@@ -53,7 +53,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
             resp = self.query_completion_api(p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = resp
         final_message_text = final_message_text.strip()
-        self.sturns += f"wise being: {final_message_text}\n"
+        self.sturns += f"{persona}: {final_message_text}\n"
 
         act_out = {}
         act_out['text'] = final_message_text
