@@ -53,7 +53,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
             resp = self.query_completion_api(p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = resp
         final_message_text = final_message_text.strip()
-        self.sturns += f"{persona}: {final_message_text}"
+        self.sturns += f"\n{persona}: {final_message_text}"
 
         act_out = {}
         act_out['text'] = final_message_text
@@ -62,7 +62,7 @@ class TurkLikeGptAgent(TurkLikeAgent):
         return {**act_out, 'episode_done': False}
 
     def observe(self, observation, increment_turn: bool = True):
-        self.sturns += f"user {observation['id']}: {observation['text']}"
+        self.sturns += f"\nuser {observation['id']}: {observation['text']}"
 
     @staticmethod
     def query_completion_api(prompt, engine,
