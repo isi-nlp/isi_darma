@@ -260,6 +260,8 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'translator': args.blueprint.translator if 'translator' in args.blueprint else None,
                 'botbackend': args.blueprint.botbackend,
                 'final_rating_question': args.blueprint.get('final_rating_question'),
+                'gpt_prompt': args.blueprint.get('gpt_prompt'),
+                'gpt_engine': args.blueprint.get('gpt_engine')
             }
         )
 
@@ -353,6 +355,16 @@ class ModelChatBlueprintArgs(BaseModelChatBlueprintArgs):
     botbackend: str = field(
         default='blenderbot',
         metadata = {"help": "Chatbot backend name; supported: blenderbot, gpt"}
+    )
+
+    gpt_prompt: str = field(
+        default='wisebeing',
+        metadata={"help": "GPT Prompt; supported: wisebeing, moderator, sarcastic"}
+    )
+
+    gpt_engine: str = field(
+        default='text-davinci-002',
+        metadata={"help": "GPT model name"}
     )
 
 @register_mephisto_abstraction()
