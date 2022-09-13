@@ -261,7 +261,8 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'botbackend': args.blueprint.botbackend,
                 'final_rating_question': args.blueprint.get('final_rating_question'),
                 'gpt_prompt': args.blueprint.get('gpt_prompt'),
-                'gpt_engine': args.blueprint.get('gpt_engine')
+                'gpt_engine': args.blueprint.get('gpt_engine'),
+                'gpt_few_shot_example': args.blueprint.get('gpt_few_shot_example')
             }
         )
 
@@ -365,6 +366,11 @@ class ModelChatBlueprintArgs(BaseModelChatBlueprintArgs):
     gpt_engine: str = field(
         default='text-davinci-002',
         metadata={"help": "GPT model name"}
+    )
+
+    gpt_few_shot_example: str = field(
+        default="none",
+        metadata={"help": "GPT few shot example; supported: nvc, none"}
     )
 
 @register_mephisto_abstraction()

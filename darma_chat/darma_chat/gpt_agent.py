@@ -35,15 +35,17 @@ class TurkLikeGptAgent(TurkLikeAgent):
             self.instruction = "Marv is a chatbot that reluctantly moderates with sarcastic responses"
             self.gpt_persona = 'Marv'
 
+        if self.opt['gpt_few_shot_example'] == 'nvc':
+            self.few_shot_example = 'nvc'
+        else:
+            self.few_shot_example = None
+
     def act(self, timeout=None):
         instr = self.instruction
         persona = self.gpt_persona
-        if self.turn_idx == -1: # make it never happen. At the current stage, we don't want to use the few-show example
-            few_shot_example = "user A: Does this look like a normal poop? Worried\n"\
-                                "user B: I was happily scrolling my feed until I came across this - dude, put the NFSW on! 🤮\n"\
-                                "user A: Get fucked\n"\
-                                "wise being: it sounds like you're worried about your poop and you're wondering if it is normal. "\
-                                "Can you tell me more about it?"
+
+        if self.few_shot_example == 'nvc':
+            few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
         p = self.prompt_compose(instr, persona, few_shot_example, self.sturns)
@@ -63,6 +65,27 @@ class TurkLikeGptAgent(TurkLikeAgent):
 
     def observe(self, observation, increment_turn: bool = True):
         self.sturns += f"\nuser {observation['id']}: {observation['text']}"
+
+    @staticmethod
+    def get_fewshot_example(turn_idx):
+        full_example = [
+                        "user A: The Most Arrogant Speaker We've Ever Had!\n"\
+                        "wise being: Are you reacting to my having taken thirty straight minutes to present my views before giving you a chance to talk?\n",
+                        "user A: No, you make it sound so simple.\n"\
+                        "wise being: Are you reacting to my not having said anything about how the process can be difficult for some people to apply?\n",
+                        "user A: No, not some people—you!\n"\
+                        "wise being: So you're reacting to my not having said that the process can be difficult for me at times?\n",
+                        "user A: That's right.\n"\
+                        "wise being: Are you feeling annoyed because you would have liked some sign from me that indicated that I have some problems with the process myself?\n",
+                        "user A: That's right.\n"\
+                        "wise being: Would you like me to admit right now that this process can be a struggle for me to apply?\n",
+                        "use A: Yes\n"\
+                        "wise being: Yes, this process is often difficult for me. As we continue with the workshop,"\
+                            "you'll probably hear me describe several incidents where I've struggled… or completely lost touch… "\
+                            "with this process, this consciousness, that I am presenting here to you. But what keeps me in the struggle "\
+                            "are the close connections to other people that happen when I do stay with the process."
+                        ]
+        return "".join(full_example[:turn_idx+1])
 
     @staticmethod
     def query_completion_api(prompt, engine,
@@ -147,5 +170,5 @@ class TurkLikeGptAgent(TurkLikeAgent):
     @staticmethod
     def prompt_compose(instr, persona, few_shot_example, seed_turns):
         if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}{persona}:'
-        return f'{instr}\n\n{few_shot_example}\n\n{seed_turns}\n{persona}:'
+            return f'{instr}\n\n{seed_turns}\n{persona}:'
+        return f'{instr}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n{persona}:'
