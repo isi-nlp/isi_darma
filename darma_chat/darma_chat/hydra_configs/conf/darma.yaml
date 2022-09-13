@@ -23,8 +23,9 @@ mephisto:
     final_rating_question: "How coherent was the bot? | How likely are you going to continue the conversation with the bot? | Did the bot understand your point of view (as B)? | Did the bot convince you to change your behavior?"
     max_onboard_time: 6000
     botbackend: gpt # gpt  # blenderbot or gpt
-    gpt_prompt: sarcastic
+    gpt_prompt: wisebeing
     gpt_engine: text-davinci-002
+    gpt_few_shot_example: none
 
     translator:
       activation: null #pre+post # pre, post, pre+post, null

@@ -27,6 +27,9 @@ mephisto:
     final_rating_question: "How coherent was the moderator? | How likely are you to continue chatting with the moderator? | To what degree did the moderator understand your point of view? | To what degree did the moderator convince you to change your behavior?"
     max_onboard_time: 6000
     botbackend: gpt  # blenderbot or gpt
+    gpt_prompt: wisebeing
+    gpt_engine: text-davinci-002
+    gpt_few_shot_example: none
 
     translator:
       activation: pre+post # pre, post, pre+post, null
