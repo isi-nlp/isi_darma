@@ -9,7 +9,6 @@ import os
 import json
 from abc import ABC, abstractmethod
 from typing import Any, Dict, List, Optional, Tuple
-import random
 import numpy as np
 import logging as log
 from pprint import pprint
@@ -22,8 +21,10 @@ from parlai.core.worlds import validate
 from parlai.crowdsourcing.utils.acceptability import AcceptabilityChecker
 from parlai.crowdsourcing.utils.worlds import CrowdOnboardWorld, CrowdTaskWorld
 from parlai.crowdsourcing.utils.mturk import get_mturk_id_from_mephisto_wrapper
+from mephisto.abstractions.providers.mturk.mturk_agent import MTurkAgent
 
 from darma_chat.bot_agent import TurkLikeAgent
+from darma_chat.gpt_agent import TurkLikeGptAgent
 from darma_chat.constants import (
     ONBOARD_FAIL,
     ONBOARD_SUCCESS,
@@ -100,7 +101,7 @@ class ModelChatOnboardWorld(CrowdOnboardWorld):
             return ONBOARD_FAIL
 
         self.annotations = act['task_data'].get('annotations')
-        log.info('Onboarding annotation results: ', self.annotations)
+        log.info(f'Onboarding annotation results: {self.annotations}')
 
         if act['task_data']['success']:
             log.info(
@@ -113,7 +114,7 @@ class ModelChatOnboardWorld(CrowdOnboardWorld):
             os.makedirs(consent_data_folder, exist_ok=True)
             consent_datapath = os.path.join(
                 consent_data_folder, "consent_log.jsonl")
-            with open(consent_datapath, 'w+') as f_jsonl:
+            with open(consent_datapath, 'a') as f_jsonl:
                 act['worker_id'] = self.worker_id
                 data_str = json.dumps(act)
                 f_jsonl.write(data_str + "\n")
@@ -142,9 +143,6 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
     def __init__(self, opt, agent, bot,  mt: Optional[DialogTranslator]=None):
         super().__init__(opt, agent)
 
-        # num_turns turns for a single side, and really it appears to be
-        # (num_turns + 1) * 2 total b/c of the "Hi!" and first bot utterance
-
         num_turns = opt['num_turns']
         max_resp_time = opt['max_resp_time']
 
@@ -156,7 +154,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         self.agent.agent_id = 'Speaker 1'
         # self.agent.agent_id = ""
-        self.bot.agent_id = 'BOT'
+        self.bot.agent_id = 'Moderator'
         # self.bot.agent_id = ""
         self.target_user = ""
 
@@ -175,9 +173,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
 
         # below are timeout protocols
         self.max_resp_time = max_resp_time  # in secs
-        log.info(
-            f'Creating {self.__class__.__name__} for tag {self.tag} with {num_turns} turns.'
-        )
+        self._start_time = time.time()
 
     def __add_problem_data_to_utterance(self, p, turn_idx: int):
         """
@@ -193,13 +189,9 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         self.dialog[turn_idx]['problem_data'] = p
 
     def parley(self):
-        log.info(f'{self.__class__.__name__}:{self.tag}: is at turn'
-                 '{self.task_turn_idx}, with {self.num_turns} pairs of turns needed...'
-        )
 
         if self.task_turn_idx == 0:
             self._run_initial_turn()
-            self.task_turn_idx += 1
             return
 
         """Otherwise, we proceed accordingly"""
@@ -213,16 +205,20 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 acts[idx] = agent.act(timeout=self.max_resp_time)
                 if self.mt:
                     text = acts[idx]['text']
-                    acts[idx]['text_orig'] = text
-                    mt_fn = self.mt.maybe_preprocess if idx == 0\
-                        else self.mt.maybe_postprocess
-                    text = mt_fn(text)
-                    # agent's act is a custom datatype, which requires force_set
-                    # but bot's act is a dict, which dont have force_set()
-                    if hasattr(acts[idx], 'force_set'):
-                        acts[idx].force_set('text', text)
-                    else:
-                        acts[idx]['text'] = mt_fn(text)
+                    text_mt = None
+                    if idx == 0 and self.mt.pre_translator:
+                        text_mt = self.mt.maybe_preprocess(text)
+                    elif self.mt.post_translator:
+                        text_mt = self.mt.maybe_postprocess(text)
+                    if text_mt and text_mt != text:
+                        # only include text_orig when MT is enabled; otherwise the frontend display's duplicates
+                        acts[idx]['text_orig'] = text
+                        # agent's act is a custom datatype, which requires force_set
+                        # but bot's act is a dict, which dont have force_set()
+                        if hasattr(acts[idx], 'force_set'):
+                            acts[idx].force_set('text', text_mt)
+                        else:
+                            acts[idx]['text'] = text_mt
                 if agent == self.bot and\
                     hasattr(self.bot, 'agent_id') and self.bot.agent_id:
                     # Set speaker name as self.bot_agent_id otherwise, at frontend bot name such as "TransformerGenerator" would appear
@@ -231,8 +227,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 log.info(f'Got act for agent idx {idx}, act was: {acts[idx]} '
                          'and self.task_turn_idx: {self.task_turn_idx}.')
 
-            if acts[idx].get('task_data', {}).get('final_rating') is not None:
-
+            final_rating = acts[idx].get('task_data', {}).get('final_rating')
+            if final_rating:
                 self.chat_done = True
                 # agent ends chat after exceeding minimum number of turns
 
@@ -244,7 +240,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 p = acts[idx]['task_data'].get('problem_data_for_prior_message')
                 if p is not None:
                     self.__add_problem_data_to_utterance(p, turn_idx=turn_idx)
-                self.dialog[turn_idx]['final_rating'] = acts[idx]['task_data']['final_rating']
+                self.dialog[turn_idx]['final_rating'] = final_rating
 
                 # Save the final chat data
                 date_folder = time.strftime('%Y_%m_%d')
@@ -254,6 +250,14 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 chat_data_path = os.path.join(chat_data_subfolder,
                     f'{time_string}_{np.random.randint(0, 1000)}_{self.task_type}.json')
                 self.final_chat_data = self.get_final_chat_data()
+                if 'final_rating_question' in self.opt:
+                    rating_qs = self.opt['final_rating_question'].split('|')
+                    rating_ans = final_rating.split('|')
+                    if len(rating_qs) != len(rating_ans):
+                        log.error(f'Rating Q-A mismatch:\n Qs {rating_qs}\nAs: {rating_ans}')
+                    else:
+                        final_rating = list(zip(rating_qs, rating_ans))
+                self.final_chat_data['final_rating'] = final_rating
                 self.agent.mephisto_agent.state.messages.append({
                         'final_chat_data': self.final_chat_data,
                         'data': {},
@@ -281,7 +285,7 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                 return
             else:
                 # if idx == 1:
-                #     user_name= "BOT"
+                #     user_name= "Moderator"
                 # else:
                 #     user_name = self.target_user
                 utterance_data = {
@@ -289,7 +293,10 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
                     # Get rid of annotations HTML if it's the bot response
                     'text': acts[idx]['text'].split('<br>')[0],
                     'id': acts[idx].get('id', 'NULL_ID'),  # In case model doesn't set id
+                    'time': time.time(),
                 }
+                if 'text_orig' in acts[idx]:
+                    utterance_data['text_orig'] = acts[idx]['text_orig']
                 self.dialog.append(utterance_data)
                 if idx == 0:
                     # Human has just responded. Any problem data received now will be
@@ -317,7 +324,8 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
         """
         Runs logic for the first turn of the human and the bot.
         """
-        pass
+        self._start_time = time.time()
+
 
     def _postprocess_acts(self, acts: List[dict], agent_idx: int):
         """
@@ -354,10 +362,20 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             )
         else:
             violations_string = None
+        model_agent = self.bot.model_agent
 
+        def __get_mturk_data():
+            if not isinstance(self.agent.mephisto_agent, MTurkAgent):
+                return None
+            agent = self.agent.mephisto_agent
+            return dict(assignment_id=agent.mturk_assignment_id,
+                        sandbox='_sandbox' in agent.provider_type,
+                        worker_id=agent.get_worker().get_mturk_worker_id())
+
+        time_now = time.time()
         data = {
             'dialog': self.dialog,
-            'workers': [get_mturk_id_from_mephisto_wrapper(self.agent)],
+            'workers': [self.agent.mephisto_agent.get_worker().worker_name],
             'bad_workers': [],
             'acceptability_violations': (violations_string,),
             'hit_ids': [self.agent.mephisto_agent.task_run_id],
@@ -365,9 +383,15 @@ class BaseModelChatWorld(CrowdTaskWorld, ABC):
             'task_description': {
                 'annotations_config': self.opt['annotations_config'],
                 'model_nickname': self.bot.worker_id,
-                'model_file': self.bot.model_agent.opt.get('model_file'),
-                'model_opt': self.bot.model_agent.opt,
+                'model_file': model_agent and model_agent.opt and model_agent.opt.get('model_file'),
+                'model_opt': model_agent and model_agent.opt,
             },
+            'time': {
+                'start': self._start_time,
+                'end': time_now,
+                'total': f'{time_now - self._start_time:.3f} sec'
+            },
+            'mturk': __get_mturk_data(),
         }
         # TODO: once the analysis scripts are fully switched over to DataBrowser, remove
         #  the 'workers' and 'assignment_ids' keys, which will now be duplicated in the
@@ -431,6 +455,7 @@ class ModelChatWorld(BaseModelChatWorld):
         conversation mode, show "Hi!" to the human and the bot and let the bot respond
         accordingly.
         """
+        super()._run_initial_turn()
 
         control_msg = {"episode_done": False}
         if self.opt['conversation_start_mode'] == "empty":
@@ -451,33 +476,44 @@ class ModelChatWorld(BaseModelChatWorld):
                     'episode_done': False,
                     'id': turn['speaker_id'],
                     'text': turn['text'],
+                    'text_orig': turn.get('text_orig'),
                     'fake_start': True,
                     'agent_idx': 0 if turn['speaker_id'] == self.target_user else 1,
+                    'time': time.time(),
                 }
-                # if turn["speaker_id"] == self.target_user:
-                #     msg['id'] = self.agent.agent_id
-                # else:
-                #     msg['id'] = self.bot.agent_id
 
                 self.dialog.append(msg)
                 self.agent.observe(validate(msg))
                 self.bot.observe(validate(msg))
 
-                # bot responds to the last turn
+                # let bot respond to the last turn
                 if idx == len(dialogue) - 1:
                     first_bot_act = self.bot.act()
                     first_bot_act = Compatibility.backward_compatible_force_set(
                         first_bot_act, 'id', self.bot.agent_id
                     )
-
+                    if self.mt and self.mt.post_translator:
+                        text = first_bot_act['text']
+                        first_bot_act['text_orig'] = text
+                        text = self.mt.maybe_postprocess(text)
+                        # agent's act is a custom datatype, which requires force_set
+                        # but bot's act is a dict, which dont have force_set()
+                        if hasattr(first_bot_act, 'force_set'):
+                            first_bot_act.force_set('text', text)
+                        else:
+                            first_bot_act['text'] = text
                     self.agent.observe(validate(first_bot_act))
 
                     bot_utterance_data = {
                         'agent_idx': 1,
                         'text': first_bot_act['text'],
-                        'id': "BOT",
+                        'text_orig': first_bot_act.get('text_orig'),
+                        'id': "Moderator",
+                        'time': time.time(),
                     }
                     self.dialog.append(bot_utterance_data)
+
+                self.task_turn_idx += 1
         else:
             raise ValueError(
                 f"Conversation start mode {self.opt['conversation_start_mode']} "
@@ -541,14 +577,23 @@ def get_bot_worker(opt: Dict[str, Any], model_name: str) -> TurkLikeAgent:
     semaphore = opt['semaphore']
     shared_bot_agents = opt['shared_bot_agents']
     num_turns = opt['num_turns']
-    bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
-    bot_worker = TurkLikeAgent(
-        opt,
-        model_name=model_name,
-        model_agent=bot_agent,
-        num_turns=num_turns,
-        semaphore=semaphore,
-    )
+    botbackend = opt.get('botbackend') or 'blenderbot'
+
+    if botbackend == 'blenderbot':
+        bot_agent = create_agent_from_shared(shared_bot_agents[model_name])
+        AgentClass = TurkLikeAgent
+    elif botbackend == 'gpt':
+        bot_agent = None # we call it over an API
+        AgentClass = TurkLikeGptAgent
+    else:
+        raise Exception(f'Botbackend={botbackend} is not supported')
+    bot_worker = AgentClass(
+         opt,
+         model_name=model_name,
+         model_agent=bot_agent,
+         num_turns=num_turns,
+         semaphore=semaphore,
+     )
     return bot_worker
 
 def get_dialog_mt(opt: Dict[str, Any]):

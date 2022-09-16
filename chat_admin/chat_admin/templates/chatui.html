@@ -1,0 +1,100 @@
+{% extends "base.html" %}
+{% from 'mturk/_macros.html' import render_assignment %} 
+
+{% block content %}
+
+<section style="background-color: #eee;">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="../">All chats</a></li>
+            <li class="breadcrumb-item active" aria-current="page">{{chat_id}}</li>
+        </ol>
+    </nav>
+    <div class="container-fluid px-5">
+        <div class="row">
+            <div class="col-md-6 col-lg-5 col-xl-4 mb-4 border-left">
+                <h2> Info </h2>
+                <ul class="list">
+                    <li class="list-item"> <b> Total time:</b>
+                        {% if 'time' in data %}
+                        {{ data['time']['total'] }} <br />
+                        <small class="text-muted">
+                            Started: {{data['time']['start'] | ctime }} <br />
+                            Ended: {{ data['time']['end'] | ctime}}
+                        </small>
+                        {% else %}
+                        (Not found. Possibly this data was collected in earlier version)
+                        {% endif %}
+                    </li>
+                    {% if 'final_rating' in data %}
+                    <li>
+                        <b>Ratings:</b>
+                        {% set rt_map={'Not at all': 1, 'Mostly not': 2, 'So-so': 3, 'Somewhat': 4, 'Very': 5}%}
+                        <ol class="list-group">
+                            {% for q, a in data['final_rating'] %}
+                            <li class="list-group-item">
+                                <i>{{q}}</i> (<small>{{a}}</small>)
+                                <input id="rating-{{loop.index}}" type="range" list="tickmarks" value="{{rt_map[a]}}"
+                                    style="width: 100%;" min="1" max="5" , value="{{idx}}" disabled>
+                                <datalist id="tickmarks"
+                                    style="display: flex; justify-content: space-between; width: 100%;">
+                                    <option>Not at all</option>
+                                    <option>Mostly not</option>
+                                    <option>So-so</option>
+                                    <option>Somewhat</option>
+                                    <option>Very</option>
+                                </datalist>
+                            </li>
+                            {% endfor %}
+                        </ol>
+                    </li>
+                    {% endif %}
+                    {% for key, val in data.items() if key not in (
+                    'dialog', 'time', 'task_description', 'final_rating', 'mturk') %}
+                    <li> <b>{{ key }}:</b> {{ val | flat_single }}</li>
+                    {% endfor %}
+                </ul>
+                <hr/>
+                {% if 'mturk' in data and 'assignment_id' in data['mturk'] %}
+                <div class="col">
+                    {{ render_assignment(data['mturk'], where=mturk_where) }}
+                </div>
+                {% else %}
+                <div class="card p-4" >
+                    <p>MTurk information is not found.
+                         This chat was created in older version of system or did not use Mturk integration</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <div class="col-md-6 col-lg-7 col-xl-8 border-right" style="overflow-y:scroll">
+                <ul class="list-unstyled">
+                    {% for msg in data['dialog'] %}
+                    <li class="d-flex justify-content-between mb-1">
+                        <div class="card
+                        {% if msg['agent_idx'] == 0 and not msg['fake_start']  %} alert-info {% endif %}
+                        {% if msg['id'] == 'Moderator' %} alert-warning {% endif %}
+                        ">
+                            <div class="card-header d-flex justify-content-between p-2">
+                                <p class="fw-bold mb-0"> {{ msg['id'] }}</p>
+                                <p class="text-muted small mb-0"><i class="far fa-clock"></i>
+                                    {% if 'time' in msg %} {{ msg['time'] | ctime }} {% else %} (time not found) {%
+                                    endif %}
+                                </p>
+                            </div>
+                            <div class="card-body" style="padding: 0.5em">
+                                <p class="mb-0">{{ msg['text'] }}</p>
+                                {% if 'text_orig' in msg %}
+                                <p class="mb-0 text-muted">{{ msg['text_orig'] }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </li>
+                    {% endfor %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+{% endblock%}

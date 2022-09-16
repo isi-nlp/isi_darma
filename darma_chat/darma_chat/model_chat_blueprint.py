@@ -12,6 +12,7 @@ from abc import ABC, abstractmethod
 from dataclasses import dataclass, field
 from threading import Semaphore, Condition
 from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from pathlib import Path
 
 import numpy as np
 import torch
@@ -257,6 +258,11 @@ class BaseModelChatBlueprint(ParlAIChatBlueprint, ABC):
                 'chat_data_folder': args.blueprint.chat_data_folder,
                 'consent_data_folder': args.blueprint.consent_data_folder,
                 'translator': args.blueprint.translator if 'translator' in args.blueprint else None,
+                'botbackend': args.blueprint.botbackend,
+                'final_rating_question': args.blueprint.get('final_rating_question'),
+                'gpt_prompt': args.blueprint.get('gpt_prompt'),
+                'gpt_engine': args.blueprint.get('gpt_engine'),
+                'gpt_few_shot_example': args.blueprint.get('gpt_few_shot_example')
             }
         )
 
@@ -346,6 +352,25 @@ class ModelChatBlueprintArgs(BaseModelChatBlueprintArgs):
     translator: Dict[str, Any] = field(
         default_factory=dict,
         metadata = {"help": "settings to enable machine translation integration"}
+    )
+    botbackend: str = field(
+        default='blenderbot',
+        metadata = {"help": "Chatbot backend name; supported: blenderbot, gpt"}
+    )
+
+    gpt_prompt: str = field(
+        default='wisebeing',
+        metadata={"help": "GPT Prompt; supported: wisebeing, moderator, sarcastic"}
+    )
+
+    gpt_engine: str = field(
+        default='text-davinci-002',
+        metadata={"help": "GPT model name"}
+    )
+
+    gpt_few_shot_example: str = field(
+        default="none",
+        metadata={"help": "GPT few shot example; supported: nvc, none"}
     )
 
 @register_mephisto_abstraction()

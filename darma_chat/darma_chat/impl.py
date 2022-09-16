@@ -25,9 +25,10 @@ def run_task(cfg: DictConfig, task_directory: str, world_module=None):
     _ = frontend_build_dir  # Unused at the moment
 
     db, cfg = load_db_and_process_config(cfg)
-    print(f'\nHydra config:\n{OmegaConf.to_yaml(cfg)}')
+    validate_config(cfg)
 
     random.seed(42)
+
 
     # Update task name when on sandbox or local to ensure data is split.
     task_name = cfg.mephisto.task.get('task_name', 'model_chat')
@@ -48,7 +49,14 @@ def run_task(cfg: DictConfig, task_directory: str, world_module=None):
     shared_state = SharedModelChatTaskState(world_module=world_module)
 
     operator = Operator(db)
-    operator.validate_and_run_config(run_config=cfg.mephisto, shared_state=shared_state)
+    operator.launch_task_run(run_config=cfg.mephisto, shared_state=shared_state)
     operator.wait_for_runs_then_shutdown(
         skip_input=True, log_rate=cfg.monitoring_log_rate
     )
+
+
+def validate_config(cfg):
+    print(f'\nHydra config:\n{OmegaConf.to_yaml(cfg)}')
+    botbackend = cfg['mephisto']['blueprint']['botbackend']
+    if botbackend == 'gpt' and not os.environ.get('OPENAI_KEY'):
+        raise Exception('OPENAI_KEY is mising. Run\n\texport OPENAI_KEY=<key>')

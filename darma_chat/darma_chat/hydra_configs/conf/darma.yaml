@@ -8,33 +8,34 @@ mephisto:
     chat_data_folder: ${task_dir}/model_chat/
     consent_data_folder: ${task_dir}/consent/
     model_opt_path: ${task_dir}/task_config/darma_model_opts.yaml
-    num_turns: 6 # reduced for now for testing
+    num_turns: 6 # number of interactions before final survey is shown. 
     task_model_parallel: true
     check_acceptability: false
     conversation_start_mode: "custom" # seed with our data 
-    seed_conversation_source: ${task_dir}/test_text.json
+    seed_conversation_source: ${task_dir}/data/french_basetexts.json  # remember top set "translator.activation: pre+post"
     conversations_needed_string: "blender_90M:10"
     left_pane_text_path: ${task_dir}/task_config/darma_left_pane_text.html 
     task_description_file: ${task_dir}/task_config/darma_left_pane_text.html 
     onboard_task_data_path: ${task_dir}/task_config/darma_onboard_task_data.json
     annotations_config_path: ${task_dir}/task_config/darma_annotations_config.json
-    onboarding_qualification: darma_onboarding
+    onboarding_qualification: darma_onboarding  # comment this to disable onboarding
     block_qualification: darma_onboarding_block
-    final_rating_question: "How coherent was E? | How responsive was E to what you wrote? | Did E understand your point of view (as B)? | Did E convince you to change your behavior?"
+    final_rating_question: "How coherent was the bot? | How likely are you going to continue the conversation with the bot? | Did the bot understand your point of view (as B)? | Did the bot convince you to change your behavior?"
     max_onboard_time: 6000
+    botbackend: gpt # gpt  # blenderbot or gpt
+    gpt_prompt: wisebeing
+    gpt_engine: text-davinci-002
+    gpt_few_shot_example: none
 
     translator:
-      activation: 'pre+post' # pre, post, pre+post, null
-
-      preprocess: nllb_api
+      activation: null #pre+post # pre, post, pre+post, null
+      preprocess: rtg_api
       preprocess_args:
-        api_url: http://rtg.isi.edu/nllb/translate
-        src_lang: fra_Latn
-        tgt_lang: eng_Latn
+        api_url: http://54.68.184.232:6060/many-eng/v1/translate
 
       postprocess: nllb_api
       postprocess_args:
-        api_url: http://rtg.isi.edu/nllb/translate
+        api_url: http://54.68.184.232:6062/nllb/translate
         src_lang: eng_Latn
         tgt_lang: fra_Latn
 

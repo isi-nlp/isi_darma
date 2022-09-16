@@ -5,3 +5,4 @@ darma_chat/frontend/_generated
 build/
 outputs/
 model_chat
+.env
