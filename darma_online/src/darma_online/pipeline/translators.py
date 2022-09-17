@@ -1,22 +1,29 @@
+from typing import List
+
 from requests import post
+from spacy.lang.en import English
 
 class Translator:
 
     def __init__(self, logger):
         self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
+        self.sentencizer = English().add_pipe('sentencizer')
+
+    def split_sentences(self, text:str) -> List[str]:
+        return [x.text for x in self.sentencizer(text).sents]
 
     def rtg(self, comment_str: str) -> str:
-        source = {'source': [comment_str]}
-        self.logger.debug(f'Sending source to RTG for translation...')
+        sentences = self.split_sentences(comment_str)
+        source = {'source': sentences}
+        self.logger.debug(f'Sending source sentences to RTG for translation: {source}')
 
         try:
             response = post(self.RTG_API, json=source)
             if response.ok:
                 response = response.json()
                 self.logger.info(f'Received Translated dialogue from RTG: {response["translation"]}')
-
-                return response["translation"][0]
+                return ' '.join(response['translation'][0])
             else:
                 self.logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
                 self.logger.warning(f'Response Body from RTG:\n{response.json()}')
