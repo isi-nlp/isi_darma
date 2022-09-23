@@ -9,12 +9,12 @@ from darma_online.logging_setup import setup_logger
 
 
 def get_perspective_scores():
-    df = read_comments()
+    data_dir = '/isi_darma/isi_darma/darma_online/src/darma_online/data'
+    df = read_comments(data_dir)
     df['Model Decision'] = df['model_score'].apply(to_binary)
     tick = time.time()
     df['Perspec Decision'], df['Perspec Score'], df['Perspec - Behav Type'] = call_perspective(df['body'])
-    print(df.head(10))
-    df.to_csv('data/output_scores_compared.csv')
+    df.to_csv(f'{data_dir}/output_scores_compared.csv')
     print(f'DONE in {time.time() - tick} seconds!!')
 
 def call_perspective(comments: List[str]):
@@ -27,7 +27,7 @@ def call_perspective(comments: List[str]):
         decision, score, behav_type = np.append(decision, d), np.append(score, s), np.append(behav_type, t)
     return decision, score, behav_type
 
-def read_comments(data_dir = '/isi_darma/isi_darma/darma_online/src/darma_online/data'):
+def read_comments(data_dir):
     # df = pd.read_csv('data/output_scores.csv', verbose=True, skiprows=range(10, 155965), index_col=0)
     df = pd.read_csv(f'{data_dir}/output_scores.csv', verbose=True, index_col=0)
     return df
