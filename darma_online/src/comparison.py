@@ -27,9 +27,9 @@ def call_perspective(comments: List[str]):
         decision, score, behav_type = np.append(decision, d), np.append(score, s), np.append(behav_type, t)
     return decision, score, behav_type
 
-def read_comments():
+def read_comments(data_dir = '/isi_darma/isi_darma/darma_online/src/darma_online/data'):
     # df = pd.read_csv('data/output_scores.csv', verbose=True, skiprows=range(10, 155965), index_col=0)
-    df = pd.read_csv('data/output_scores.csv', verbose=True, index_col=0)
+    df = pd.read_csv(f'{data_dir}/output_scores.csv', verbose=True, index_col=0)
     return df
 
 def to_binary(x):
