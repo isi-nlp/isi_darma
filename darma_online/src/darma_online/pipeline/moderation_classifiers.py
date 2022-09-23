@@ -2,6 +2,7 @@ from googleapiclient import discovery
 from abc import ABC, abstractmethod
 from requests import get, post
 import operator
+import time
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
@@ -55,8 +56,16 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			needs_mod, toxicity_score, behav_type = self.map_behavtypes(response)
 
 		except Exception as e:
-			self.logger.error(f"Exception occurred: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
-			needs_mod, toxicity_score, behav_type = False, 0, ""
+
+			if e.status_code == 429:
+				self.logger.debug(f"API rate limit reached. Waiting for 60 seconds.")
+				time.sleep(60)
+				self.logger.debug(f'Retrying toxicity measurement for comment: {analyze_request["comment"]["text"]}')
+				needs_mod, toxicity_score, behav_type = self.measure_toxicity(comment)
+
+			else:
+				self.logger.error(f"Exception occurred with code {e.status_code}: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
+				needs_mod, toxicity_score, behav_type = False, 0, ""
 
 		return needs_mod, toxicity_score, behav_type
 
