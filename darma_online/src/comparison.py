@@ -42,16 +42,3 @@ def to_binary(x):
 
 if __name__ == '__main__':
     get_perspective_scores()
-
-    # <09/23/2022 02:35:08 PM> [ERROR] <58> <measure_toxicity> Exception occurred:
-    # <HttpError 429 when requesting https://commentanalyzer.googleapis.com/v1alpha1/comments:analyze?key=AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I&
-    # alt=json returned "Quota exceeded for quota metric 'Analysis requests (AnalyzeComment)' and limit 'Analysis requests (AnalyzeComment) per minute' of service '" \
-    #                   "commentanalyzer.googleapis.com' for consumer 'project_number:416769962659'.".
-    # Details: "[{'@type': 'type.googleapis.com/google.rpc.ErrorInfo', " \
-    #          "'reason': 'RATE_LIMIT_EXCEEDED', 'domain': 'googleapis.com', " \
-    #          "'metadata': {'quota_location': 'global', 'quota_metric': 'CommentAnalyzerService/analyze_requests', " \
-    #          "'quota_limit_value': '60', 'consumer': 'projects/416769962659', 'quota_limit': 'AnalyzeRequestsPerMinutePerProject', " \
-    #          "'service': 'commentanalyzer.googleapis.com'}}, {'@type': 'type.googleapis.com/google.rpc.Help', " \
-    #          "'links': [{'description': 'Request a higher quota limit.', 'url': 'https://cloud.google.com/docs/quota#requesting_higher_quota'}]}]">
-    # for comment: i can give you the rowlet. Setting toxicity to 0 with empty behaviour type.
-
