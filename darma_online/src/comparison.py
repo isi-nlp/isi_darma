@@ -1,7 +1,6 @@
 import time
 from typing import List
 import numpy as np
-from tqdm import tqdm
 import pandas as pd
 
 from darma_online.pipeline.moderation_classifiers import PerspectiveAPIModerator
@@ -26,7 +25,7 @@ def get_perspective_scores():
 def call_perspective(comments: List[str], logger):
     perspective = PerspectiveAPIModerator(logger)
     decision, score, behav_type = np.array([]), np.array([]), np.array([])
-    for idx, comm in tqdm(enumerate(comments), desc='Calling Perspective API', total=len(comments), unit='comments'):
+    for idx, comm in enumerate(comments):
         logger.info(f'Check score for comment #{idx} - {comm}')
         d, s, t = perspective.measure_toxicity(comm)
         decision, score, behav_type = np.append(decision, d), np.append(score, s), np.append(behav_type, t)
