@@ -19,7 +19,7 @@ def get_perspective_scores():
         tick = time.time()
         df_split = df.iloc[split:split+1000]
         df_split['Perspec Decision'], df_split['Perspec Score'], df_split['Perspec - Behav Type'] = call_perspective(df_split['body'], logger)
-        df.to_csv(f'{data_dir}/output_scores_compared_{idx}.csv')
+        df_split.to_csv(f'{data_dir}/output_scores_compared_{idx}.csv')
         logger.info(f'Split {idx+1} DONE in {time.time() - tick} seconds!!')
 
 def call_perspective(comments: List[str], logger):
