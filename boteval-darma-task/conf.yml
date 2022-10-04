@@ -3,7 +3,7 @@ chat_dir: data
 chatbot:
   display_name: 'Moderator'
   topics_file: chat_topics.json
-  #bot_name: transformers
+  #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
@@ -57,6 +57,7 @@ mturk:
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
     sandbox: true  # sandbox: false to go live
+  seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
     # https://boto3.amazonaws.com/v1/documentation/api/1.11.9/reference/services/mturk.html#MTurk.Client.create_hit
@@ -89,7 +90,5 @@ flask_config:
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   DATABASE_FILE_NAME: 'sqlite-database-03.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
-  #SERVER_NAME: localhost
   SERVER_NAME: dev.gowda.ai
   PREFERRED_URL_SCHEME: https
-
