@@ -88,7 +88,13 @@ mturk:
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'sqlite-database-03.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-06.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
-  SERVER_NAME: dev.gowda.ai
+  SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
+  SESSION_COOKIE_SECURE: false
+  SESSION_COOKIE_HTTPONLY: false
+  SESSION_COOKIE_SAMESITE: none
+  REMEMBER_COOKIE_SECURE: false
+  REMEMBER_COOKIE_HTTPONLY: false
+  REMEMBER_COOKIE_SAMESITE: none
