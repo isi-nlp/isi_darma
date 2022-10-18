@@ -1,7 +1,6 @@
 """
 This work is done by Taiwei Shi during his internship at USC ISI (Summer 2022).
 """
-from email import message
 import openai
 import os
 
