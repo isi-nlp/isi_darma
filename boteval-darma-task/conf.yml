@@ -9,7 +9,7 @@ chatbot:
   bot_name: gpt
   bot_args:
     engine: text-davinci-002
-    prompt: moderator
+    prompt: wisebeing
 
   transforms:
     human:
@@ -88,7 +88,7 @@ mturk:
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'sqlite-database-06.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-08.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
