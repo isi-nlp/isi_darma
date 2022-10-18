@@ -1,6 +1,7 @@
 """
 This work is done by Taiwei Shi during his internship at USC ISI (Summer 2022).
 """
+from email import message
 import openai
 import os
 
@@ -17,10 +18,10 @@ class GPTBot(BotAgent):
     SARCASTIC = 'sarcastic'
 
     def __init__(self, engine: str, prompt: str, *args, api_key='',
-         few_shot_example=None, **kwargs):
+         few_shot_example=None, max_ctx_len=2048, **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
-        self.sturns = ''
+        self.max_ctx_len = max_ctx_len
         self.engine = engine
         self.prompt = prompt
         self.few_shot_example = few_shot_example # e.g. nvc
@@ -44,8 +45,27 @@ class GPTBot(BotAgent):
         elif prompt == self.SARCASTIC:
             self.instruction = "Marv is a chatbot that reluctantly moderates with sarcastic responses"
             self.persona = 'Marv'
+        else:
+            raise Exception(f'Unknown prompt: {prompt}')
         self.turn_idx = 0
         log.info(f"Initialized GPT bot with {self.engine=} {self.prompt=} {self.persona=}\n{self.instruction=}")
+        self.context = []
+
+    def context_append(self, user, text):
+        turn = f'user {user}: {text}'
+        n_toks = len(turn.strip().split())
+        self.context.append((turn, n_toks))
+
+        
+    def get_seed_turns(self) -> str:
+        seed_turns = ''
+        ctx_len = 0
+        for turn, turn_len in reversed(self.context):
+            ctx_len += turn_len
+            if ctx_len >= self.max_ctx_len:
+                break
+            seed_turns = turn + '\n' + seed_turns
+        return seed_turns.strip()
 
     def talk(self, timeout=None):
         instr = self.instruction
@@ -55,15 +75,16 @@ class GPTBot(BotAgent):
             few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
-        p = self.prompt_compose(instr, persona, few_shot_example, self.sturns)
+        seed_turns = self.get_seed_turns()
+        p = self.prompt_compose(instr, persona, few_shot_example, seed_turns)
         if self.turn_idx == 0:
             resp = self.query_completion_api(p, engine=self.engine)
         else:
             resp = self.query_completion_api(p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = resp
         final_message_text = final_message_text.strip()
-        self.sturns += f"\n{persona}: {final_message_text}"
 
+        self.context_append(self.persona, final_message_text)
         act_out = {}
         act_out['text'] = final_message_text
         act_out['user_id'] = "Moderator"
@@ -71,7 +92,10 @@ class GPTBot(BotAgent):
         return {**act_out, 'episode_done': False}
 
     def hear(self, msg):
-        self.sturns += f"\nuser {msg['user_id']}: {msg['text']}"
+        user_id = msg['user_id']
+        if msg.get('data') and msg['data'].get('speaker_id'):
+            user_id = msg['data']['speaker_id']
+        self.context_append(user_id, msg['text'])
 
     @staticmethod
     def get_fewshot_example(turn_idx):
