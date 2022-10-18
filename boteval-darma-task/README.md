@@ -5,7 +5,7 @@
 
 * Bot eval docs are at http://cutelab.name/boteval/ 
 * Setting up MT Backend Services:  [darma_chat/docs/setup-mt-backend.md](https://github.com/isi-nlp/isi_darma/blob/main/darma_chat/docs/setup-mt-backend.md)
-* Preparing initial seed threads [darma_chat/docs/setup-mt-backend.md](https://github.com/isi-nlp/isi_darma/blob/main/darma_chat/docs/setup-mt-backend.md)
+* Preparing initial seed threads [darma_chat/docs/prep-threads.md](https://github.com/isi-nlp/isi_darma/blob/main/darma_chat/docs/prep-threads.md)
   >  this is probably outdated; check `chat_topics.json` for format. Hint: we need to include `id` and `name` for each topic
 
 
