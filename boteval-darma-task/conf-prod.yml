@@ -1,4 +1,5 @@
-chat_dir: data
+# sandbox chat_dir: data
+chat_dir: data-prod
 
 chatbot:
   display_name: 'Moderator'
@@ -27,7 +28,7 @@ limits:
   max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 10
   max_turns_per_thread: 6
-  reward: &reward '0.01' # dollars
+  reward: &reward '0.5' # dollars
   
 onboarding:
   agreement_file: user-agreement.html
@@ -56,7 +57,7 @@ ratings:
 mturk: 
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
-    sandbox: true  # sandbox: false to go live
+    sandbox: false  # sandbox: false to go live
   seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
@@ -66,7 +67,7 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot in French'
+    Title: 'Evaluate a moderator chatbot in French (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
     Description: Evaluate a moderator chatbot after conversing with it in French given a French conversation. You MUST be able to read and write French fluently!
     QualificationRequirements: 
@@ -83,12 +84,28 @@ mturk:
             - Country: CH
             - Country: CD
          ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "00000000000000000040"  # 5k hits
+         Comparator: GreaterThan
+         IntegerValues: [5000]
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "00000000000000000060"  # adult content
+         Comparator: EqualTo
+         IntegerValues: [1]
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "000000000000000000L0"  # percentage approved
+         Comparator: GreaterThan
+         IntegerValues: [95]
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
+         Comparator: DoesNotExist
+         ActionsGuarded: DiscoverPreviewAndAccept
 
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-prod-01.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https

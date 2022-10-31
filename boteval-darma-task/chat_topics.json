@@ -1,7 +1,43 @@
 [
+
+ {
+     "id": "chat04",
+     "name": "Chat 04 - Transport",
+     "conversation": [
+      {
+        "speaker_id": "A",
+        "text": "I insulted a controller I summarize the story. My wife had taken a ticket to the station. No luck she had a hard time hitting the post office and she took a half-fare ticket, she was in quite a hurry. When she tries to get through the doors, it doesn't work. She gives her ticket to the controller, who points out that it is half a fare, she explains the situation to him but he tells her \"it makes 35 euros.\" He tells her that if she doesn't want to pay, he can ask for her ID and that it will be 85 euros. I say we're in the stroller with our 6-month-old baby right now. So I say \"drop it, they're assholes\" and the other says it's a crime and he can make a complaint. In concrete terms, do you think I risk something? More generally, I do not understand the controller's persistence in this situation. We went to see him, we offered to pay the difference, he could see perfectly well that we were not trying to defraud. My wife is Japanese and doesn't understand either. In his country it is perfectly normal to pay when you get off the train, to go to the staff to tell them that you have made a mistake.",
+        "text_orig": "J'ai insulté un contrôleur Je récapitule l'histoire. Ma femme avait pris un billet pour aller à la gare. Manque de chance elle a dû mal taper sur la borne et elle a pris un ticket demi-tarif, elle était assez pressée. Quand elle essaye de passer les portes ça marche pas. Elle donne son ticket au contrôleur qui lui fait remarquer que c'est un demi tarif, elle lui explique la situation mais il lui dit \"ça fait 35 euros\". Elle commence à paniquer et à fondre en larmes, il s'en fout, il lui dit que si elle veut pas payer il peut lui demander sa pièce d'identité et que ça fera 85 euros. Je précise qu'on est à ce moment avec notre bébé de 6 mois dans la poussette. Du coup, je lui dis \"laisse tomber, c'est des connards\" l'autre me répond que c'est un délit et qu'il peut porter plainte. Concrètement, à votre avis, je risque quelque chose ? De manière plus générale, je ne comprends pas l'obstination du contrôleur dans cette situation. C'est nous qui sommes allés le voir, nous avons proposé de payer la différence, il pouvait parfaitement voir que nous n'étions pas en train d'essayer de frauder. Ma femme est japonaise et ne comprend pas non plus. Dans son pays c'est parfaitement normal de payer en descendant du train, d'aller voir le personnel pour leur signaler qu'on s'est trompé."
+      },
+      {
+        "speaker_id": "degTMNzC",
+        "text": "I did well to snore twice or three times on the bus in Japan because I was wrong and I didn't have the exact amount to pay when I got off the bus. It's not every rose in your wife's house either, she'd have gotten on the wrong train there, she'd have been fined too, baby or not. The rest, your wife was scared and it shocked her, okay? Taking on the controller who only does his job, when you are wrong and your baby is no excuse at all, I do not understand the point.....................",
+        "text_orig": "Je me suis bien fait engueuler deux ou trois fois dans le bus au Japon parce que je m'étais trompé et n'avais pas l'exact montant à payer en sortant du bus. C'est pas non plus tout rose chez ta femme, elle se serait trompé dans un train là-bas, elle aurait pris une amende aussi, bébé ou pas. Le reste, ta femme a eu peur et ça l'a choqué, ok. S'en prendre au contrôleur qui ne fait que son job, alors que vous êtes en tort et que votre bébé n'est en rien une excuse, je comprends pas trop le point de vue."
+      },
+      {
+        "speaker_id": "DpTnjQfd",
+        "text": "Because of your answer you are so disconnected from reality, most of the controllers think they're cowboys, they could do a lot less to change, but they're not big dogs. At least 3 out of 4 are high so when the train is loaded like me put umbrellas in their calves",
+        "text_orig": "Vu ta reponse tu es tellement deconnecter de la réalité, la majorité des controleurs se prennent pour des cowboys, ils pourraient largement moins amender mais non cest des gros chiens. Au minimum 3 sur 4 sont hautain donc quand le train est bondé faite comme moi mettez des coup de parapluie dans leurs mollet"
+      },
+      {
+        "speaker_id": "degTMNzC",
+        "text": "But yes, but yes. You're the one who takes the transports and has never been in touch with controllers. The experiences of others must be because they live in a parallel dimension.",
+        "text_orig": "Mais oui, mais oui. Y a que toi qui prends les transports et qui a jamais été en contacte avec des contrôleurs. Les expériences des autres, c'est forcement parce qu'ils vivent dans une dimension parallèle."
+      },
+      {
+        "speaker_id": "DpTnjQfd",
+        "text": "You're a fool. I want you to catch cancer and lots of other owl diseases fdp",
+        "text_orig": "T'es un bouffon toi. Je te souhaite de chopper le cancer et pleins d'autres maladies chouette fdp"
+      }
+    ],
+    "target_user": "DpTnjQfd"
+  },
+
+
+
     {
-        "id": "chat01",
-        "name": "Chat 01 - Racism Moderation",
+        "id": "chat01.1",
+        "name": "Chat 01.1 - Racism Moderation",
         "conversation": [
             {
                 "speaker_id": "A",
@@ -32,8 +68,8 @@
         "target_user": "C"
     },
     {
-        "id": "chat02",
-        "name": "Chat 02 - Racism Moderation",
+        "id": "chat02.1",
+        "name": "Chat 02.1 - Racism Moderation",
         "conversation": [
             {
                 "speaker_id": "A",
@@ -64,8 +100,8 @@
         "target_user": "C"
     },
     {
-        "id": "chat03",
-        "name": "Chat 03 - Racism Moderation",
+        "id": "chat03.1",
+        "name": "Chat 03.1 - Racism Moderation",
         "conversation": [
             {
                 "speaker_id": "A",
@@ -154,8 +190,8 @@
             },
             {
                 "speaker_id": "C",
-                "text": "Hello / u / sirdeck, did you have a good night? Did you find cold water in the shower? \" \"\" that you're coming out of your bullet hole. \"\" Could that be from me? You're so toxic, you don't realize how aggressive you are. Judging by your history, I'm not the first one you pass your nerves ad nauseam on Reddit. Between two video games. = rhetorical process. When did I say that one was more than the other? I'm stuck with my little finger. Now let go of my ribs, switch to something else, or then come in private, and we settle this like two adult stories that you mature.",
-                "text_orig": "Bonjour /u/sirdeck, As-tu passé une bonne nuit ? T'as pas trouvé l'eau froide dans la douche ? \"expression de merde\", \"que tu sors de ton trou de balle\" ça vient de moi peut être ? T'es tellement toxique que tu ne te rends pas compte de ton agressivité. A en juger par ton historique, je suis pas le premier sur lequel tu passes tes nerfs ad nauseam sur Reddit. Entre deux parties de jeux vidéo. = procédé rhétorique. A quel moment j'ai dis que tel ou tel l'était plus que d'autres ? J'en reste à mon petit doigt. Maintenant lâche mes côtes, passe à autre chose ou alors viens en privé et on règle ça comme deux adultes histoire que tu gagnes en maturité."
+                "text": "Hello / u / E, did you have a good night? Did you find cold water in the shower? \" \"\" that you're coming out of your bullet hole. \"\" Could that be from me? You're so toxic, you don't realize how aggressive you are. Judging by your history, I'm not the first one you pass your nerves ad nauseam on Reddit. Between two video games. = rhetorical process. When did I say that one was more than the other? I'm stuck with my little finger. Now let go of my ribs, switch to something else, or then come in private, and we settle this like two adult stories that you mature.",
+                "text_orig": "Bonjour /u/E, As-tu passé une bonne nuit ? T'as pas trouvé l'eau froide dans la douche ? \"expression de merde\", \"que tu sors de ton trou de balle\" ça vient de moi peut être ? T'es tellement toxique que tu ne te rends pas compte de ton agressivité. A en juger par ton historique, je suis pas le premier sur lequel tu passes tes nerfs ad nauseam sur Reddit. Entre deux parties de jeux vidéo. = procédé rhétorique. A quel moment j'ai dis que tel ou tel l'était plus que d'autres ? J'en reste à mon petit doigt. Maintenant lâche mes côtes, passe à autre chose ou alors viens en privé et on règle ça comme deux adultes histoire que tu gagnes en maturité."
             }
         ],
         "target_user": "C"
