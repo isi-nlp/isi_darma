@@ -1,0 +1,657 @@
+[
+    {
+        "id": "chat04",
+        "name": "chat 04 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "Berlin: Raid at the \"Center for Political Beauty\"",
+                "text_orig": "Berlin: Razzia beim \"Zentrum f\u00fcr politische Sch\u00f6nheit\""
+            },
+            {
+                "speaker_id": "c",
+                "text": "Rightly, the flyer fraud was criminal and democratic.To do this, it only strengthens the victim carol of the AfD, which probably gave them more voters than the Schn\u00f6den Flyer could ever.The \"Center for Political Beauty\" wrote on Twitter with a view of the state government of the SPD, the Greens and Left: \"The first official act of the new R2G Senate in Berlin: Search for apartments of artists. A black day for freedom of art in GermanyIt's laughable.Fraud is apparently an art form now?",
+                "text_orig": "zurecht, der flyerbetrug war kriminell und demokratiefeindlich. dazu st\u00e4rkt es nur die opfernarrative der afd, was denen wahrscheinlich mehr w\u00e4hler beschert hat als die schn\u00f6den flyer es jemals k\u00f6nnten. das \"zentrum f\u00fcr politische sch\u00f6nheit\" schrieb auf twitter mit blick auf die landesregierung aus spd, gr\u00fcnen und linken: \"die erste amtshandlung des neuen r2g-senats in berlin: wohnungen von k\u00fcnstlern durchsuchen. ein schwarzer tag f\u00fcr die kunstfreiheit in deutschland.\"das ist doch lachhaft. betrug ist jetzt anscheinend eine kunstform?"
+            },
+            {
+                "speaker_id": "d",
+                "text": "I'm about to cry.The poor AfD.",
+                "text_orig": "ich heul gleich. die arme afd."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Oh yes, fuck democracy.I am pretty sure that you would cry a lot if it were about another party.",
+                "text_orig": "ach ja stimmt, schei\u00df auf demokratie. ich bin mir ziemlich sicher dass du sehr viel rumheulen w\u00fcrdest wenn es hier um eine andere partei gehen w\u00fcrde."
+            },
+            {
+                "speaker_id": "a",
+                "text": "Democracy also has to see how it defends itself against perfidious democracy.If you now want to tell me that the AfD is prefabricated democrats, then I think we have a completely different problem. just because they have been chosen with democratic means, they are far from unexplained Democrats want to avert the damage from the German people.",
+                "text_orig": "die demokratie muss halt auch gucken wie sie sich gegen perfide demokratiefeinde wehrt. wenn du mir jetzt erz\u00e4hlen willst, dass die afd vorzeigedemokraten sind, dann haben wir glaub ich ein ganz anderes problem.nur weil sie mit demokratischen mitteln gew\u00e4hlt wurden, sind sie noch lange keine unschludigen demokraten die schaden vom deutschen volke abwenden m\u00f6chten."
+            },
+            {
+                "speaker_id": "c",
+                "text": "You can also put yourself in front of a polling station and beat up well -known Mig songs of the AfD local association.Great, you have a few people from choosing AfD, an hour later explodes that then on social media and mobilizes even more people AfD.",
+                "text_orig": "kannst dich ja auch vor ein wahllokal stellen und bekannte miglieder des afd ortsvereins verpr\u00fcgeln. super, haste ein paar leute daran gehindert afd zu w\u00e4hlen, ne stunde sp\u00e4ter explodiert dass dann auf social media und mobilisiert noch mehr leute afd zu w\u00e4hlen."
+            }
+        ],
+        "target_user": "c"
+    },
+    {
+        "id": "chat488",
+        "name": "chat 488 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "a",
+                "text": "Mild interesting: a speed camera crashed as bulky waste",
+                "text_orig": "Milde interessant: Ein als Sperrm\u00fcll getarnter Blitzer"
+            },
+            {
+                "speaker_id": "b",
+                "text": "And then some tell you that radar controls only serve to security.Why is your stupid cunts hiding the things as bulky waste.When you see them, you slow down the same way.",
+                "text_orig": "und dann erz\u00e4hlen die einem aber, dass radarkontrollen nur der sicherheit dienen. warum versteckt ihr dummen cunts die dinger dann als sperrm\u00fcll. wenn man die sieht bremst man genauso ab."
+            },
+            {
+                "speaker_id": "c",
+                "text": "A brilliant suggestion: just don't drive too fast, then you don't have to slow down.",
+                "text_orig": "genialer vorschlag: einfach nicht zu schnell fahren, dann muss man auch nicht abbremsen."
+            },
+            {
+                "speaker_id": "b",
+                "text": "I know few people who intentionally drive 20-30kmh too fast.It always catches you when you are somewhere in a new area and overlook a sign etc.",
+                "text_orig": "ich kenne wenig leute die innerorts absichtlich 20-30kmh zu schnell fahren. es erwischt einen immer wenn man irgendwo unterwegs in einer neuen gegend ist und ein schild \u00fcbersieht etc."
+            },
+            {
+                "speaker_id": "d",
+                "text": "stupid excuse ever.And also wrong. Those who overlook speed signs also overlooks other signs, humans and is not suitable to keep a vehicle.",
+                "text_orig": "d\u00e4mlichste ausrede ever. und auch falsch.wer geschwindigkeitsschilder \u00fcbersieht, \u00fcbersieht auch andere schilder, menschen und ist nicht geeignet, ein fahrzeug zu f\u00fchren."
+            },
+            {
+                "speaker_id": "b",
+                "text": "The greatest Alman statement ever.",
+                "text_orig": "die gr\u00f6\u00dfte alman aussage ever."
+            }
+        ],
+        "target_user": "b"
+    },
+    {
+        "id": "chat484",
+        "name": "chat 484 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "a",
+                "text": "With advertising interruptions: Amazon starts free streaming service |tagesschau.de",
+                "text_orig": "Mit Werbeunterbrechungen: Amazon startet kostenlosen Streamingdienst | tagesschau.de"
+            },
+            {
+                "speaker_id": "b",
+                "text": "Yes horny.I do not assume that Amazon makes the effort to place the advertising in suitable places, but that it simply slums in every X minutes and the films are then interrupted in the most inappropriate places to show advertising.no thanks.",
+                "text_orig": "ja geil. ich geh mal nicht davon aus dass amazon sich die m\u00fche macht die werbung an passenden stellen zu platzieren sondern die einfach alle x minuten reinknallt und die filme dann an den unpassendsten stellen unterbrochen werden um werbung zu zeigen. nee, danke."
+            },
+            {
+                "speaker_id": "c",
+                "text": "But you still have the content for free.I think it's cool for people who don't want to spend money.",
+                "text_orig": "du hast halt den inhalt aber trotzdem umsonst. find ich cool f\u00fcr leute, die kein geld ausgeben m\u00f6chten."
+            },
+            {
+                "speaker_id": "b",
+                "text": "Always this \"but it's for nothing!\".Yes and?Free shit is still a shit.I mean, if it doesn't bother you when the most important film scene is interrupted in the middle of the sentence for advertising, it breaks the whole film.\"Luke, I'm your ...\" \"New Girl!Now at Amazon Prime! \u201dNah, really not.Not even for free.",
+                "text_orig": "immer dieses \u201eaber es ist doch umsonst!\u201c. ja und? kostenlose kacke ist doch immer noch kacke. ich mein, wenn es euch nicht st\u00f6rt wenn in der wichtigsten filmszene mitten im satz f\u00fcr werbung unterbrochen wird macht das doch den ganzen film kaputt. \u201eluke, ich bin dein\u2026\u201c\u201enew girl! jetzt bei amazon prime!\u201cnee, echt nicht. nichtmal f\u00fcr umsonst."
+            },
+            {
+                "speaker_id": "c",
+                "text": "But that's your subjective perception.I also find it stupid with advertising, but think that there are enough people who find the offer horny.In this way you can reach more people and sales, which in turn financed new productions.",
+                "text_orig": "das ist doch aber deine subjektive wahrnehmung. ich finde es auch bl\u00f6d mit werbung, denke aber dass es genug leute gibt die das angebot geil finden. so erreichen sie mehr leute und umsatz, was wiederum teilweise neue produktionen finanziert."
+            },
+            {
+                "speaker_id": "b",
+                "text": "Yes, of course, that's subjective.I just don't understand why you don't care.",
+                "text_orig": "ja nat\u00fcrlich ist das subjektiv. ich versteh halt nur nicht warum einem das so egal ist."
+            }
+        ],
+        "target_user": "b"
+    },
+    {
+        "id": "chat409",
+        "name": "chat 409 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "c",
+                "text": "Don't send your children to the daycare sick!",
+                "text_orig": "Schickt eure Kinder nicht krank in die Kita!"
+            },
+            {
+                "speaker_id": "d",
+                "text": "Children are often sick.deal with it.Life cannot stand still because of a runny nose.",
+                "text_orig": "kinder sind halt oft krank. deal with it. das leben kann nicht permanent wegen eines schnupfens stillstehen."
+            },
+            {
+                "speaker_id": "b",
+                "text": "If you don't have the capacity yourself to take care of your children when they are sick, then don't get any.deal with it.Logically, it makes no sense (except self -addiction) to send his child sick to the daycare, is shit for the child and a sick child becomes 10 sick children.",
+                "text_orig": "wenn man selber nicht die kapazit\u00e4t hat sich um seine kinder zu k\u00fcmmern wenn sie krank sind, dann halt keine bekommen. deal with it. ergibt halt logisch gesehen keinen sinn (au\u00dfer selbstsucht) sein kind krank in die kita zu schicken, ist f\u00fcrs kind schei\u00dfe und aus einem kranken kind werden 10 kranke kinder."
+            },
+            {
+                "speaker_id": "a",
+                "text": "If you don't have the capacity yourself to take care of your children when they are sick, then no benefit circumstances can change.If you think as a society, you would never get children reasonably intelligent people because they know that everyone can end in a situation in which the family or other network can break away.",
+                "text_orig": "wenn man selber nicht die kapazit\u00e4t hat sich um seine kinder zu k\u00fcmmern wenn sie krank sind, dann halt keine bekommenlebensumst\u00e4nde k\u00f6nnen sich \u00e4ndern. wenn man als gesellschaft wirklcih so denkt w\u00fcrden halbwegs intelligente leute nie kinder kriegen, weil sie wissen, dass jeder in einer situation enden kann, in der das famili\u00e4re oder sonstige netzwerk wegbrechen kann."
+            },
+            {
+                "speaker_id": "b",
+                "text": "But does not change the fact that the risk to other children is unacceptable due to the health of their own children.It is also not about the family network, but about any possibilities of collecting. \"Taking care of his children\" can organize a babysitter to take the child into the office/home office or stay at home without payment.Some daycare centers, as well as that of OP (because surgery said it takes some time to insulate these children, so isolation is therefore possible) can also insulate children.So it would also be taken care of, what is not possible, the child is sending to the daycare without warning so that other children also get sick.To Herpes, who can really end for toddlers.",
+                "text_orig": "\u00e4ndert aber nichts daran, dass die gef\u00e4hrdung anderer kinder aufgrund des gesundheitszustandes der eigenen kinder inakzeptabel ist. es geht auch nicht ums famili\u00e4re netzwerk, sondern um jegliche auffangm\u00f6glichkeiten dsr\u00fcber hinaus.\"sich um seine kinder zu k\u00fcmmern\" kann hei\u00dfen einen babysitter zu organisieren, das kind ins b\u00fcro/homeoffice mitzunehmen oder ohne bezahlung zuhause zu bleiben wenn dies m\u00f6glich ist. einige kitas, wie auch die von op (da op sagte, dass es einige zeit dauert bis man diese kinder isoliert, daher ist folglich eine isolation m\u00f6glich) k\u00f6nnen kinder auch isolieren. so w\u00e4re sich also auch um das kind gek\u00fcmmert.was nicht geht, ist das kind ohne vorwarnung in die kita schicken, damit andere kinder auch krank werden.hier geht es mitunter ja auch nicht um \" hat ein wenig schnupfen\" sondern z.b. um herpes, der f\u00fcr kleinkinder echt beschissen enden kann."
+            },
+            {
+                "speaker_id": "a",
+                "text": "I understand what it is about, but I find it as \"if you would have thought about it earlier and don't get children at all\" very often.It doesn't help those affected in the situation, the children are still there, only everyone feels more shitty and even more than failure.",
+                "text_orig": "ich verstehe um was es geht, aber ich find so aussagen wie \"h\u00e4ttest du dir das halt fr\u00fcher \u00fcberlegt und erst gar keine kinder bekommen\" halt sehr oft fehl am platz. es hilft den betroffenen in der situation nicht, die kinder sind ja trotzdem da, es f\u00fchlen sich nur alle noch beschissener und noch mehr als versager."
+            },
+            {
+                "speaker_id": "b",
+                "text": "Was relatively obviously only an oversubscribed reflection of the brain -burned statement of the glue -eating full idiots to which I replied. Of course this was hard to put it, but the point is an important problem, other people have no obligation to do their own disadvantages in order to use your (also often not from your own guilt) to iron out inadequacies.That yours is generally meant here and not referred to you personally.It starts with people who ring the bell with you because the children only have to go to the toilet quickly, continue to think that they have a special right on something because they have children and ends in the endangerment of other children because you are sick in your childThe daycare sends \"because you have no other option\"",
+                "text_orig": "war relativ offensichtlich nur eine \u00fcberzeichnete spiegelung der hirnverbrannten aussage des kleberfressenden vollidioten auf den ich geantwortet habe.nat\u00fcrlich war das desswegen hart ausgedr\u00fcckt, der punkt ist allerdings ein wichtiges problem, andere menschen haben keinerlei obligation dazu sich selbst nachteile zuzumuten um deine wie auch immer (auch oft nicht aus eigener schuld) entstandenen unzul\u00e4nglichkeiten auszub\u00fcgeln. das deine ist hier generell gemeint und nicht auf dich pers\u00f6nlich bezogen. das f\u00e4ngt mit leuten an die bei dir klingeln weil die kinder nur mal schnell aufs klo m\u00fcssen, geht weiter \u00fcber menschen die meinen dass sie ein sonderanrecht auf irgendetwas haben weil sie kinder haben, und endet bei der gef\u00e4hrdung anderer kinder weil man sein kind krank in die kita schickt \"weil man ja keine andere m\u00f6glichkeit hat\""
+            }
+        ],
+        "target_user": "b"
+    },
+    {
+        "id": "chat397",
+        "name": "chat 397 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "f",
+                "text": "19-year-old fights for her rights: \"I am caught in Gaza\".Women are systematically suppressed in the coastal stripes Gaza controlled by the radical Israel and Egypt.So also the 19-year-old AFAF.",
+                "text_orig": "19-J\u00e4hrige k\u00e4mpft um ihre Rechte: \"Ich bin gefangen in Gaza\". In dem von der radikal-islamischen Hamas kontrollierten K\u00fcstenstreifen Gaza, zwischen Israel und \u00c4gypten, werden Frauen systematisch unterdr\u00fcckt. So auch die 19-j\u00e4hrige Afaf."
+            },
+            {
+                "speaker_id": "e",
+                "text": "Always remember: Hamas has not crushed to power.They were chosen completely democratically.",
+                "text_orig": "immer dran denken: die hamas hat sich nicht an die macht geputscht. die sind ganz demokratisch gew\u00e4hlt worden."
+            },
+            {
+                "speaker_id": "d",
+                "text": "What do you mean by that?",
+                "text_orig": "was willst du damit sagen?"
+            },
+            {
+                "speaker_id": "a",
+                "text": "that a large part of the residents of Gaza finds this way of dealing with women absolutely okay.",
+                "text_orig": "das ein gro\u00dfer teil der bewohner von gaza diese art mit frauen umzugehen absolut in ordnung findet."
+            },
+            {
+                "speaker_id": "b",
+                "text": "The Hamas was not chosen because people find Sharia so horny, at least not primarily.Hamas is popular because it actively act as the only organization against the Israelis perceived as a occupying power.",
+                "text_orig": "die hamas wurde aber nicht gew\u00e4hlt weil die leute die scharia so geil finden, zumindest nicht prim\u00e4r. die hamas ist popul\u00e4r weil sie so ziemlich als einzige organisation aktiv gegen die als besatzungsmacht empfundenen israelis vorgehen."
+            },
+            {
+                "speaker_id": "a",
+                "text": "The one does not exclude the other.At least I have never noticed Gaza as a paradise for emancipation and women's rights.",
+                "text_orig": "das eine schlie\u00dft das andere nicht aus. zumindest ist mir gaza noch nie als paradies f\u00fcr emanzipation und frauenrechte aufgefallen."
+            },
+            {
+                "speaker_id": "b",
+                "text": "If you are bombarded regularly and live in a completely over -populated ghetto from which you are very likely to never get out, while your \"enemy\" controls water and electricity and \"your\" country is populated, women's rights and emancipation may not be your highest priority.Especially since the only perceptible opposition comes from ultra -conservative Islamists, who can of course also propagate their world view.",
+                "text_orig": "wenn du regelm\u00e4\u00dfig bombardiert wirst und in einem v\u00f6llig \u00fcberbev\u00f6lkerten ghetto lebst, aus dem du mit hoher wahrscheinlichkeit nie rauskommen wirst, w\u00e4hrend dein \"feind\" wasser und strom kontrolliert und \"dein\" land besiedelt, sind frauenrechte und emanzipation m\u00f6glicherweise nicht deine h\u00f6chste priorit\u00e4t. zumal die einzige wahrnehmbare opposition von ultrakonservativen islamisten kommt, die dadurch nat\u00fcrlich auch ihr weltbild propagieren k\u00f6nnen."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Oh yes, always these secondary contradictions, which are then cleared after the revolution.Then the Gaza Strip would become a haven of emancipation and queer friendliness.^^ But of course you can't worry about such nonsense if you have to close rockets.",
+                "text_orig": "ach ja, immer diese nebenwiderspr\u00fcche, die dann nach der revolution \u00e4hm befreiung gekl\u00e4rt werden. dann w\u00fcrde der gazastreifen ein hort der emanzipation und queerfreundlichkeit werden. ^^aber um so einen unsinn kann man sich nat\u00fcrlich nicht k\u00fcmmern, wenn man raketen verschlie\u00dfen muss."
+            },
+            {
+                "speaker_id": "b",
+                "text": "I didn't say that and I am also not a supporter of the fucking Hamas, I have only tried to explain the support of Hamas by the population there more differently than \"these are all backward gay haters\".",
+                "text_orig": "das habe ich so nicht gesagt und ich bin auch kein unterst\u00fctzer der fucking hamas, ich habe nur versucht die unterst\u00fctzung der hamas durch die dortige bev\u00f6lkerung differenzierter zu erkl\u00e4ren als \"das sind alle r\u00fcckst\u00e4ndige schwulenhasser\"."
+            }
+        ],
+        "target_user": "b"
+    },
+    {
+        "id": "chat119",
+        "name": "chat 119 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "\"Serious risk of security for personnel and patients\": Great Britain's health service NHS only works in emergency mode",
+                "text_orig": "\u00bbErnsthaftes Risiko f\u00fcr Sicherheit von Personal und Patienten\u00ab: Gro\u00dfbritanniens Gesundheitsdienst NHS arbeitet nur noch im Notfallmodus"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Brexit success!",
+                "text_orig": "brexit erfolg!"
+            },
+            {
+                "speaker_id": "a",
+                "text": "No, intended political calculation.",
+                "text_orig": "nein, beabsichtigtes politisches kalk\u00fcl."
+            },
+            {
+                "speaker_id": "c",
+                "text": "They intended that a bunch of doctors leave the country because they weren't British?Cool calculation, and how does that help the conservatives now that you fuck your health system?",
+                "text_orig": "die haben beabsichtigt das ein haufen mediziner das land verlassen weil sie eben keine briten waren? cooles kalk\u00fcl, und wie hilft das den konservativen jetzt das sie ihr gesundheitssystem zerficken?"
+            },
+            {
+                "speaker_id": "a",
+                "text": "The big, long -term goal is to privatize medical care.",
+                "text_orig": "das gro\u00dfe, langfristige ziel ist es, die medizinische versorgung zu privatisieren.die nhs verrotten zu lassen l\u00e4uft bei den bef\u00fcrwortern unter dem begriff \"starving the beast\"."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Then you still have no staff because privatization is never good for the working atmosphere in the social sector?But hey if they want to continue fucking, just too.",
+                "text_orig": "dann haste halt weiterhin kein personal weil privatisierung nie gut f\u00fcr das arbeitsklima im sozialen sektor ist? aber hey wenn die sich weiter ficken wollen, nur zu."
+            }
+        ],
+        "target_user": "c"
+    },
+    {
+        "id": "chat07",
+        "name": "chat 07 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "c",
+                "text": "Now in Hamburg.",
+                "text_orig": "Jetzt im Hamburg."
+            },
+            {
+                "speaker_id": "d",
+                "text": "\"In protest against the high fuel prices, I will now burn senseless fuel!\" But you really showed the mineral oil companies, her hero.",
+                "text_orig": "\"aus protest gegen die hohen spritpreise werde ich jetzt sinnlos sprit verbrennen!\"damit habt ihr es den mineral\u00f6lkonzernen aber so richtig gezeigt, ihr helden."
+            },
+            {
+                "speaker_id": "a",
+                "text": "Achso and people who protest for affordable something should go to work instead or how? I'm quite sure that driving to the city center does not really make a big difference if they then make 10 hours a day trailer through Germany for 10 hours a day a daytransport.",
+                "text_orig": "achso und leute die f\u00fcr bezahlbares irgendwas protestieren sollten stattdessen lieber arbeiten gehen oder wie?ich bin mir recht sicher dass einmal am wochende in die innenstadt fahren jetzt nicht wirklich einen gro\u00dfen unterschied macht wenn die dann den rest der woche 10 stunden pro tag anh\u00e4nger durch deutschland transportieren."
+            },
+            {
+                "speaker_id": "e",
+                "text": "You could also protest normally on foot with signs and so. But then you would have to move and would not damage the climate. After all, I don't work.Two houses further if his SUV consumes so much./s",
+                "text_orig": "man k\u00f6nnte auch ganz normal protestieren zu fu\u00df mit schildern und so.aber dann m\u00fcsste man sich ja bewegen und w\u00fcrde auch das klima nicht so sch\u00e4digen.das geht schlie\u00dflich nicht.ich meine wie soll hans j\u00fcrgen bei den aktuellen preisen sonntags br\u00f6tchen holen gehen beim b\u00e4cker zwei h\u00e4user weiter wenn sein suv so viel verbraucht.spritpreisbremse jetzt!!\u00a1!!!!!!!!!!!! /s"
+            },
+            {
+                "speaker_id": "a",
+                "text": "I do not get it.Does your /s now refer to the whole comment or only to the last part with the price brake?",
+                "text_orig": "ich checks nicht. bezieht sich dein /s jetzt auf den ganzen kommentar oder nur auf den letzten teil mit der preisbremse?"
+            },
+            {
+                "speaker_id": "b",
+                "text": "Obviously on the last part",
+                "text_orig": "offensichtlich auf den letzten teil"
+            },
+            {
+                "speaker_id": "a",
+                "text": "I also thought to myself, but then his comment doesn't make any sense.What should you have to do with truck drivers on Sundays?These are just comparisons brought to the hair to claim that the truck drivers are stupid because they drive to demo on the weekend and use a few liters of fuel even though they are only during the week (on paper only) Use 10 hours a day as a work equipment, which is now really ridiculous.Is nothing more than when the farmers protest with tractors for milk prices or something.",
+                "text_orig": "dachte ich mir auch, aber dann macht sein kommentar halt keinen sinn. was sollen irgendwelche sonntags suv-fahrer mit lkw-fahrern zu tun haben? das sind einfach nur an den haaren herbeigezogene vergleiche um behaupten zu k\u00f6nnen dass die lkw-fahrer dumm sind, weil sie am wochende mit dem lkw zu demo fahren und dabei ein paar liter sprit verbauchen obwohl sie den lkw unter der woche (auf dem papier nur) 10 stunden am tag als arbeitsmittel nutzen.das ist doch jetzt echt l\u00e4cherlich. ist ja auch nichts anderes als wenn die bauern mit traktoren f\u00fcr milchpreise protestieren oder so."
+            }
+        ],
+        "target_user": "a"
+    },
+    {
+        "id": "chat42",
+        "name": "chat 42 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "d",
+                "text": "Application for the city council meeting: FDP wants vignette for Coburg's cyclists",
+                "text_orig": "Antrag zur Stadtratssitzung: FDP will Vignette f\u00fcr Coburgs Radler"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Quite apart from the stupid idea, \u20ac 10 a year, since the administrative effort alone is probably eating twice?",
+                "text_orig": "ganz abgesehen mal von der bescheuerten idee ansich, 10\u20ac pro jahr, da frisst doch alleine der verwaltungsaufwand wahrscheinlich das doppelte?"
+            },
+            {
+                "speaker_id": "e",
+                "text": "It doesn't matter.The main thing is that you can harass the cyclists.They should all get into cars and block the streets.Only that is freedom!",
+                "text_orig": "das ist ja egal. hauptsache man kann die radfahrer drangsalieren. die sollen alle in autos steigen und die stra\u00dfen blockieren. nur das ist freiheit!"
+            },
+            {
+                "speaker_id": "a",
+                "text": "This fucking car centering is so much pissing me up in the entire German -speaking world.I live in a (smaller) university and overall cycling is okay here, but of course there is also a lot of bad things.The most annoying, however, is how cyclists and fu\u00b4\u00dfr\u00e4gers are constantly being played against each other and the only ones have to suffer from construction sites, while drivers do not notice anything at all.#x200b; in the city centerConstruction site directly on the street.what is being done?Cycle path easy to make, cars are allowed to use the now and cyclists and pedestrians must now squeeze through ne (additionally narrowed by the construction site).And don't even get me Started on traffic light circuits.Why do I have to wait 3 (!) Auto ambuluations as a pedestrian \\*in/cyclist \\*in the wind and bet until it becomes green for me while people are allowed to drive through in their carts?",
+                "text_orig": "mich kotzt diese fucking autozentrierung im gesamten deutschen sprachraum so derma\u00dfen an. ich wohn in einer (kleineren) uni gro\u00dfstadt und insgesamt ist radfahren hier okay, aber gibt nat\u00fcrlich auch viel schlechtes. am nervigstens ist aber, wie radfahrer\\*innen und fu\u00b4\u00dfg\u00e4nger\\*innen st\u00e4ndig gegeneinander ausgespielt werden und die einzigen sind die bei baustellen leiden m\u00fcssen, w\u00e4hrend autofahrer\\*innen \u00fcberhaupt nix merken (d\u00fcrfen).#x200b;in der innenstadt gro\u00dfe baustelle direkt an der stra\u00dfe. was wird gemacht? radweg einfach zu gemacht, autos d\u00fcrfen den jetzt benutzen und radfahrer\\*innen und fu\u00dfg\u00e4nger\\*innen m\u00fcssen sich jetzt durch ne (zus\u00e4tzlich durch die baustelle verengte) quergasse quetschen. and don't even get me started on ampelschaltungen. wieso muss ich als fu\u00dfg\u00e4nger\\*in/radfahrer\\*in bei wind und wette teilweise 3 (!) auto-ampelschaltungen abwarten bis es f\u00fcr mich gr\u00fcn wird w\u00e4hrend leute in ihren karren durchfahren d\u00fcrfen?"
+            },
+            {
+                "speaker_id": "f",
+                "text": "Why do I have to wait 3 (!) Auto amplifiers as a pedestrian/cyclist*in the wind and bet until it becomes green for me while people are allowed to drive through their carts? I don't do anymore.I drive when it is safe and the drivers should be pleased that I do not need them to stop, as the car collar, which passes past you, does it in fact.You are the weaker * and * the oppressed.For me, absolutely grotesque rules are only waste that is relevant in the event of a case for the blame.",
+                "text_orig": "wieso muss ich als fu\u00dfg\u00e4nger*in/radfahrer*in bei wind und wette teilweise 3 (!) auto-ampelschaltungen abwarten bis es f\u00fcr mich gr\u00fcn wird w\u00e4hrend leute in ihren karren durchfahren d\u00fcrfen?mach ich nicht mehr. ich fahre, wenns safe ist und da sollen die autofahrer gef\u00e4lligst froh sein, dass ich sie nicht zum anhalten n\u00f6tige, wie es der autolindwurm, der bei gr\u00fcn an einem vorbeizieht, es faktisch tut. man ist halt der schw\u00e4chere *und* der unterdr\u00fcckte. absolut grotesk.verkehrsregeln sind deswegen f\u00fcr mich nur noch makulatur, die halt im falle eines falles f\u00fcr die schuldzuweisung relevant sind."
+            },
+            {
+                "speaker_id": "g",
+                "text": "I don't do it anymore.I drive when it is safe and the drivers should be pleased that I do not need them to stop, as the car collar, which passes past you, does it in fact.You are the weaker and the oppressed.Absolutely grotesque.Provided you will survive it ... And in the end you will probably be the first to be around if other road users do not adhere to the rules.Regardless of whether the car, bike or foot bus.",
+                "text_orig": "mach ich nicht mehr. ich fahre, wenns safe ist und da sollen die autofahrer gef\u00e4lligst froh sein, dass ich sie nicht zum anhalten n\u00f6tige, wie es der autolindwurm, der bei gr\u00fcn an einem vorbeizieht, es faktisch tut. man ist halt der schw\u00e4chere und der unterdr\u00fcckte. absolut grotesk.ich warte dann mal gespannt auf den post, wenn dich doch einer mit dem auto erwischt. vorausgesetzt du \u00fcberlebst es hoffentlich...und am ende bist du vermutlich der erste der rumheult, wenn sich andere verkehrsteilnehmer nicht an die regeln halten. unabh\u00e4ngig ob jetzt auto, rad oder fu\u00dfbus.verkehrsregeln sind bekanntlich nur f\u00fcr die anderen da..."
+            },
+            {
+                "speaker_id": "f",
+                "text": "I have developed such a hatred on cars that I am ok to give my life in the fight against them.Because when I die in road traffic, then probably not as a consequence that I have disregarded a rule, but because I am tameted by a driver.I mean that very seriously.Drivers from the STPO lead a law that is subject to assertiveness and in combination with the complete alienation from the outside world that uses as soon as you sit in a car, many of them lose the reference to reality and no longer understand what they are actually degradingMake if you endanger people who are not shielded in metal acids * deliberately * to enforce this supposed right.",
+                "text_orig": "ich hab einen solchen hass auf autos entwickelt, dass ich damit ok bin, mein leben im kampf gegen sie zu geben. denn wenn ich im stra\u00dfenverkehr sterbe, dann wahrscheinlich nicht als konsequenz daraus, dass ich eine regel missachtet habe, sondern weil ich von einem autofahrer ermodet werde. das meine ich ganz ernst. autofahrer leiten aus der stvo n\u00e4mlich ein durchsetzungspflichtiges recht ab und in kombination mit der v\u00f6lligen entfremdung von der au\u00dfenwelt, die einsetzt, sobald man sich in ein auto setzt, verlieren viele von ihnen den bezug zur realit\u00e4t und verstehen gar nicht mehr, was sie eigentlich grade machen, wenn sie menschen, die nicht in metallakarossen abgeschirmt sind, *absichtlich* gef\u00e4hrden, um dieses vermeintliche recht durchzusetzen."
+            },
+            {
+                "speaker_id": "b",
+                "text": "I feel that because I experience it similarly every day and the statistics also agree with you when it comes to your risk.But I don't think it is really expedient of how you deal with it.I also think as part of the STPO, there are still enough options for showing car travelers that the supposed right of the stronger is not to enforce it is not a good idea.Satisfactory for me because there are actually regular experiences of success.As a result, not sticking to the rules is more likely to do \"political damage\".Every cyclist who does not stop for pedestrians on the crosswalk stimulates me a lot.Something like that is wind in the sails of those who, with every improvement for bicycle traffic or appropriate restriction for cars, directly with \"Yes but the cyclists ...\" as stupid as this is this argument.",
+                "text_orig": "ich f\u00fchle das, weil ich es t\u00e4glich \u00e4hnlich erlebe und auch die statistiken geben dir recht, was deine gef\u00e4hrdung angeht. nur ist es denke ich nicht wirklich zielf\u00fchrend, wie du damit umgehst. ich denke auch im rahmen der stvo gibt es noch gen\u00fcgend m\u00f6glichkeiten autofahrenden zu zeigen, dass das vermeintliche recht des st\u00e4rkeren durchsetzen zu wollen, keine gute idee ist.ansonsten hilft es vielleicht auch sich in initiativen oder anderweitig politisch zu engagieren, das ist zwar anstrengend aber f\u00fcr mich befriedigend, weil es tats\u00e4chlich regelm\u00e4\u00dfig erfolgserlebnisse gibt. dadurch sich selbst nicht an regeln zu halten, richtet man eher einen \"politischen schaden\" an. jeder radfahrer, der f\u00fcr fu\u00dfg\u00e4ngern am zebrastreifen nicht h\u00e4lt, regt mich sehr auf. sowas ist wind in den segeln von denen, die bei jeder verbesserung f\u00fcr den radverkehr oder angemessenen beschr\u00e4nkung f\u00fcr kfz direkt mit \"ja aber die radfahrer...\" ankommen, so dumm diese argumentation auch ist."
+            },
+            {
+                "speaker_id": "f",
+                "text": "I have to correct it because of course I take consideration of other road users and of course I grant other road users who are given the rare right to passage from the auto infrastructure, this right. This thing is: the zebra crossing nobody would need the street when the pedestrianscould simply cross anywhere and it should.Above all, because without cars cyclists suddenly have space for a comfortable Schlenker outside.",
+                "text_orig": "da muss ich nachkorrigieren, weil ich nat\u00fcrlich r\u00fccksicht auf andere verkehrsteilnehmer nehme und nat\u00fcrlich gew\u00e4hren ich anderen verkehrsteilnehmern, die gerade von der autoinfrastruktur das seltene recht auf passage einger\u00e4umt bekommen, dieses recht.das ding ist: den zebrastreifen br\u00e4uchte niemand, wenn die fu\u00dfg\u00e4nger die stra\u00dfe einfach \u00fcberall queren k\u00f6nnten und es auch d\u00fcrften. vor allem, weil ohne autos radfahrer pl\u00f6tzlich platz f\u00fcr einen bequemen schlenker au\u00dfenrum haben."
+            }
+        ],
+        "target_user": "f"
+    },
+    {
+        "id": "chat85",
+        "name": "chat 85 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "d",
+                "text": "Infection Protection Act: Exception of mask obligation in the event of a timely vaccination no longer mandatory",
+                "text_orig": "Infektionsschutzgesetz: Ausnahme von Maskenpflicht bei zeitnaher Impfung nicht mehr zwingend"
+            },
+            {
+                "speaker_id": "e",
+                "text": "How does the rest of the world do?",
+                "text_orig": "wie macht es eigentlich der rest der welt?"
+            },
+            {
+                "speaker_id": "b",
+                "text": "Accept that Corona will not disappear and it is a senseless fight against windmills to try to move as many infections as possible because preventing it is not medium to long term anyway.",
+                "text_orig": "akzeptieren, dass corona nicht verschwinden wird und es ein sinnloser kampf gegen windm\u00fchlen ist zu versuchen, weiterhin m\u00f6glichst viele infektionen zu verschieben denn verhindern geht sowieso nicht mittel- bis langfristig."
+            },
+            {
+                "speaker_id": "a",
+                "text": "Politics mainly want the old shooters because ... main voter lol",
+                "text_orig": "die politik will haupts\u00e4chlich die alten sch\u00fctzen weil... hauptw\u00e4hler lol"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Do you care these people?",
+                "text_orig": "sind dir diese menschen egal?"
+            },
+            {
+                "speaker_id": "f",
+                "text": "Those who are old and cannot be vaccinated every 3 months is to blame. There is a vaccine, who is still dying to Corona despite multiple vaccination, this would probably also be on an ordinary flu.This has to be tolerated.",
+                "text_orig": "wer alt ist und sich nicht alle 3 monate impfen l\u00e4sst ist selbst schuld.genug impfstoff ist da, wer trotz mehrfachimpfung noch an corona verstirbt w\u00e4re dies wohl auch an einer gew\u00f6hnlichen grippe. das gilt es zu tolerieren."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Yes, just stupid that there are people the waiting, cannot be vaccinated.unbelievable?Or waiting people who are indirectly influenced by a lower number of inpatient beds.",
+                "text_orig": "ja nur bl\u00f6d das es da leute gibt die warte,sich nicht impfen lassen k\u00f6nnen. krass oder? oder warte leute die indirekt davon beeinflusst werden durch geringere anzahl von station\u00e4ren betten."
+            },
+            {
+                "speaker_id": "f",
+                "text": "Yes, just stupid that there are people the waiting, cannot be vaccinated.Crass or? How big is the proportion of the total population?If I have such a weak immune system, after 2 years of pandemic I would invest \u20ac 150 in a full facial mask with activated carbon filters.The money would be worth my life to me.is probably also safer than to hope that my fellow human beings have been put on their surgical mask that has been washed up 7 times. Edit: Or waiting people who are indirectly influenced by a lower number of inpatient beds.as well as the payment of the nursing staff.Maybe the beds will be more.",
+                "text_orig": "ja nur bl\u00f6d das es da leute gibt die warte,sich nicht impfen lassen k\u00f6nnen. krass oder?wie gro\u00df ist der anteil an der gesamtbev\u00f6lkerung? wenn ich ein derma\u00dfen schwaches immunsystem habe, w\u00fcrde ich nach 2 jahren pandemie 150\u20ac in eine vollgesichtsmaske mit aktivkohlefilter investieren. das geld w\u00e4re mir mein leben wert. ist vermutlich auch sicherer als zu hoffen, dass meine mitmenschen ihre op maske die schon 7 mal mitgewaschen wurde richtig aufsetzen.edit:oder warte leute die indirekt davon beeinflusst werden durch geringere anzahl von station\u00e4ren betten.frag mal den gesundheitsminister was er bisher f\u00fcr die arbeitsbedingungen sowie die bezahlung der pflegekr\u00e4fte gemacht hat. vielleicht werden die betten dann auch wieder mehr."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Just shit that you can't walk around with this full face mask. And before you come, no, I am not for FFP2 mask obligation, since they are also properly supported by a time limit and is never carried properly anyway.A surgical mask is correctly worn.Why does it always have to be a number for you.Does it make a difference for you whether you save 10 or 1000 people?I have the chance to live my life as normal, only I put on a mask in public buildings.With this I help to save people and relieve hospitals.What is it itchy for me how many people I save?Sparing a illness is already enough?Where really where do you become limited by these shreds?",
+                "text_orig": "schei\u00dfe nur das man mit dieser vollgesichtsmaske nicht so lang rumlaufen darf.und bevor du kommst, nein ich bin nicht f\u00fcr ffp2 maskenpflicht, da diese richtig getragen ebenfalls einem zeitlimit untersteht und sowieso nie richtig getragen wird. da ist eine op-maske richtig getragen viel mehr wert. wieso muss es eigentlich immer f\u00fcr dich ne zahl sein. macht es f\u00fcr euch ne unterschied ob ihr 10 oder 1000 menschen rettet? ich habe die chance mein leben ganz normal weiter zu leben, nur ziehe ich in \u00f6ffentlichen geb\u00e4uden eine maske an. damit helfe ich dabei menschen zu retten und krankenh\u00e4user zu entlasten. was juckts mich wie viele menschen ich dadurch rette? ihm ne krankheit zu ersparen ist doch schon genug? wo wirklich wo wirst du denn eingeschr\u00e4nkt durch diese fetzen stoff?"
+            },
+            {
+                "speaker_id": "g",
+                "text": "It actually makes a difference for me whether 10 or 1000 people are saved in the evaluation of proportionality.I don't find that reprehensible either.",
+                "text_orig": "es macht f\u00fcr mich tats\u00e4chlich einen unterschied, ob 10 oder 1000 menschen gerettet werden in der bewertung der verh\u00e4ltnism\u00e4\u00dfigkeit. ich empfinde das auch nicht als verwerflich."
+            },
+            {
+                "speaker_id": "c",
+                "text": "You have addressed it proportionality. So why do I ask how much human life if I should only hold a fabric in front of my mouth if I go to public buildings. Where am I being relatively restricted that I risk a human life?",
+                "text_orig": "du hast es angesprochen verh\u00e4ltnism\u00e4\u00dfigkeit.warum frag ich also nach wie viel menschenleben wenn ich nur ne stoff vor mein mund halten soll wenn ich in \u00f6ffentliche geb\u00e4ude gehe.wo werde ich denn da verh\u00e4ltnism\u00e4\u00dfig eingeschr\u00e4nkt, das ich ein menschenlebe riskiere?"
+            }
+        ],
+        "target_user": "c"
+    },
+    {
+        "id": "chat93",
+        "name": "chat 93 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "a",
+                "text": "Spotify's problem with Joe Rogan",
+                "text_orig": "Spotifys Problem mit Joe Rogan"
+            },
+            {
+                "speaker_id": "d",
+                "text": "I really don't understand the excitement.I always saw his \"show\" as a talk show and not as a scientific journal or even news.I think he himself also says that he is actually only about leading interesting conversations.Now I find a debate about possible untruths or false interpretations somehow strongly wanted.At Arabella or Jerry Springer or firm and fluffy, nobody stimulates that the truth content is at least questionable.",
+                "text_orig": "ich verstehe die aufregung echt nicht. ich habe seine \"show\" immer als talk-show und nicht als wissenschaftliches journal oder gar nachrichten verstanden. ich glaube er selber sagt auch das es ihm eigentlich nur darum geht interessante konversationen zu f\u00fchren. jetzt eine debatte f\u00fchren zu wollen \u00fcber eventuelle unwahrheiten oder falschinterpretationen finde ich doch irgendwie stark gewollt. bei arabella oder jerry springer oder fest und flauschig regt/e sich ja auch niemand auf das der wahrheitsgehalt doch zumindest fraglich ist/war."
+            },
+            {
+                "speaker_id": "c",
+                "text": "When was the truth content even questionable at solid and fluffy?Did I miss something?Please help me, Brudi.(Note: since Corona I have heard myself through all episodes almost in a row ...)",
+                "text_orig": "wann war der wahrheitsgehalt bei fest und flauschig jemals fraglich? habe ich was verpasst? bitte hilf mir, brudi. (anm.: seit corona habe ich mich durch alle folgen fast am st\u00fcck geh\u00f6rt\u2026)"
+            },
+            {
+                "speaker_id": "d",
+                "text": "B\u00f6hmermann secretly builds Lego and giving away kindergartens?B\u00f6hmermann drives a red Porsche Cayenne?B\u00f6hmermann and this whole Ethiopia History? Schulz is currently in a monastery in South Tyrol?Now are just four things that come to mind.",
+                "text_orig": "b\u00f6hmermann baut heimlich lego und verschenkts an kinderg\u00e4rten? b\u00f6hmermann f\u00e4hrt nen roten porsche cayenne? b\u00f6hmermann und diese ganze \u00e4thiopien geschichte?schulz ist momentan in nem kloster in s\u00fcdtirol? sind jetzt einfach mal vier sachen die mir gerade einfallen."
+            },
+            {
+                "speaker_id": "b",
+                "text": "So I think you can distinguish between harmless and obvious stupid and inviting people like Alex Jones ...",
+                "text_orig": "also ich finde man kann durchaus zwischen harmloser und offensichtlicher bl\u00f6delei und dem einladen von leuten wie alex jones unterscheiden..."
+            },
+            {
+                "speaker_id": "d",
+                "text": "You are aware that Alex Jones is a very bad example, right?Someone who refers to a \"..kind of retarded\" in front of an audience of millions and wants to travel to the edge of the earth with a flat -shaped one on a boat to convince him of the opposite, but it is really not a yardstick if you are about the difference between stupid and seriouswant to talk.",
+                "text_orig": "dir ist bewusst dass gerade alex jones ein sehr schlechtes beispiel ist oder? jemanden der sich vor einem millionenpublikum selber als \"..kind of retarded\" bezeichnet und mit nem flacherdler auf nem boot zum rande der erde reisen will um ihn vom gegenteil zu \u00fcberzeugen kann doch wirklich kein ma\u00dfstab sein wenn man \u00fcber den unterschied zwischen bl\u00f6delei und ernst reden will."
+            },
+            {
+                "speaker_id": "b",
+                "text": "But the guy has enough fans who apparently take his shit for bare coin and eagerly buy all the esochiss from his shop.The fact that he now takes the whole thing on the shovel that he also earns money with these drottles also testifies to a nasty cynicism.",
+                "text_orig": "der typ hat aber genug fans, die seine schei\u00dfe offenbar f\u00fcr bare m\u00fcnze nehmen und den ganzen esoschei\u00df aus seinem shop begierig kaufen. das er das ganzen jetzt selbst auf die schippe nimmt, dass er mit diesen trotteln auch noch geld verdient zeugt vor allem von einem ekligen zynismus."
+            },
+            {
+                "speaker_id": "d",
+                "text": "But the guy has enough fans who apparently take his shit for bare coin and eagerly buy all the esochiss from his shop.There are also enough idiots buying Shungite or any crystals, dream catchers, homeopathy chosen or the most diverse religions as true and correctly accept and much more.There are generally many people who want to believe in all kinds of crap.Now the responsibility for the naivety of these people to want to assign someone else to be right.",
+                "text_orig": "der typ hat aber genug fans, die seine schei\u00dfe offenbar f\u00fcr bare m\u00fcnze nehmen und den ganzen esoschei\u00df aus seinem shop begierig kaufen. es gibt auch genug idioten die shungite kaufen oder irgendwelche kristalle, traumf\u00e4nger, hom\u00f6opathie ged\u00f6ns oder diverseste religionen als wahr und richtig hinnehmen und noch viel mehr. es gibt generell viele leute die an allen m\u00f6glichen mist glauben wollen. jetzt die verantwortung f\u00fcr die naivit\u00e4t dieser menschen jemand andrem zuweisen zu wollen kann nicht richtig sein."
+            }
+        ],
+        "target_user": "d"
+    },
+    {
+        "id": "chat122",
+        "name": "chat 122 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "Pandemie: New Lockdown?Montgomery wants this as an option for the winter",
+                "text_orig": "Pandemie: Neuer Lockdown? Montgomery will das als Option f\u00fcr den Winter"
+            },
+            {
+                "speaker_id": "a",
+                "text": "With the absolute pandemic experts Buschmann, Lindner and Kubicki as a government manager, this will definitely not be an option",
+                "text_orig": "mit den absoluten pandemieexperten buschmann, lindner und kubicki jetzt als regierungsverantwortliche wird das bestimmt keine option sein"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Fortunately. (Even if Kubicki is absolutely contrary to me)",
+                "text_orig": "gl\u00fccklicherweise.(auch wenn mir kubicki absolut zuwider ist)"
+            },
+            {
+                "speaker_id": "a",
+                "text": "Yes lockdowns were really annoying ... The step plan from C.L would have been much better, which had only been provided for from a 200 incidence of incidence at all at a time when almost nobody was vaccinated yep",
+                "text_orig": "ja lockdowns waren echt nervig... viel besser w\u00e4re der stufenplan von c.l gewesen, der erst ab einer 200er inzidenz \u00fcberhaupt einschr\u00e4nkungen vorgesehen hatte in einer zeit in der fast niemand geimpft war yep"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Just stupid that the situation is absolutely not to be compared with the pandemic at the beginning of the pandemic.",
+                "text_orig": "bl\u00f6d nur, dass die situation jetzt halt absolut nicht mit der zu beginn der pandemie zu vergleichen ist."
+            },
+            {
+                "speaker_id": "a",
+                "text": "voice.It's just stupid that the FDP is chosen because of its anti -science course (whether pandemic or climate change) and therefore has no other options than it continues to continue, no matter what the situation will be.",
+                "text_orig": "stimm. bl\u00f6d nur, dass die fdp wegen ihres wissenschaftsfeindlichen kurses ( ob pandemie oder klimawandel) gew\u00e4hlt wird und deswegen gar keine anderen optionen hat als diesen weiter zu fahren, egal wie die situation sein wird."
+            }
+        ],
+        "target_user": "a"
+    },
+    {
+        "id": "chat201",
+        "name": "chat 201 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "Living without a car: comes time, comes bike",
+                "text_orig": "Leben ohne Auto: Kommt Zeit, kommt Rad"
+            },
+            {
+                "speaker_id": "a",
+                "text": "Without a car it doesn't work in the country, that's right.Therefore, e-cars for longer distances (10km or something) and the rest with a bike. With the car in the city, however, it also works, that is more agile than any public transport.",
+                "text_orig": "ohne auto klappt auf dem land nicht, das ist richtig. daher e-autos f\u00fcr l\u00e4ngere strecken (10km oder so) und der rest mit fahrrad.mit auto in der stadt klappt aber auch einfach net, das ist qu\u00e4lender als jeder \u00f6pnv je sein k\u00f6nnte."
+            },
+            {
+                "speaker_id": "b",
+                "text": "Without a car it doesn't work in the country, that's right.Well, if you read the original linked article, you can't say that so fully.",
+                "text_orig": "ohne auto klappt auf dem land nicht, das ist richtig. nun, wenn man den original verlinkten artikel liest, kann man das nicht so uneingeschr\u00e4nkt behaupten."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Without a car it does not work in the country - except your definition of works \"is already possible but massive waste of time and in an emergency you are fucked\". Besser?",
+                "text_orig": "ohne auto klappt es auf dem land nicht - au\u00dfer deine definition von klappt ist \"ist schon m\u00f6glich aber massive zeitverschwendung und im notfall bist du gefickt\".besser?"
+            },
+            {
+                "speaker_id": "d",
+                "text": "Life in the country is always a massive waste of time if you want to framed it.Just like that with emergencies",
+                "text_orig": "leben auf dem land ist immer massive zeitverschwendung wenn du es so framen willst. genauso das mit notf\u00e4llen"
+            },
+            {
+                "speaker_id": "c",
+                "text": "I personally don't find it.The regular life with Home Office and shopping in the next village by bike is still okay, but in emergencies like child injured in kindergarten is an hour by bike vs. 10 minutes by car.",
+                "text_orig": "finde ich pers\u00f6nlich nicht. das regul\u00e4re leben mit home office und einkaufen im n\u00e4chsten dorf mit fahrrad ist ja noch okay, aber bei notf\u00e4llen wie kind verletzt sich im kindergarten ist ne stunde mit dem rad vs. 10 minuten mit dem auto."
+            },
+            {
+                "speaker_id": "d",
+                "text": "It is about emergencies, the question is whether you are faster than the ambulance (or actually as the RTW) of special rights and and right away.15 minutes as in the article is now more at the bottom of the scale, but the price for country life.",
+                "text_orig": "es geht um notf\u00e4lle, da ist die frage ob du ohne sonderrechte und wegerechte schneller bist als der krankenwagen (bzw eigentlich als der rtw) der sonderrechte und und wegerechte hat. 15 minuten wie im artikel ist jetzt eher am unteren ende der skala, aber halt der preis f\u00fcrs landleben.sobald du im n\u00e4chsten dorf arbeiten oder einkaufen musst verschwendest du zeit."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Because some parents give a fuck on special rights if there is something with the child ...",
+                "text_orig": "weil irgendwelche eltern einen fuck auf sonderrechte geben wenn etwas mit dem kind ist..."
+            },
+            {
+                "speaker_id": "d",
+                "text": "How much faster than an RTW are you on average? And how safe drives in such a situation.Can you exclude transport damage?",
+                "text_orig": "wie viel schneller als ein rtw bist du denn so im schnitt?und wie sicher f\u00e4hrst in so einer situation. kannst du transportsch\u00e4den ausschlie\u00dfen?"
+            }
+        ],
+        "target_user": "d"
+    },
+    {
+        "id": "chat45",
+        "name": "chat 45 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "c",
+                "text": "\"Win better earners\": Economic method: Lindner's relief plans come at the wrong time",
+                "text_orig": "\u201eBesserverdienende gewinnen\u201c: Wirtschaftsweise: Lindners Entlastungspl\u00e4ne kommen zur falschen Zeit"
+            },
+            {
+                "speaker_id": "b",
+                "text": "It is strange that the government only wants to discuss the revenue side.Never on the output side.Germany benefits massively on inflation through VAT.At the same time, like anyway, the highest taxes already have.Where is all the money, when bridges, schools and what do I know at the same time.",
+                "text_orig": "schon seltsam, dass die regierung immer nur \u00fcber die einnahmenseite diskutieren will. nie \u00fcber die ausgabenseite. deutschland profitiert \u00fcber die mwst massiv an der inflation. zugleich haben wie sowieso schon die h\u00f6chsten abgaben. wo bleibt denn das ganze geld, wenn zeitgleich br\u00fccken, schulen und was wei\u00df ich vermodern."
+            },
+            {
+                "speaker_id": "a",
+                "text": "\u20ac 303,000 salary for radio intenders, Ber-Airport, Stuttgart 21, Cum-Ex ...",
+                "text_orig": "303.000\u20ac gehalt f\u00fcr rundfunk-intendantinnen, ber-flughafen, stuttgart 21, cum-ex..."
+            },
+            {
+                "speaker_id": "d",
+                "text": "Well, the salary of the radio directors is not paid for by the tax revenue but runs through the GEZ income.The rest was also relatively expensive",
+                "text_orig": "naja das gehalt der rundfunkintendantin wird nicht von den steuereinnahmen bezahlt sondern l\u00e4uft \u00fcber die gez einnahmen. der rest ist aber auch relativ teuer gewesen"
+            },
+            {
+                "speaker_id": "a",
+                "text": "There was talk of \"taxes\", not just taxes.",
+                "text_orig": "es war die rede von \"abgaben\", nicht nur steuern."
+            },
+            {
+                "speaker_id": "d",
+                "text": "Ah right.I have to have overlooked.I think I only limited this to taxes because it was about expenses that are paid for from the normal federal budget.",
+                "text_orig": "ah stimmt. muss ich \u00fcberlesen haben. ich hab das glaube ich nur auf steuern beschr\u00e4nkt weil es um ausgaben ging, die aus dem normalen bundeshaushalt bezahlt werden."
+            },
+            {
+                "speaker_id": "a",
+                "text": "What would the comment have contributed to the discussion?To be honest, this annoys me in Reddit that someone has to shit constantly and have to ride around in individual words and formulations, even if it is completely irrelevant - and then it is often not even true.",
+                "text_orig": "was h\u00e4tte der kommentar denn \u00fcberhaupt produktiv zur diskussion beigetragen? ehrlich gesagt nervt mich das an reddit tierisch, dass st\u00e4ndig jemand klugschei\u00dfen und an einzelnen w\u00f6rter und formulierungen rumkritteln muss, selbst wenn es v\u00f6llig irrelevant ist \u2013 und dann stimmt es oft noch nicht mal."
+            }
+        ],
+        "target_user": "a"
+    },
+    {
+        "id": "chat48",
+        "name": "chat 48 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "Ukraine: According to media reports, Federal Government wants to enable delivery of \"Pard\" tanks",
+                "text_orig": "Ukraine: Bundesregierung will laut Medienberichten Lieferung von \"Gepard\"-Panzern erm\u00f6glichen"
+            },
+            {
+                "speaker_id": "c",
+                "text": "Now guess you'd better say just yes to all the trash that should go to Ukraine.is certainly the best too.Marder and cheetah without ammunition?let's go.Leopard that are hopelessly inferior in the tank fight.Next stage: Germany gets Flak because the stuff doesn't tear anything.",
+                "text_orig": "sch\u00e4tze jetzt sagen sie lieber einfach ja zu all dem trash der in die ukraine soll. ist sicher auch das beste. marder und gepard ohne munition? ab geht's. leopard die im panzerkampf hoffnungslos unterlegen sind, los. n\u00e4chste stufe: deutschland bekommt flak, weil das zeug nichts rei\u00dft."
+            },
+            {
+                "speaker_id": "a",
+                "text": "I say that the Ukraine prefers to have no tanks",
+                "text_orig": "ich behaupte mal das ist der ukraine lieber als keine panzer zu haben"
+            },
+            {
+                "speaker_id": "c",
+                "text": "What brings you a tank that cannot win a tank fight?Incidentally, the Leo1 is not more armored than an IFV",
+                "text_orig": "was bringt dir ein panzer, der keinen panzerkampf gewinnen kann? \u00fcbrigens ist der leo1 nicht schwerer gepanzert als ein ifv"
+            },
+            {
+                "speaker_id": "a",
+                "text": "For example, it could also be used in non -tank fights.And do you really think the shit has Russia is better?lol",
+                "text_orig": "man k\u00f6nnte ihn zum beispiel auch in nicht panzerk\u00e4mpfen einsetzen. und glaubst du echt der scheiss den russland hat ist besser? lol"
+            },
+            {
+                "speaker_id": "c",
+                "text": "And do you really think the shit has Russia is better?Lolpanzer?Clear yes.You obviously have little idea about the vehicles.For example, it could also be used in non -tank fights.Why then Leos and no IFV that were built for this role? Edit: instead of giving down, it is better to discuss and explain why the old Leopard1 should be equivalent to a modernized T-72 or T-90.",
+                "text_orig": "und glaubst du echt der scheiss den russland hat ist besser? lolpanzer? klares ja. du hast offenbar wenig ahnung von den fahrzeugen. man k\u00f6nnte ihn zum beispiel auch in nicht panzerk\u00e4mpfen einsetzen. wieso dann leos und keine ifv die f\u00fcr diese rolle gebaut worden sind?edit: statt runterzuvoten, diskutiert doch lieber und erkl\u00e4rt wieso der alte leopard1 einem modernisierten t-72 oder t-90 gleichgestellt sein soll."
+            }
+        ],
+        "target_user": "c"
+    },
+    {
+        "id": "chat197",
+        "name": "chat 197 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "b",
+                "text": "I hit 2 animals in the driving test today.",
+                "text_orig": "Ich habe heute 2 Tiere in der Fahrpr\u00fcfung angefahren.\ud83d\ude2d"
+            },
+            {
+                "speaker_id": "c",
+                "text": "It is also said that croissants are the pigeons of the soil. In serious: pigeon - shit on it.If that happens again, you are most likely to think about it that you hopefully have no scratches on the car. Horns - the critters are very agile and absolute escape animals.It is a miracle that this did not run away when you were even meter away.In case of doubt, this was already sick and would not have lasted long anyway.I know not a good consolation.When someone who worked in the tier emergency: croissants are so small and you will not find a veterinarian who treats this.They would have taken it with them, put it in a cage, feed in and wait for food.And if that was so injured anyway, it would not have been inevitable, it would have been inevitable anyway.",
+                "text_orig": "man sagt ja auch, h\u00f6rnchen seien die tauben des bodens.im ernst: taube - drauf geschissen. wenn dir das nochmal passiert machst du dir am ehesten gedanken drum, dass du hoffentlich keine kratzer am auto hast.h\u00f6rnchen - die viecher sind sehr agil und absolute fluchttiere. dass das nicht abgehauen ist als du mim auto noch meter entfernst warst ist ein wunder. im zweifel war das schon entsprechend krank und h\u00e4tte eh nicht lange durchgehalten. ich wei\u00df, kein guter trost. als jemand der in der tiernotrettung gearbeitet hat: h\u00f6rnchen sind so klein und du findest keinen tierarzt der das behandelt. die h\u00e4tten das mitgenommen, in einen k\u00e4fig gesetzt, futter rein und abgewartet. und wenn das eh so verletzt war dass es nicht durchh\u00e4lt, w\u00e4re das sowieso unvermeidlich gewesen."
+            },
+            {
+                "speaker_id": "a",
+                "text": "Deaf - shit on it.why?Because there are many of them?You can already have a little more respect for life.",
+                "text_orig": "taube - drauf geschissen. warum? weil es viele davon gibt? bisschen mehr respekt vor dem leben darf man schon haben.gut, dass du bei der tiernotrerrung die vergangenheitsform verwendest."
+            },
+            {
+                "speaker_id": "c",
+                "text": "Have I now somehow startled a local pigeon breeding association or where do you all come from?And then as horny accounts that are almost never active here in the sub, troll back on your pigeon breeder discord.To judge from which you obviously have no idea is to be too insulting for me to get into further discussions.",
+                "text_orig": "hab ich jetzt hier irgendwie nen lokalen taubenzuchtverein aufgeschreckt oder wo kommt ihr spontan alle her? und dann noch so geile accounts die hier quasi nie im sub aktiv sind, trollt euch zur\u00fcck auf euer taubenz\u00fcchter-discord.wird zeit neben dem spa\u00dfisub /r/pferdesindkacke noch ein unironisches /r/taubensindkacke zu gr\u00fcnden.und dann abwertend \u00fcber meine jahrelange arbeit zu urteilen von der du offensichtlich keine ahnung hast ist mir ehrlich gesagt zu beleidigend als dass ich mich auf weitere diskussionen einlasse."
+            },
+            {
+                "speaker_id": "a",
+                "text": "Have I now somehow startled a local pigeon breeding association or where do you all come from?And then so horny accounts that are almost never active in the sub, troll back on your pigeon breeder discord.lol, Brudi, what kind of paranoid conspiracy theory is that?I can't speak for the others, I'm just on the road here and for a long time.After all, the thread is on the homepage and I also have a dislike against the very unappealing, derogatory way you talk about animals.So it is probably the same. And that in the same breath you ironically call your job that goes diametrically against the nature of the statements is just an own goal.",
+                "text_orig": "hab ich jetzt hier irgendwie nen lokalen taubenzuchtverein aufgeschreckt oder wo kommt ihr spontan alle her? und dann noch so geile accounts die hier quasi nie im sub aktiv sind, trollt euch zur\u00fcck auf euer taubenz\u00fcchter-discord.lol, brudi, was f\u00fcr eine paranoide verschw\u00f6rungstheorie ist das denn? ich kann nicht f\u00fcr die anderen sprechen, ich bin einfach so hier unterwegs und das auch schon sehr lange. der faden ist immerhin auf der startseite und ich hab auch ganz ohne taubendiscord eine abneigung gegen die sehr unsympathisch wirkende, abf\u00e4llige art wie du \u00fcber tiere redest. so geht's den anderen vermutlich auch.und dass du im selben atemzug ironischerweise deinen job nennst der diametral gegen die natur der aussagen geht, ist halt ein eigentor."
+            },
+            {
+                "speaker_id": "c",
+                "text": "The very unappealing, derogatory way you talk about animals. Not about animals. Only over pigeons. Because pigeons are annoying, shit everything and can only be used as a feed animal for meaningful animals. Since there has been new fittings as emails, the only half -sensible \"purpose\" of these shapely chickens has also been history. they can't even sing. Just coo. If there are no pigeons in the world tomorrow, the world is a better one. And if there are still a few remaining pigeons tomorrow, I will hunt them personally. In the SUV. Hopefully he won't get a scratch. And woe there are so hyper-woke people around the corner with \\ #taubenlivesmatter and their \"All birds are beautiful\" hippies. Should you sing something nice for the poor poor pigeons in the pigeon sky. But at least the whine would be even more beautiful to listen to than the stupid cubes of the gray kackViewers. Lower with pigeons! Heil Spatz! What else forgot? Oh yes:* prefer a blind in bed than a pigeon on the roof* belts - pigeons while driving* pigeon - if you order sparrows from wish",
+                "text_orig": "die sehr unsympathisch wirkende, abf\u00e4llige art wie du \u00fcber tiere redest.nicht \u00fcber tiere. nur \u00fcber tauben. weil tauben nerven, alles vollschei\u00dfen und h\u00f6chstens als futtertier f\u00fcr sinnvolle tiere zu gebrauchen sind. seit es so neumodischen schei\u00df wie emails gibt, ist der einzige halbsinnvolle \"zweck\" dieser unf\u00f6rmigen h\u00fchner auch geschichte. nicht mal gescheit singen k\u00f6nnen die. nur gurren. wenn es morgen keine tauben mehr auf der welt gibt ist die welt eine bessere. und wenn morgen noch einige wenige resttauben \u00fcbrig sind, werde ich sie pers\u00f6nlich jagen. im suv. hoffentlich bekommt der keine schrammen. und wehe es kommen wieder so hyper-woke leute um die ecke mit \\#taubenlivesmatter und ihrem \"alle v\u00f6gel sind sch\u00f6n\"-hippieschei\u00df. sollen sie doch was nettes singen f\u00fcr die armen armen tauben im taubenhimmel. aber immerhin w\u00e4re das gejaule noch sch\u00f6ner anzuh\u00f6ren als das d\u00e4mliche gurren der grauen kackviecher.nieder mit tauben! heil spatz!noch was vergessen? ach ja:* lieber ne blinde im bett als ne taube aufm dach* gurten sich an - tauben beim autofahren* tauben - wenn man spatzen bei wish bestellt"
+            },
+            {
+                "speaker_id": "a",
+                "text": "You are triggered.",
+                "text_orig": "du bist ausgel\u00f6st."
+            }
+        ],
+        "target_user": "a"
+    }
+]

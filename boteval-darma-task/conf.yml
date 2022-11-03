@@ -2,7 +2,7 @@ chat_dir: data
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: chat_topics.json
+  topics_file: german_chat_topics.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
@@ -21,7 +21,8 @@ chatbot:
         args:
           api_url: http://localhost:6062/nllb/translate
           src_lang: eng_Latn
-          tgt_lang: fra_Latn
+          tgt_lang: deu_Latn
+          # tgt_lang: fra_Latn
   
 limits:
   max_threads_per_user: 10
@@ -35,7 +36,7 @@ onboarding:
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
-    know_french: I can read and write fluently in French and I agree to write in French in this task.
+    know_french: I can read and write fluently in German and I agree to write in German in this task.
 
 ratings:
   - question: How Coherent was the conversation?
@@ -66,9 +67,9 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot in French'
+    Title: 'Evaluate a moderator chatbot in German [DEV]'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it in French given a French conversation. You MUST be able to read and write French fluently!
+    Description: Evaluate a moderator chatbot after conversing with it in German given a German conversation. You MUST be able to read and write German fluently!
     QualificationRequirements: 
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
@@ -88,7 +89,7 @@ mturk:
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'dev.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
