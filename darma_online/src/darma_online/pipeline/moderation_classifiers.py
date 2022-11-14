@@ -28,9 +28,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 		self.toxicity_threshold = 0.5
 		self.logger = logger
-		self.toxicity_endpoint = "http://effectmed01.isi.edu:5001/"
-		self.tox_classifier_behavtypes = "http://effectmed01.isi.edu:5001/v1/toxicity/types"
-		self.tox_classifier_endpoint = "http://effectmed01.isi.edu:5001/v1/toxicity/"
+		self.moderator_endpoint = "http://127.0.0.1:5050"
 
 	# self.behav_types = self.get_behavTypes(self.tox_classifier_behavtypes, self.toxicity_endpoint)
 
@@ -52,8 +50,11 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		}
 
 		try:
-			response = self.client.comments().analyze(body=analyze_request).execute()
-			needs_mod, toxicity_score, behav_type = self.map_behavtypes(response)
+			perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
+			needs_mod, toxicity_score, behav_type = self.map_behavtypes(perspec_response)
+			moderator_response = self.get_moderator_response(comment)
+			final_decision = self.intersect_moderation(needs_mod, moderator_response)
+			return final_decision, toxicity_score, behav_type
 
 		except Exception as e:
 
@@ -95,12 +96,11 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 		return needs_mod, score, behav_type
 
-	def get_behavTypes(self, behavtype_endpoint, endpoint):
-		endpoint_health = get(endpoint).status_code
-		if endpoint_health == 200:
-			behav_types = get(behavtype_endpoint).json()
-			self.logger.info(f"Current tracking Toxicity Behaviour types: {behav_types}")
-			return behav_types
+	def get_moderator_response(self, comment):
+		request = { "1": { "comment" : comment } }
+		resp = post(self.moderator_endpoint, json=request)
+		if resp.status_code == 200:
+			return resp.json()["0"]["score"]
 		else:
 			self.logger.info(f"Endpoint {endpoint} is not healthy. Returning status code {endpoint_health}.")
 			return {}
