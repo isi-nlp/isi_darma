@@ -83,7 +83,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 					}
 				}
 
-		self.logger.info(f"Toxicity scores after mapping: {mapping}")
+		self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
 
 		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
 			needs_mod = True
@@ -92,7 +92,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
 
 		else:
-			self.logger.info(f'Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
+			self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
 			needs_mod, score, behav_type = False, 0.0, ""
 
 		return needs_mod, score, behav_type
