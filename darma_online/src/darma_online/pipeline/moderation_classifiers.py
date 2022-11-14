@@ -123,5 +123,8 @@ class PerspectiveAPIModerator(ModerationClassifier):
         else:
             row = [comment, perspec_score, moderator_score]
             self.intersection_df.loc[len(self.intersection_df)] = row
+            # Dump intersection scores to csv and reload
+            self.intersection_df.to_csv(f"{self.csv_path}/intersection_scores.csv", index=False)
+            self.intersection_df = pd.read_csv(f"{self.csv_path}/intersection_scores.csv", header=0)
             self.logger.info(f"Moderator = {moderator_score} and Perspective = {perspec_score}, DISAGREE about moderation. Data saved to {self.csv_path}/intersection_scores.csv")
             return False
