@@ -2,17 +2,20 @@ from typing import List
 
 from requests import post
 from spacy.lang.en import English
+from spacy.lang.fr import French
 
 class Translator:
 
     def __init__(self, logger):
         self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
-        self.sentencizer = English().add_pipe('sentencizer')
+        # self.eng_sentencizer = English().add_pipe('sentencizer')
+        self.french_sentencizer = French().add_pipe('sentencizer')
+        self.logger.info('French Sentencizers initialized.')
 
     def split_sentences(self, text:str) -> List[str]:
-        split_text = [x.text for x in self.sentencizer(text).sents]
-        self.logger.debug(f'Split text into sentences: {split_text}')
+        split_text = [x.text for x in self.french_sentencizer(text).sents]
+        self.logger.debug(f'Split french text into sentences: {split_text}')
         return split_text[:80] if len(split_text) > 80 else split_text
 
     def rtg(self, comment_str: str) -> str:
