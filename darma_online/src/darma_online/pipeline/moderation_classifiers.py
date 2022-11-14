@@ -98,8 +98,8 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		return needs_mod, score, behav_type
 
 	def get_moderator_response(self, comment):
-		request = { "1": { "comment" : comment } }
-		resp = post(self.moderator_endpoint, json=request)
+		request_data = { "0": { "comment" : comment } }
+		resp = post(self.moderator_endpoint, json=request_data)
 		if resp.status_code == 200:
 			self.logger.info(f"Moderator response: {resp.json()}")
 			return resp.json()["0"]["score"]
