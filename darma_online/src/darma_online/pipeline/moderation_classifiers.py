@@ -32,7 +32,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
         self.toxicity_threshold = 0.5
         self.logger = logger
         self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
-        self.csv_path = "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data"
+        self.csv_path = "/isi_darma/isi_darma/darma_online/src/darma_online/data"
 
         # Data collection for intersection scores
         if os.path.exists(f"{self.csv_path}/intersection_scores.csv"):
