@@ -1,6 +1,6 @@
 import requests
 
-MODERATOR_ENDPOINT = "http://127.0.0.1:5050"
+MODERATOR_ENDPOINT = "http://128.9.37.116:5050/moderation-prediction-classifier"
 
 def get_moderator_response(comment):
     response = requests.post(MODERATOR_ENDPOINT, data=comment)

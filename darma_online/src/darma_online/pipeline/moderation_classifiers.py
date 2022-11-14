@@ -28,7 +28,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 		self.toxicity_threshold = 0.5
 		self.logger = logger
-		self.moderator_endpoint = "http://127.0.0.1:5050"
+		self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
 
 	# self.behav_types = self.get_behavTypes(self.tox_classifier_behavtypes, self.toxicity_endpoint)
 
