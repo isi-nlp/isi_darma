@@ -6,3 +6,4 @@ requests==2.26.0
 setuptools
 wheel
 spacy
+pandas

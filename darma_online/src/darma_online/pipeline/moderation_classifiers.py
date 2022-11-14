@@ -27,11 +27,17 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			static_discovery=False,
 		)
 
-		self.toxicity_threshold = 0.5
-		self.logger = logger
-		self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
+        self.toxicity_threshold = 0.5
+        self.logger = logger
+        self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
+        self.csv_path = "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data"
 
-	# self.behav_types = self.get_behavTypes(self.tox_classifier_behavtypes, self.toxicity_endpoint)
+        # Data collection for intersection scores
+        if os.path.exists(f"{self.csv_path}/intersection_scores.csv"):
+            self.intersection_df = pd.read_csv(f"{self.csv_path}/intersection_scores.csv", header=0)
+        else:
+            columns = ['comment', 'perspective_score', 'moderator_score']
+            self.intersection_df = pd.DataFrame(columns=columns)
 
 	def needs_moderation(self, toxicity) -> bool:
 		return toxicity >= self.toxicity_threshold
@@ -50,12 +56,13 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			}
 		}
 
-		try:
-			perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
-			needs_mod, toxicity_score, behav_type = self.map_behavtypes(perspec_response)
-			moderator_response = self.get_moderator_response(comment)
-			final_decision = self.intersect_moderation(needs_mod, moderator_response)
-			return final_decision, toxicity_score, behav_type
+        try:
+            perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
+            # TODO: Deprecate 'needs_mod' since we now use 'final_decision'
+            needs_mod, perspec_score, behav_type = self.map_behavtypes(perspec_response)
+            moderator_score = self.get_moderator_response(comment)
+            final_decision = self.intersect_moderation(perspec_score, moderator_score, comment)
+            return final_decision, perspec_score, behav_type
 
 		except Exception as e:
 
@@ -107,11 +114,12 @@ class PerspectiveAPIModerator(ModerationClassifier):
 			self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
 			return resp.status_code
 
-	def intersect_moderation(self, perspec_decision, moderator_score):
-		moderator_decision = self.needs_moderation(moderator_score)
-		if perspec_decision and moderator_decision:
-			self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
-			return True
-		else:
-			self.logger.info(f"Moderator = {moderator_decision} and Perspective API = {perspec_decision}, DISAGREE about moderation.")
-			return False
+    def intersect_moderation(self, perspec_score, moderator_score, comment):
+        if self.needs_moderation(perspec_score) and self.needs_moderation(moderator_score):
+            self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
+            return True
+        else:
+            row = [comment, perspec_score, moderator_score]
+            self.intersection_df.loc[len(self.intersection_df)] = row
+            self.logger.info(f"Moderator = {moderator_score} and Perspective = {perspec_score}, DISAGREE about moderation. Data saved to {self.csv_path}/intersection_scores.csv")
+            return False
