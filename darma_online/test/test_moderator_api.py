@@ -3,9 +3,11 @@ import requests
 MODERATOR_ENDPOINT = "http://128.9.37.116:5050/moderation-prediction-classifier"
 
 def get_moderator_response(comment):
-    response = requests.post(MODERATOR_ENDPOINT, data=comment)
+    data = {"0":
+            { "comment": comment}
+            }
+    response = requests.post(MODERATOR_ENDPOINT, json=data)
     return response.json()["0"]["score"]
-
 
 if __name__ == "__main__":
     comments = ["I hate you",
