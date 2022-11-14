@@ -20,7 +20,7 @@ class Translator:
         split_sentences = [sent.text.strip() for sent in doc.sents]
         # Only return sentences with less than 80 tokens
         split_sentences = [sent for sent in split_sentences if len(sent.split()) < 80]
-        self.logger.debug(f'Split french text into sentences: {split_sentences}')
+        self.logger.debug(f'Split french text into {len(split_sentences)} sentences')
         # Return only 10 sentences
         return split_sentences[:10] if len(split_sentences) > 10 else split_sentences
 
