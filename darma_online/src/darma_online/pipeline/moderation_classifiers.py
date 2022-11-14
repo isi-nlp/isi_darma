@@ -101,10 +101,10 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		request_data = { "0": { "comment" : comment } }
 		resp = post(self.moderator_endpoint, json=request_data)
 		if resp.status_code == 200:
-			self.logger.info(f"Moderator response: {resp.json()}")
+			self.logger.info(f'Moderator score = {resp.json()["0"]["score"]}')
 			return resp.json()["0"]["score"]
 		else:
-			self.logger.warning(f"{resp.status_code} status code from Moderator: {resp.json()}")
+			self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
 			return resp.status_code
 
 	def intersect_moderation(self, perspec_decision, moderator_score):
