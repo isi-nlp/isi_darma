@@ -10,16 +10,21 @@ class Translator:
         self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
         # self.eng_sentencizer = English().add_pipe('sentencizer')
-        self.french_sentencizer = French().add_pipe('sentencizer')
+        fr = French()
+        self.french_sentencizer = fr.add_pipe('sentencizer')
         self.logger.info('French Sentencizers initialized.')
 
-    def split_sentences(self, text:str) -> List[str]:
-        split_text = [x.text for x in self.french_sentencizer(text).sents]
-        self.logger.debug(f'Split french text into sentences: {split_text}')
-        return split_text[:80] if len(split_text) > 80 else split_text
+    def split_comment(self, comment:str) -> List[str]:
+        doc = self.french_sentencizer(comment)
+        split_sentences = [sent.text.strip() for sent in doc.sents]
+        # Only return sentences with less than 80 tokens
+        split_sentences = [sent for sent in split_sentences if len(sent.split()) < 80]
+        self.logger.debug(f'Split french text into sentences: {split_sentences}')
+        # Return only 10 sentences
+        return split_sentences[:10] if len(split_sentences) > 10 else split_sentences
 
     def rtg(self, comment_str: str) -> str:
-        sentences = self.split_sentences(comment_str)
+        sentences = self.split_comment(comment_str)
         source = {'source': sentences}
         self.logger.debug(f'Sending source sentences to RTG for translation: {source}')
 
