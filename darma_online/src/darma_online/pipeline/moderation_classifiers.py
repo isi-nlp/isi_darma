@@ -102,5 +102,10 @@ class PerspectiveAPIModerator(ModerationClassifier):
 		if resp.status_code == 200:
 			return resp.json()["0"]["score"]
 		else:
-			self.logger.info(f"Endpoint {endpoint} is not healthy. Returning status code {endpoint_health}.")
-			return {}
+			return resp.status_code
+
+	def intersect_moderation(self, perspec_response, moderator_score):
+		if perspec_response and self.needs_moderation(moderator_score):
+			return True
+		else:
+			return False
