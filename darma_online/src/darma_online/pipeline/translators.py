@@ -9,7 +9,8 @@ class Translator:
     def __init__(self, logger):
         self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
-        # self.eng_sentencizer = English().add_pipe('sentencizer')
+        # self.eng_sentencizer = English().
+        # self.eng_sentencizer.add_pipe('sentencizer')
         self.french_sentencizer = French()
         self.french_sentencizer.add_pipe('sentencizer')
         self.logger.info('French Sentencizers initialized.')
