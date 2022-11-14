@@ -108,13 +108,17 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
     def get_moderator_response(self, comment):
         request_data = { "0": { "comment" : comment } }
-        resp = post(self.moderator_endpoint, json=request_data)
-        if resp.status_code == 200:
-            self.logger.info(f'Moderator score = {resp.json()["0"]["score"]}')
-            return resp.json()["0"]["score"]
-        else:
-            self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
-            return resp.status_code
+        try:
+            resp = post(self.moderator_endpoint, json=request_data)
+            if resp.status_code == 200:
+                self.logger.info(f'Moderator score = {resp.json()["0"]["score"]}')
+                return resp.json()["0"]["score"]
+            else:
+                self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
+                return resp.status_code
+        except Exception as e:
+            self.logger.error(f"Exception occurred while getting moderator response: {e}")
+            return 0
 
     def intersect_moderation(self, perspec_score, moderator_score, comment):
         if self.needs_moderation(perspec_score) and self.needs_moderation(moderator_score):
