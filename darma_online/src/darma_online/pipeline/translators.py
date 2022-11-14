@@ -34,7 +34,7 @@ class Translator:
             if response.ok:
                 response = response.json()
                 self.logger.info(f'Received Translated dialogue from RTG: {response["translation"]}')
-                return ' '.join(response['translation'][0])
+                return ' '.join(response['translation'])
             else:
                 self.logger.warning(f'Translation failed with {response.status_code} -> {response.reason}!')
                 self.logger.warning(f'Response Body from RTG:\n{response.json()}')
