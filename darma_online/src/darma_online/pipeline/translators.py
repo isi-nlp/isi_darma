@@ -10,8 +10,8 @@ class Translator:
         self.RTG_API = 'http://spolin.isi.edu:6060/translate'
         self.logger = logger
         # self.eng_sentencizer = English().add_pipe('sentencizer')
-        fr = French()
-        self.french_sentencizer = fr.add_pipe('sentencizer')
+        self.french_sentencizer = French()
+        self.french_sentencizer.add_pipe('sentencizer')
         self.logger.info('French Sentencizers initialized.')
 
     def split_comment(self, comment:str) -> List[str]:
