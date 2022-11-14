@@ -18,7 +18,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
 	def __init__(self, logger) -> None:
 
-		self.client = discovery.build(
+		self.perspec_client = discovery.build(
 			"commentanalyzer",
 			"v1alpha1",
 			developerKey=API_KEY,
