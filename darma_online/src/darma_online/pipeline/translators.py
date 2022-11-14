@@ -11,7 +11,9 @@ class Translator:
         self.sentencizer = English().add_pipe('sentencizer')
 
     def split_sentences(self, text:str) -> List[str]:
-        return [x.text for x in self.sentencizer(text).sents]
+        split_text = [x.text for x in self.sentencizer(text).sents]
+        self.logger.debug(f'Split text into sentences: {split_text}')
+        return split_text[:80] if len(split_text) > 80 else split_text
 
     def rtg(self, comment_str: str) -> str:
         sentences = self.split_sentences(comment_str)
