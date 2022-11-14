@@ -3,6 +3,8 @@ from abc import ABC, abstractmethod
 from requests import get, post
 import operator
 import time
+import pandas as pd
+import os
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
@@ -10,22 +12,22 @@ API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
 class ModerationClassifier(ABC):
 
-	@abstractmethod
-	def needs_moderation(self, toxicity):
-		pass
+    @abstractmethod
+    def needs_moderation(self, toxicity):
+        pass
 
 
 class PerspectiveAPIModerator(ModerationClassifier):
 
-	def __init__(self, logger) -> None:
+    def __init__(self, logger) -> None:
 
-		self.perspec_client = discovery.build(
-			"commentanalyzer",
-			"v1alpha1",
-			developerKey=API_KEY,
-			discoveryServiceUrl="https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1",
-			static_discovery=False,
-		)
+        self.perspec_client = discovery.build(
+            "commentanalyzer",
+            "v1alpha1",
+            developerKey=API_KEY,
+            discoveryServiceUrl="https://commentanalyzer.googleapis.com/$discovery/rest?version=v1alpha1",
+            static_discovery=False,
+        )
 
         self.toxicity_threshold = 0.5
         self.logger = logger
@@ -39,22 +41,22 @@ class PerspectiveAPIModerator(ModerationClassifier):
             columns = ['comment', 'perspective_score', 'moderator_score']
             self.intersection_df = pd.DataFrame(columns=columns)
 
-	def needs_moderation(self, toxicity) -> bool:
-		return toxicity >= self.toxicity_threshold
+    def needs_moderation(self, toxicity) -> bool:
+        return toxicity >= self.toxicity_threshold
 
-	def measure_toxicity(self, comment) -> (float, str):
+    def measure_toxicity(self, comment) -> (float, str):
 
-		analyze_request = {
-			'comment': {'text': comment},
-			'requestedAttributes': {
-				'TOXICITY': {},
-				'SEVERE_TOXICITY': {},
-				'IDENTITY_ATTACK': {},
-				'INSULT': {},
-				'PROFANITY': {},
-				'THREAT': {},
-			}
-		}
+        analyze_request = {
+            'comment': {'text': comment},
+            'requestedAttributes': {
+                'TOXICITY': {},
+                'SEVERE_TOXICITY': {},
+                'IDENTITY_ATTACK': {},
+                'INSULT': {},
+                'PROFANITY': {},
+                'THREAT': {},
+            }
+        }
 
         try:
             perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
@@ -64,55 +66,55 @@ class PerspectiveAPIModerator(ModerationClassifier):
             final_decision = self.intersect_moderation(perspec_score, moderator_score, comment)
             return final_decision, perspec_score, behav_type
 
-		except Exception as e:
+        except Exception as e:
 
-			if e.status_code == 429:
-				self.logger.debug(f"API rate limit reached. Waiting for 60 seconds.")
-				time.sleep(60)
-				self.logger.debug(f'Retrying toxicity measurement for comment: {analyze_request["comment"]["text"]}')
-				needs_mod, toxicity_score, behav_type = self.measure_toxicity(comment)
+            if e.status_code == 429:
+                self.logger.debug(f"API rate limit reached. Waiting for 60 seconds.")
+                time.sleep(60)
+                self.logger.debug(f'Retrying toxicity measurement for comment: {analyze_request["comment"]["text"]}')
+                needs_mod, perspec_score, behav_type = self.measure_toxicity(comment)
 
-			else:
-				self.logger.error(f"Exception occurred with code {e.status_code}: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
-				needs_mod, toxicity_score, behav_type = False, 0, ""
+            else:
+                self.logger.error(f"Exception occurred with code {e.status_code}: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
+                needs_mod, perspec_score, behav_type = False, 0, ""
 
-		return needs_mod, toxicity_score, behav_type
+        return needs_mod, perspec_score, behav_type
 
-	def map_behavtypes(self, toxicity_scores):
-		mapping = {
-					"toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
-					"severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
-					"behav_types": {
-						"namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
-						"ad-hominem_attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
-						"obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
-						"dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
-					}
-				}
+    def map_behavtypes(self, toxicity_scores):
+        mapping = {
+                    "toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
+                    "severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
+                    "behav_types": {
+                        "namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
+                        "ad-hominem_attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
+                        "obscene/vulgar": toxicity_scores["attributeScores"]["PROFANITY"]["summaryScore"]["value"],
+                        "dehumanizing": toxicity_scores["attributeScores"]["THREAT"]["summaryScore"]["value"]
+                    }
+                }
 
-		self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
+        self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
 
-		if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
-			needs_mod = True
-			behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
-			score = mapping["behav_types"][behav_type]
-			self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
+        if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
+            needs_mod = True
+            behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
+            score = mapping["behav_types"][behav_type]
+            self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
 
-		else:
-			self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
-			needs_mod, score, behav_type = False, 0.0, ""
+        else:
+            self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}. Setting behaviour type to empty string.')
+            needs_mod, score, behav_type = False, 0.0, ""
 
-		return needs_mod, score, behav_type
+        return needs_mod, score, behav_type
 
-	def get_moderator_response(self, comment):
-		request_data = { "0": { "comment" : comment } }
-		resp = post(self.moderator_endpoint, json=request_data)
-		if resp.status_code == 200:
-			self.logger.info(f'Moderator score = {resp.json()["0"]["score"]}')
-			return resp.json()["0"]["score"]
-		else:
-			self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
-			return resp.status_code
+    def get_moderator_response(self, comment):
+        request_data = { "0": { "comment" : comment } }
+        resp = post(self.moderator_endpoint, json=request_data)
+        if resp.status_code == 200:
+            self.logger.info(f'Moderator score = {resp.json()["0"]["score"]}')
+            return resp.json()["0"]["score"]
+        else:
+            self.logger.warning(f"{resp.status_code} status code from Moderator: {resp}")
+            return resp.status_code
 
     def intersect_moderation(self, perspec_score, moderator_score, comment):
         if self.needs_moderation(perspec_score) and self.needs_moderation(moderator_score):
