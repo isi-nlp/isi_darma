@@ -8,7 +8,7 @@ from typing import Dict
 from praw.models import Redditor
 
 CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/darma_online/src/darma_online/creds.yaml")
-
+CONFIG_FN = os.environ.get("CONF_FP", "/isi_darma/isi_darma/darma_online/src/darma_online/config.yaml")
 
 def get_username(redditor_obj: Redditor):
 	"""
