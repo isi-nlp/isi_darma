@@ -67,15 +67,13 @@ class PerspectiveAPIModerator(ModerationClassifier):
             return final_decision, perspec_score, behav_type
 
         except Exception as e:
-
             if e.status_code == 429:
                 self.logger.debug(f"API rate limit reached. Waiting for 60 seconds.")
                 time.sleep(60)
                 self.logger.debug(f'Retrying toxicity measurement for comment: {analyze_request["comment"]["text"]}')
                 needs_mod, perspec_score, behav_type = self.measure_toxicity(comment)
-
             else:
-                self.logger.error(f"Exception occurred with code {e.status_code}: {e} for comment: {analyze_request['comment']['text']}. Setting toxicity to 0 with empty behaviour type.")
+                self.logger.error(f"Exception occurred with code: {e} for comment. Setting toxicity to 0 with empty behaviour type.")
                 needs_mod, perspec_score, behav_type = False, 0, ""
 
         return needs_mod, perspec_score, behav_type
