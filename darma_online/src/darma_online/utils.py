@@ -29,6 +29,12 @@ def load_credentials(logger: Logger, creds_fn: str = CRED_FN) -> Dict[str, str]:
 	logger.debug(f"Loaded credentials from {creds_fn}")
 	return creds
 
+def load_config(logger: Logger, config_fn: str = CONFIG_FN) -> Dict[str, str]:
+	with open(config_fn, "r") as f:
+		config = yaml.safe_load(f)
+
+	logger.debug(f"Loaded config from {CONFIG_FN}")
+	return config
 
 def load_reddit_client(logger):
 	creds = load_credentials(logger)
@@ -105,7 +111,7 @@ def get_child_comments(logger, currComment, commentList, botReply, postedComment
 # 1. Save the structure of the thread in the json - refer Apoorva's code and use as plug & play
 # 2. Save the comment/post id in the json
 # 3. Save the french comment and the translation in the json structure
-def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "darma_test"):
+def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "darma_test", json_output_path ="/isi_darma/isi_darma/darma_online/src/darma_online/data/conversations"):
 	"""
 	Records entire conversation tree into JSON format
 	"""
@@ -153,12 +159,11 @@ def create_json_thread(logger, comment, is_submission, bot_reply, subreddit = "d
 				"post_id": comment.submission.id
 	}
 
-	json_outputs_path = "/isi_darma/isi_darma/darma_online/src/darma_online/data/conversations"
-	if not os.path.exists(json_outputs_path):
-		os.makedirs(json_outputs_path)
+	if not os.path.exists(json_output_path):
+		os.makedirs(json_output_path)
 
-	size = len(os.listdir(json_outputs_path))
-	filename = f"{json_outputs_path}/{subreddit}_conversationDump{size}.json"
+	size = len(os.listdir(json_output_path))
+	filename = f"{json_output_path}/{subreddit}_conversationDump{size}.json"
 	with open(filename, "w") as write_file:
 		json.dump(data, write_file, indent=4)
 	write_file.close()
