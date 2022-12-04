@@ -186,7 +186,7 @@ class BasicBot(ModerationBot):
             # Dialogue requires no moderation
             else:
                 self.logger.info(
-                    f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with no Behav_type -> {len(behav_type)}")
+                    f"NO RESPONSE generated based on moderation strategy: {moderation_strategy}. Toxicity Score = {toxicity} & with Behav_type -> {behav_type}")
                 final_response = ""
 
         # User has previously opted out of moderation
