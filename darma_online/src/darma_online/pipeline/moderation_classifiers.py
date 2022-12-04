@@ -38,7 +38,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
         if os.path.exists(f"{self.csv_path}/intersection_scores.csv"):
             self.intersection_df = pd.read_csv(f"{self.csv_path}/intersection_scores.csv", header=0)
         else:
-            columns = ['comment', 'perspective_score', 'moderator_score']
+            columns = ['comment', 'moderator_score', 'perspective_score', 'perspective_behav_type']
             self.intersection_df = pd.DataFrame(columns=columns)
 
     def needs_moderation(self, toxicity) -> bool:
@@ -63,7 +63,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             # TODO: Deprecate 'needs_mod' since we now use 'final_decision'
             needs_mod, perspec_score, behav_type = self.map_behavtypes(perspec_response)
             moderator_score = self.get_moderator_response(comment)
-            final_decision = self.intersect_moderation(perspec_score, moderator_score, comment)
+            final_decision = self.intersect_moderation(comment, moderator_score, perspec_score, behav_type)
             return final_decision, perspec_score, behav_type
 
         except Exception as e:
@@ -120,12 +120,12 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.error(f"Exception occurred while getting moderator response: {e}")
             return 0
 
-    def intersect_moderation(self, perspec_score, moderator_score, comment):
+    def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type, ):
         if self.needs_moderation(perspec_score) and self.needs_moderation(moderator_score):
             self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
             return True
         else:
-            row = [comment, perspec_score, moderator_score]
+            row = [comment, moderator_score, perspec_score, behav_type]
             self.intersection_df.loc[len(self.intersection_df)] = row
             # Dump intersection scores to csv and reload
             self.intersection_df.to_csv(f"{self.csv_path}/intersection_scores.csv", index=False)
