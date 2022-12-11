@@ -128,7 +128,8 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
     def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type):
         perspec_tox_score = max(perspec_score['toxicity'], perspec_score['severe_toxicity'])
-        data_row = [comment, moderator_score, perspec_tox_score, behav_type, perspec_score["namecalling"], perspec_score["ad-hominem_attacking"], perspec_score["obscene/vulgar"], perspec_score["dehumanizing"]]
+        behav_scores = perspec_score["behav_types"]
+        data_row = [comment, moderator_score, perspec_tox_score, behav_type, behav_scores["namecalling"], behav_scores["ad-hominem_attacking"], behav_scores["obscene/vulgar"], behav_scores["dehumanizing"]]
 
         if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
             self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
