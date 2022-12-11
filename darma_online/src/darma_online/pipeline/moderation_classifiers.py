@@ -34,12 +34,21 @@ class PerspectiveAPIModerator(ModerationClassifier):
         self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
         self.csv_path = config["data_path"]
 
-        # Data collection for intersection scores
-        if os.path.exists(f"{self.csv_path}/intersection_scores.csv"):
-            self.intersection_df = pd.read_csv(f"{self.csv_path}/intersection_scores.csv", header=0)
+        COLUMNS = ['comment', 'moderator_score', 'perspec_tox_score', 'det_behav_type', 'namecalling' ,'ad-hominem_attacking', 'obscene/vulgar','dehumanizing']
+        self.intersect_csv = "intersection_scores"
+        self.mod_agree_csv = "mod_agree"
+
+        # Data collection for intersection scores - disagreement
+        if os.path.exists(f"{self.csv_path}/{self.intersect_csv}.csv"):
+            self.intersection_df = pd.read_csv(f"{self.csv_path}/{self.intersect_csv}.csv", header=0)
         else:
-            columns = ['comment', 'moderator_score', 'perspective_score', 'perspective_behav_type']
-            self.intersection_df = pd.DataFrame(columns=columns)
+            self.intersection_df = pd.DataFrame(columns=COLUMNS)
+
+        # Data collection for agreed moderation
+        if os.path.exists(f"{self.csv_path}/{self.mod_agree_csv}"):
+            self.mod_agree_df = pd.read_csv(f"{self.csv_path}/{self.mod_agree_csv}", header=0)
+        else:
+            self.mod_agree_df = pd.DataFrame(columns=COLUMNS)
 
     def needs_moderation(self, toxicity) -> bool:
         return toxicity >= self.toxicity_threshold
