@@ -138,3 +138,16 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.intersection_df = self.dump_data(self.intersection_df, data_row, False)
             self.logger.info(f"Moderator = {moderator_score} and Perspective = {perspec_tox_score}, DISAGREE about moderation. Data saved to {self.csv_path}/intersection_scores.csv")
             return False
+
+    def dump_data(self, dataframe, data_row, mod=False):
+
+        if not mod: csv_name = self.mod_agree_csv
+        else: csv_name = self.intersect_csv
+
+        dataframe.loc[len(dataframe)] = data_row
+
+        # Dump intersection scores to csv and reload
+        dataframe.to_csv(f"{self.csv_path}/{csv_name}.csv", index=False)
+        dataframe = pd.read_csv(f"{self.csv_path}/{csv_name}.csv", header=0)
+
+        return dataframe
