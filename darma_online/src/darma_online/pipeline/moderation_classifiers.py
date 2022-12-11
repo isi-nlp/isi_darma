@@ -150,5 +150,6 @@ class PerspectiveAPIModerator(ModerationClassifier):
         # Dump intersection scores to csv and reload
         dataframe.to_csv(f"{self.csv_path}/{csv_name}.csv", index=False)
         dataframe = pd.read_csv(f"{self.csv_path}/{csv_name}.csv", header=0)
+        self.logger.debug(f"Saved data to {self.csv_path}/{csv_name}.csv")
 
         return dataframe
