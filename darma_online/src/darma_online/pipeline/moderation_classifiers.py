@@ -90,7 +90,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
     def map_behavtypes(self, toxicity_scores):
         mapping = {
                     "toxicity": toxicity_scores["attributeScores"]["TOXICITY"]["summaryScore"]["value"],
-                    "severe toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
+                    "severe_toxicity": toxicity_scores["attributeScores"]["SEVERE_TOXICITY"]["summaryScore"]["value"],
                     "behav_types": {
                         "namecalling": toxicity_scores["attributeScores"]["INSULT"]["summaryScore"]["value"],
                         "ad-hominem_attacking": toxicity_scores["attributeScores"]["IDENTITY_ATTACK"]["summaryScore"]["value"],
