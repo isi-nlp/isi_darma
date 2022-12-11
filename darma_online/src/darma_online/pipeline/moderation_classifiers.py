@@ -102,7 +102,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
         self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
         behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
         score = mapping["behav_types"][behav_type]
-        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with score = {score}")
+        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with behav score = {score} and toxicity score = {max(mapping['toxicity'], mapping['severe_toxicity'])}")
 
         if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe toxicity"]):
             needs_mod = True
@@ -110,7 +110,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe toxicity"]} is below threshold {self.toxicity_threshold}.')
             needs_mod = False
 
-        return needs_mod, score, behav_type
+        return needs_mod, mapping, behav_type
 
     def get_moderator_response(self, comment):
         request_data = { "0": { "comment" : comment } }
@@ -126,8 +126,11 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.error(f"Exception occurred while getting moderator response: {e}")
             return 0
 
-    def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type, ):
-        if self.needs_moderation(perspec_score) and self.needs_moderation(moderator_score):
+    def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type):
+        perspec_tox_score = max(perspec_score['toxicity'], perspec_score['severe_toxicity'])
+        data_row = [comment, moderator_score, perspec_tox_score, behav_type, perspec_score["namecalling"], perspec_score["ad-hominem_attacking"], perspec_score["obscene/vulgar"], perspec_score["dehumanizing"]]
+
+        if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
             self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
             return True
         else:
