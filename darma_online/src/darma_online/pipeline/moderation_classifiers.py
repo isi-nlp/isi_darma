@@ -34,7 +34,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
         self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
         self.csv_path = config["intersection_scores_path"]
 
-        COLUMNS = ['comment', 'moderator_score', 'perspec_tox_score', 'det_behav_type', 'namecalling' ,'ad-hominem_attacking', 'obscene/vulgar','dehumanizing']
+        COLUMNS = ['comment', 'moderator_score', 'perspec_tox_score', 'det_behav_type', 'namecalling' ,'ad_hominem_attacking', 'obscene_vulgar','dehumanizing']
         self.intersect_csv = "intersection_scores"
         self.mod_agree_csv = "mod_agree"
 
