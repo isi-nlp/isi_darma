@@ -29,7 +29,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             static_discovery=False,
         )
 
-        self.toxicity_threshold = 0.5
+        self.toxicity_threshold = config["toxicity_threshold"]
         self.logger = logger
         self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
         self.csv_path = config["intersection_scores_path"]
@@ -53,7 +53,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
     def needs_moderation(self, toxicity) -> bool:
         return toxicity >= self.toxicity_threshold
 
-    def measure_toxicity(self, comment) -> (float, str):
+    def measure_toxicity(self, comment, hashid=None) -> (float, str):
 
         analyze_request = {
             'comment': {'text': comment},
