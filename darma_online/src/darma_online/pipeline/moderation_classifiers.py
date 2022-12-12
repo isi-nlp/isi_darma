@@ -133,18 +133,16 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
             self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
-            self.mod_agree_df = self.dump_data(self.mod_agree_df, data_row, True)
+            # TODO: Also save hashid of comment
+            self.mod_agree_df = self.dump_data(self.mod_agree_df, data_row, self.mod_agree_csv)
             return True
         else:
-            self.intersection_df = self.dump_data(self.intersection_df, data_row, False)
+            self.intersection_df = self.dump_data(self.intersection_df, data_row, self.intersect_csv)
             self.logger.info(f"Moderator = {moderator_score} and Perspective = {perspec_tox_score}, DISAGREE about moderation. Data saved to {self.csv_path}/intersection_scores.csv")
             return False
 
-    def dump_data(self, dataframe, data_row, mod=False):
-
-        if not mod: csv_name = self.mod_agree_csv
-        else: csv_name = self.intersect_csv
-
+    def dump_data(self, dataframe, data_row, csv_name):
+        # Insert the new row data in the dataframe
         dataframe.loc[len(dataframe)] = data_row
 
         # Dump intersection scores to csv and reload
