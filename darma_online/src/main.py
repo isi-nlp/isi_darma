@@ -13,12 +13,13 @@ def main():
 	parser.add_argument("--test", "-t", action="store_true")
 	parser.add_argument("--passive", "-p", action="store_true")
 	parser.add_argument("--subreddit", "-s", default=SUBREDDIT, required=False)
+	parser.add_argument("--lang", "-l", default="fr", required=True)
 	args = parser.parse_args()
 
 	# Set the subreddit to be moderated
 	sub = SUBREDDIT if args.subreddit is None else args.subreddit
 
-	moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub)
+	moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub, lang=args.lang)
 
 	reddit_client = load_reddit_client(moderation_bot.logger)
 	moderation_bot.logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")

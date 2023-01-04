@@ -22,7 +22,7 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test') -> None:
+    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test', lang='fr') -> None:
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
@@ -46,7 +46,7 @@ class BasicBot(ModerationBot):
         self.current_dialogue = None
 
         self.databases = DatabaseManager(self.logger, root = self.CONFIG["data_path"])
-        self.bot_responses = self.response_generator.read_responses( path = self.CONFIG["bot_responses"] )
+        self.bot_responses = self.response_generator.read_responses( path = self.CONFIG["bot_responses"] )[lang]
 
     @staticmethod
     def detect_language(text):
