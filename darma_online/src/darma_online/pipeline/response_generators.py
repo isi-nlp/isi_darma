@@ -44,21 +44,17 @@ class SpolinBotRG(ResponseGenerator):
 		return best_response
 
 	@staticmethod
-	def get_random_comtype_resp(usernames: List[str] = None):
+	def get_random_resp(responses: List[str], usernames: List[str] = None):
 
 		if usernames is None:
-			usernames = ['les autres']
+			usernames = responses['others']
 
 		usernames = ",".join(usernames)
 
-		comtype_responses = [
-			("template1", f"Veuillez cesser de faire cela et vous comporter correctement!"),
-			 ("template2", f"Vous avez eu un comportement de ce genre en répondant à {usernames}"),
-			  ("template3", f"Je me sens contrarié parce que même si je ne connais pas {usernames}, le langage que vous avez utilisé pour communiquer avec eux me bouleverserait."),
-			   ("template4", f"Est-ce parce que vous êtes en colère contre {usernames} parce qu'ils ont des croyances différentes des vôtres?"),
-			    ("template5", f"Voulez-vous que {usernames} changent d'opinion et peut-être convaincre d'autres personnes qui partagent actuellement leurs opinions de changer également?")
-		]
-		return random.sample(comtype_responses, 1)[0]
+		selected_response = random.sample(responses['nvc_responses'], 1)[0]
+		selected_response = selected_response.replace("<usernames>", usernames)
+
+		return selected_response
 
 	@staticmethod
 	def read_responses(path : str = "/darma_online/darma_online/src/darma_online/data/response_templates/responses.json"):
