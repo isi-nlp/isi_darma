@@ -162,8 +162,8 @@ class BasicBot(ModerationBot):
             if needs_mod and moderation_strategy == 'respond' :
 
                 self.logger.info(f'******** Toxic user {author_username} found. Responding to {type} ********')
-                behav_type_response = self.bot_responses[f'{behav_type}_resp_fr']
-                initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp_fr']} {behav_type_response}"
+                behav_type_response = self.bot_responses[f'{behav_type}_resp']
+                initial_response = f"Bonjour {author_username}, \n{self.bot_responses['init_resp']} {behav_type_response}"
                 self.logger.info(f'Initial response generated & translated with behav type based response = {behav_type_response}')
 
                 if type == "post": parent_username = "envers les autres"
@@ -173,7 +173,7 @@ class BasicBot(ModerationBot):
                 if parent_username == author_username: parent_username = "les autres"
 
                 # Response sampled from templates
-                best_resp_template = self.response_generator.get_random_comtype_resp([parent_username])
+                best_resp_template = self.response_generator.get_random_resp(self.bot_responses["nvc_responses"], [parent_username])
                 template_id, best_response = best_resp_template[0], best_resp_template[1]
                 self.logger.info(f'Author username: {author_username} and parent username: {parent_username}')
                 self.logger.info(f'Templated response selected for toxic user: {template_id} - {best_response}')
@@ -198,7 +198,7 @@ class BasicBot(ModerationBot):
         elif opt_out:
             self.logger.info(f'{author_username} opted out of toxicity moderation, skipping moderation')
             self.databases.add_optout_user(author_username, dialogue_str)
-            opt_out_response = f"D'accord, {author_username}, {self.bot_responses['opt_out_complete_fr']}"
+            opt_out_response = f"{self.bot_responses['hello']}, {author_username}, {self.bot_responses['opt_out_complete']}"
             obj_to_reply.reply(opt_out_response)
             self.logger.info(f'Opt-out complete message sent to new user: {author_username} with message: {opt_out_response}')
             final_response = ""
