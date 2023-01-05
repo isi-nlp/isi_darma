@@ -173,10 +173,9 @@ class BasicBot(ModerationBot):
                 if parent_username == author_username: parent_username = "les autres"
 
                 # Response sampled from templates
-                best_resp_template = self.response_generator.get_random_resp(self.bot_responses["nvc_responses"], [parent_username])
-                template_id, best_response = best_resp_template[0], best_resp_template[1]
+                best_response = self.response_generator.get_random_resp(self.bot_responses["nvc_responses"], [parent_username])
                 self.logger.info(f'Author username: {author_username} and parent username: {parent_username}')
-                self.logger.info(f'Templated response selected for toxic user: {template_id} - {best_response}')
+                self.logger.info(f'Templated response selected for toxic user: {best_response}')
 
                 # Combine initial and best response for FINAL response
                 final_response = initial_response + '\n' + best_response
