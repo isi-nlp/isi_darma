@@ -69,8 +69,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         try:
             perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
-            # TODO: Deprecate 'needs_mod' since we now use 'final_decision'
-            needs_mod, perspec_score, behav_type = self.map_behavtypes(perspec_response)
+            perspec_decision, perspec_score, behav_type = self.map_behavtypes(perspec_response)
             moderator_score = self.get_moderator_response(comment)
             final_decision = self.intersect_moderation(comment, moderator_score, perspec_score, behav_type)
             return final_decision, perspec_score, behav_type
@@ -80,12 +79,12 @@ class PerspectiveAPIModerator(ModerationClassifier):
                 self.logger.debug(f"API rate limit reached. Waiting for 60 seconds.")
                 time.sleep(60)
                 self.logger.debug(f'Retrying toxicity measurement for comment: {analyze_request["comment"]["text"]}')
-                needs_mod, perspec_score, behav_type = self.measure_toxicity(comment)
+                final_decision, perspec_score, behav_type = self.measure_toxicity(comment)
             else:
                 self.logger.error(f"Exception occurred with code: {e} for comment. Setting toxicity to 0 with empty behaviour type.")
-                needs_mod, perspec_score, behav_type = False, 0, ""
+                final_decision, perspec_score, behav_type = False, 0, ""
 
-        return needs_mod, perspec_score, behav_type
+        return final_decision, perspec_score, behav_type
 
     def map_behavtypes(self, toxicity_scores):
         mapping = {
