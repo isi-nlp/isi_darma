@@ -1,0 +1,6 @@
+toxicity_threshold: 0.5
+data_path: /Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data
+bot_responses: /Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data/response_templates/responses.json
+creds_yaml: /Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data/creds.yaml
+json_output_path: /Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/darma_online/data/conversations
+intersection_scores_path: /Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/experiments/csv_dumps
