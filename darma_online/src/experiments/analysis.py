@@ -76,7 +76,7 @@ def norm_vio():
     print(removed_comments.shape, removed_comments.columns)
 
     logger = setup_logger(f'analysis_log', f'analysis_log.log')
-    config_fn = os.environ.get("CONF_FP", "/Users/darpanjain/Data/USC/RA - ISI/isi_darma/darma_online/src/experiments/analysis_config.yaml")
+    config_fn = os.environ.get("CONF_FP", "/isi_darma/isi_darma/darma_online/src/experiments/analysis_config.yaml")
     config = load_config(logger, config_fn=config_fn)
     mod_classifier = PerspectiveAPIModerator(logger, config)
 
