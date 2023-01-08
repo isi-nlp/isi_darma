@@ -82,7 +82,7 @@ def norm_vio():
 
     # Run each comment through mod_classifier
     tick = time.time()
-    for count, comment in enumerate(removed_comments['body']):
+    for count, comment in enumerate(removed_comments['body'][1937:]):
         if count % 50 == 0:
             print(f'Processed {count} comments in {time.time() - tick} seconds')
             time.sleep(60)
