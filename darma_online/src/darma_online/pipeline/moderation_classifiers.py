@@ -46,7 +46,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         # Data collection for agreed moderation
         if os.path.exists(f"{self.csv_path}/{self.mod_agree_csv}"):
-            self.mod_agree_df = pd.read_csv(f"{self.csv_path}/{self.mod_agree_csv}", header=0)
+            self.mod_agree_df = pd.read_csv(f"{self.csv_path}/{self.mod_agree_csv}.csv", header=0)
         else:
             self.mod_agree_df = pd.DataFrame(columns=COLUMNS)
 
