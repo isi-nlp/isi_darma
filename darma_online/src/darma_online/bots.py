@@ -22,7 +22,7 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test', lang='fr') -> None:
+    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test', lang='french') -> None:
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
