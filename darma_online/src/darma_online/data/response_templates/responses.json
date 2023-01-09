@@ -48,6 +48,27 @@
 	},
 
 	"german":
-	{}
+	{
+		"hello" : "Hallo",
+		"bot_info" : "unser Gespräch war/ist für die Studie zur Verbesserung des Dialogs in öffentlichen Foren bestimmt. Deine Teilnahme an dieser Studie ist freiwillig. Sie wird vom US- Verteidigungsministerium finanziert. Wir verfolgen keine Daten über Sie nach, etwa Ihren Benutzernamens oder demografische Informationen. Dieser öffentliche Dialog sowie Ihre Kommentare können zur künftigen Forschungsarbeit gesammelt und öffentlich archiviert werden. Vertreter des US-Verteidigungsministeriums erhalten im Rahmen ihrer Zuständigkeit für die Überwachung der Studie zum Schutz von Menschen Zugang zu den Forschungsunterlagen. Es besteht das Risiko, dass Ihre persönlichen Daten veröffentlicht werden, wenn Sie sie im Dialog in diesem Forum erwähnten. Wenn Sie dieses Risiko nicht eingehen möchten, wenn Sie minderjährig sind (unter 18 Jahren) oder wenn Sie es ablehnen, dass wir Ihre Beiträge zu diesem Thema verwenden, schreiben Sie \"Abmelden\" und wir werden Ihre Kommentare nicht in unsere Studie einbeziehen. Bei mir handelt es sich um eine KI-Einheit, die von Forschern der University of Southern California entwickelt wurde, um den sozialen Diskurs in Online-Foren zu optimieren. Diese Studie wird vom US-Verteidigungsministerium finanziert. Öffentliche Dialoge, an denen ich beteiligt bin, gehören zur Studie. Im Rahmen dieser Studie werden keine personenbezogenen Daten erhoben oder gespeichert, jedoch wird der öffentliche Dialog in diesem Forum archiviert. Vertreter des US-Verteidigungsministeriums erhalten im Rahmen ihrer Zuständigkeit für die Überwachung der Studie zum Schutz von Menschen Zugang zu den Forschungsunterlagen. Esbesteht das Risiko, dass Ihre persönlichen Daten veröffentlicht werden, wenn Sie sie im Dialog in Foren unter meiner Beteiligung erwähnten. Wenn Sie nicht möchten, dass Ihre Teilnahme an einem Dialog als Teil unserer Forschung verwendet wird, antworten Sie bitte während des Dialogs mit \"Abmelden\". Wenn Sie minderjährig sind (unter 18) oder wenn Sie nicht möchten, dass wir Ihre Beiträge - vorherig oder zukünftig - verwenden, schreiben Sie \"Abmelden\" auf meine Benutzerseite. Bei Fragen zu unserer Forschungsarbeit kontaktieren Sie uns bitte unter darma@isi.edu.",
+		"init_resp": "ich bin ein Bot (in meinem Profil wird vieles über mich erklärt, auch etwa, wie ich aufhöre, auf dich zu antworten oder deine Kommentare zu speichern). Folgendes scheint passiert zu sein:",
+		"opt_out_complete": "Sie wurden abgemeldet.",
+		"namecalling_resp" : "utiliser des insultes ou des comparaisons désobligeantes.",
+		"ad-hominem_attacking_resp" : "u kritisierst den Charakter einer Person und nicht den Inhalt der Diskussion.",
+		"obscene/vulgar_resp" : "du verwendest obszöne oder vulgäre Sprache.",
+		"dehumanizing_resp" : "du vergleichst Menschen mit Tieren oder Monstern und entmenschlichst sie somit.",
+		"responses" :
+			{
+				"others" : "Andere",
+				"nvc_responses":
+					[
+						"Bitte höre damit auf und benimm dich!",
+						"Du hast dich so verhalten, als du <usernames> geantwortet hast.",
+						"Ich bin verärgert, denn auch wenn ich <usernames> nicht kenne, verärgert mich er Sprachgebrauch, den du gegenüber ihnen verwendet hast.",
+						"Verhältst du dich so, weil <usernames> anderer Meinung als du sind und du dich deshalb ärgerst?",
+						"Willst du, dass <usernames> ihre Meinung ändern und andere gleichermaßen?"
+					]
+			}
+	}
 }
 
