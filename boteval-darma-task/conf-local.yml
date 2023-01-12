@@ -8,7 +8,7 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-002
+    engine: text-davinci-003
     prompt: wisebeing 
     # 
 
@@ -92,6 +92,4 @@ flask_config:
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   DATABASE_FILE_NAME: 'local.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
-  SERVER_NAME: darmaeval.cutelab.name
-  PREFERRED_URL_SCHEME: https
   
