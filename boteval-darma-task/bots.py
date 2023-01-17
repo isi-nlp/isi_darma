@@ -15,6 +15,10 @@ class GPTBot(BotAgent):
     WISEBEING = 'wisebeing'
     MODERATOR = 'moderator'
     SARCASTIC = 'sarcastic'
+    ADVOCATE = 'advocate'
+    CURT = 'curt'
+    PERSUASIVE = 'persuasive'
+    STERN = 'stern'
 
     def __init__(self, engine: str, prompt: str, *args, api_key='',
          few_shot_example=None, max_ctx_len=2048, **kwargs):
@@ -44,6 +48,18 @@ class GPTBot(BotAgent):
         elif prompt == self.SARCASTIC:
             self.instruction = "Marv is a chatbot that reluctantly moderates with sarcastic responses"
             self.persona = 'Marv'
+        elif prompt == self.ADVOCATE:
+            self.instruction = "The following is a conversation with an advocate. The advocate will try to create a more civil online environment by encouraging users to have empathy and to understand other people's viewpoints."
+            self.persona = 'Advocate'
+        elif prompt == self.CURT:
+            self.instruction = "The following is a conversation with a curt teacher. The curt teacher will try to create a more civil online environment, responding in short and targeted responses."
+            self.persona = 'Curt'
+        elif prompt == self.PERSUASIVE:
+            self.instruction = "The following is a conversation with a persuasive teacher. The persuasive teacher will try to persuade users to be civil and respectful, to create a more civil online environment."
+            self.persona = 'Persuasive'
+        elif prompt == self.STERN:
+            self.instruction = "The following is a conversation with a stern teacher. The stern teacher will assert their authority to create a more civil online environment, and will press that authority when questioned."
+            self.persona = 'Stern'
         else:
             raise Exception(f'Unknown prompt: {prompt}')
         self.turn_idx = 0
