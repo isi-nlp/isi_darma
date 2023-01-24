@@ -26,7 +26,7 @@ chatbot:
 #
 
 limits:
-  max_threads_per_user: 1
+  max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 20
   max_turns_per_thread: 6
   reward: &reward '0.5' # dollars
