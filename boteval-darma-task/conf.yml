@@ -2,27 +2,27 @@ chat_dir: data
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: german_chat_topics.json
+  topics_file: chat_topics_eng.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-002
+    engine: text-davinci-003
     prompt: wisebeing
 
-  transforms:
-    human:
-      - name: rtg-api
-        args:
-          api_url: http://localhost:6060/many-eng/v1/translate
-    bot:
-      - name: nllb-api
-        args:
-          api_url: http://localhost:6062/nllb/translate
-          src_lang: eng_Latn
-          tgt_lang: deu_Latn
-          # tgt_lang: fra_Latn
+  # transforms:
+  #   human:
+  #     - name: rtg-api
+  #       args:
+  #         api_url: http://localhost:6060/many-eng/v1/translate
+  #   bot:
+  #     - name: nllb-api
+  #       args:
+  #         api_url: http://localhost:6062/nllb/translate
+  #         src_lang: eng_Latn
+  #         tgt_lang: deu_Latn
+  #         # tgt_lang: fra_Latn
   
 limits:
   max_threads_per_user: 10
