@@ -1,3 +1,4 @@
+# sandbox chat_dir: data
 chat_dir: data
 
 chatbot:
@@ -8,27 +9,27 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-003
-    prompt: wisebeing
+    engine: text-davinci-002
+    prompt: moderator
 
-  # transforms:
-  #   human:
-  #     - name: rtg-api
-  #       args:
-  #         api_url: http://localhost:6060/many-eng/v1/translate
-  #   bot:
-  #     - name: nllb-api
-  #       args:
-  #         api_url: http://localhost:6062/nllb/translate
-  #         src_lang: eng_Latn
-  #         tgt_lang: deu_Latn
-  #         # tgt_lang: fra_Latn
-  
+#  transforms:
+#    human:
+#      - name: rtg-api
+#        args:
+#          api_url: http://localhost:6060/many-eng/v1/translate
+#    bot:
+#      - name: nllb-api
+#        args:
+#          api_url: http://localhost:6062/nllb/translate
+#          src_lang: eng_Latn
+#          tgt_lang: fra_Latn
+#
+
 limits:
   max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 10
-  max_turns_per_thread: 1
-  reward: &reward '0.01' # dollars
+  max_turns_per_thread: 6
+  reward: &reward '2' # dollars
   
 onboarding:
   agreement_file: user-agreement.html
@@ -36,7 +37,7 @@ onboarding:
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
-    # know_french: I can read and write fluently in German and I agree to write in German in this task.
+    #know_french: I can read and write fluently in French and I agree to write in French in this task.
 
 ratings:
   - question: How Coherent was the conversation?
@@ -67,29 +68,42 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot [DEV]'
+    Title: 'Evaluate a moderator chatbot (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it. 
+    Description: Evaluate a moderator chatbot after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
     QualificationRequirements: 
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
          LocaleValues:
             - Country: US
             - Country: CA
-            - Country: FR
             - Country: GB
             - Country: AU
-            - Country: BE
-            - Country: HT
-            - Country: CH
-            - Country: CD
-         ActionsGuarded: DiscoverPreviewAndAccept
-
+      #    ActionsGuarded: DiscoverPreviewAndAccept
+      # -  QualificationTypeId: "00000000000000000040"  # 5k hits
+      #    Comparator: GreaterThan
+      #    IntegerValues: [5000]
+      #    ActionsGuarded: DiscoverPreviewAndAccept
+      # -  QualificationTypeId: "00000000000000000060"  # adult content
+      #    Comparator: EqualTo
+      #    IntegerValues: [1]
+      #    ActionsGuarded: DiscoverPreviewAndAccept
+      # -  QualificationTypeId: "000000000000000000L0"  # percentage approved
+      #    Comparator: GreaterThan
+      #    IntegerValues: [95]
+      #    ActionsGuarded: DiscoverPreviewAndAccept
+      # -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
+      #    Comparator: DoesNotExist
+      #    ActionsGuarded: DiscoverPreviewAndAccept
+      # -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+      #    Comparator: Exists
+      #    ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'dev.db'   # this will be placed in task dir
+  # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-stage-eng-mod-01.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https

@@ -68,9 +68,9 @@ _mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot in German [DEV]'
+    Title: 'Evaluate a moderator chatbot [DEV]'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it in German given a German conversation. You MUST be able to read and write German fluently!
+    Description: Evaluate a moderator chatbot after conversing with it. 
     QualificationRequirements: 
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In

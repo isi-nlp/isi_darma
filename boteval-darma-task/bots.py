@@ -1,8 +1,10 @@
 """
 This work is done by Taiwei Shi during his internship at USC ISI (Summer 2022).
 """
+
 import openai
 import os
+import json
 
 from boteval import log, C, registry as R
 from boteval.bots import BotAgent
@@ -11,17 +13,12 @@ from boteval.bots import BotAgent
 
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
-    
-    WISEBEING = 'wisebeing'
-    MODERATOR = 'moderator'
-    SARCASTIC = 'sarcastic'
-    ADVOCATE = 'advocate'
-    CURT = 'curt'
-    PERSUASIVE = 'persuasive'
-    STERN = 'stern'
 
-    def __init__(self, engine: str, prompt: str, *args, api_key='',
-         few_shot_example=None, max_ctx_len=2048, **kwargs):
+    def __init__(self, engine: str, prompt: str,
+            *args, api_key='',
+            few_shot_example=None, max_ctx_len=2048,
+            persona_configs_relative_filepath='persona_configs.json',
+            **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
         self.max_ctx_len = max_ctx_len
@@ -36,35 +33,37 @@ class GPTBot(BotAgent):
                             " You may obtain key from https://beta.openai.com/account/api-keys")
         openai.api_key = api_key
 
-        if prompt == self.WISEBEING:
-            # wise being prompt. This prompt performs the best
-            self.instruction = "The following is a conversation with a wise and loving being who has an understanding"\
-                    " of how nonviolent communication work. This being is dedicated to building a more civil online environment."
-            self.persona = self.WISEBEING
-        elif prompt == self.MODERATOR:
-            # moderation bot prompt. This would make GPT-3 behave more like a tradditional moderation bot
-            self.instruction = "The following is a conversation with a moderation bot. The bot is dedicated to building a more civil online environment."
-            self.persona = self.MODERATOR
-        elif prompt == self.SARCASTIC:
-            self.instruction = "Marv is a chatbot that reluctantly moderates with sarcastic responses"
-            self.persona = 'Marv'
-        elif prompt == self.ADVOCATE:
-            self.instruction = "The following is a conversation with an advocate. The advocate will try to create a more civil online environment by encouraging users to have empathy and to understand other people's viewpoints."
-            self.persona = 'Advocate'
-        elif prompt == self.CURT:
-            self.instruction = "The following is a conversation with a curt teacher. The curt teacher will try to create a more civil online environment, responding in short and targeted responses."
-            self.persona = 'Curt'
-        elif prompt == self.PERSUASIVE:
-            self.instruction = "The following is a conversation with a persuasive teacher. The persuasive teacher will try to persuade users to be civil and respectful, to create a more civil online environment."
-            self.persona = 'Persuasive'
-        elif prompt == self.STERN:
-            self.instruction = "The following is a conversation with a stern teacher. The stern teacher will assert their authority to create a more civil online environment, and will press that authority when questioned."
-            self.persona = 'Stern'
-        else:
-            raise Exception(f'Unknown prompt: {prompt}')
+        self.load_persona(
+            prompt,
+            configs_relative_filepath=\
+                persona_configs_relative_filepath
+        )
         self.turn_idx = 0
         log.info(f"Initialized GPT bot with {self.engine=} {self.prompt=} {self.persona=}\n{self.instruction=}")
         self.context = []
+
+    def load_persona(self, 
+                     prompt,
+                     configs_relative_filepath='persona_configs.json'):
+        
+        configs_filepath =\
+            os.path.join(
+                os.path.dirname(os.path.realpath(__file__)),
+                configs_relative_filepath
+            )
+
+        with open(configs_filepath, mode='r') as f:
+            persona_jsons = json.load(f)
+            matching_personas = [
+                (x['title'], x['instruction'])
+                for x in persona_jsons if x['id']==prompt
+            ]
+                        
+            if matching_personas:
+                self.persona, self.instruction = matching_personas[0]
+            else:
+                raise Exception(f'Unknown prompt: {prompt}')
+        
 
     def context_append(self, user, text):
         turn = f'user {user}: {text}'
@@ -83,15 +82,13 @@ class GPTBot(BotAgent):
         return seed_turns.strip()
 
     def talk(self, timeout=None):
-        instr = self.instruction
-        persona = self.persona
-
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
         seed_turns = self.get_seed_turns()
-        p = self.prompt_compose(instr, persona, few_shot_example, seed_turns)
+        p = self.prompt_compose(self.instruction, self.persona, few_shot_example, seed_turns)
+
         if self.turn_idx == 0:
             resp = self.query_completion_api(p, engine=self.engine)
         else:
@@ -107,11 +104,18 @@ class GPTBot(BotAgent):
         return {**act_out, 'episode_done': False}
 
     def hear(self, msg):
-        user_id = msg['user_id']
+        user_id = msg.get('user_id')
         if msg.get('data') and msg['data'].get('speaker_id'):
             user_id = msg['data']['speaker_id']
+        if not user_id and msg.get('speaker_id'):
+            user_id = msg['speaker_id']
         self.context_append(user_id, msg['text'])
 
+    def feed(self, text):
+        # force feed instead of adding conversation
+        n_toks = len(text.strip().split())
+        self.context.append((text, n_toks))
+        
     @staticmethod
     def get_fewshot_example(turn_idx):
         full_example = [
@@ -216,5 +220,5 @@ class GPTBot(BotAgent):
     @staticmethod
     def prompt_compose(instr, persona, few_shot_example, seed_turns):
         if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}\n{persona}:'
+            return f'{instr}\n\n{seed_turns}\nuser {persona}:'
         return f'{instr}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n{persona}:'
