@@ -27,7 +27,7 @@ chatbot:
 limits:
   max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 10
-  max_turns_per_thread: 6
+  max_turns_per_thread: 1
   reward: &reward '0.01' # dollars
   
 onboarding:
@@ -36,7 +36,7 @@ onboarding:
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
-    know_french: I can read and write fluently in German and I agree to write in German in this task.
+    # know_french: I can read and write fluently in German and I agree to write in German in this task.
 
 ratings:
   - question: How Coherent was the conversation?
@@ -67,9 +67,9 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot in German [DEV]'
+    Title: 'Evaluate a moderator chatbot [DEV]'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it in German given a German conversation. You MUST be able to read and write German fluently!
+    Description: Evaluate a moderator chatbot after conversing with it. 
     QualificationRequirements: 
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
