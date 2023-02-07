@@ -3,14 +3,14 @@ chat_dir: data-prod
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: chat_topics_eng_pp.json
+  topics_file: chat_topics_eng.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    prompt: wisebeing
+    prompt: curt
 
 #  transforms:
 #    human:
@@ -26,11 +26,11 @@ chatbot:
 #
 
 limits:
-  max_threads_per_user: 10
-  max_threads_per_topic: &max_assignments 20
-  max_turns_per_thread: 6
-  reward: &reward '0.5' # dollars
-
+  max_threads_per_user: 4
+  max_threads_per_topic: &max_assignments 8
+  max_turns_per_thread: 4
+  reward: &reward '1.5' # dollars
+  
 onboarding:
   agreement_file: user-agreement.html
   instructions_file: instructions.html
@@ -40,7 +40,7 @@ onboarding:
     #know_french: I can read and write fluently in French and I agree to write in French in this task.
 
 ratings:
-  - question: How Coherent was the conversation?
+  - question: How coherent was the conversation?
     choices: &choices
       - Not at all
       - Mostly not
@@ -55,52 +55,52 @@ ratings:
     choices: *choices
 
 # rename _mturk -> mturk to enable crowd backend
-mturk:
+mturk: 
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
-    sandbox: true  # sandbox: false to go live
+    sandbox: false  # sandbox: false to go live
   seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
     # https://boto3.amazonaws.com/v1/documentation/api/1.11.9/reference/services/mturk.html#MTurk.Client.create_hit
     MaxAssignments: *max_assignments
-    AutoApprovalDelayInSeconds: 604800     # 7 days = 604k sec
+    AutoApprovalDelayInSeconds: 86400     # 7 days = 604k sec
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
-    AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
+    AssignmentDurationInSeconds: 7200      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator persona (Ver. A) (Adult Content)'
+    Title: 'Evaluate a moderator chatbot (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot persona after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
-    QualificationRequirements:
-      -  QualificationTypeId: "00000000000000000071"  # locale qualification
-         Comparator: In
-         LocaleValues:
-            - Country: US
-            - Country: CA
-            - Country: GB
-            - Country: AU
-         ActionsGuarded: DiscoverPreviewAndAccept
+    Description: Evaluate a moderator chatbot after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    QualificationRequirements: 
+      # -  QualificationTypeId: "00000000000000000071"  # locale qualification
+      #    Comparator: In
+      #    LocaleValues:
+      #       - Country: US
+      #       - Country: CA
+      #       - Country: GB
+      #       - Country: AU
       -  QualificationTypeId: "00000000000000000040"  # 5k hits
          Comparator: GreaterThan
-         IntegerValues: [10000]
-         ActionsGuarded: DiscoverPreviewAndAccept
+         IntegerValues: [2400]
       -  QualificationTypeId: "00000000000000000060"  # adult content
          Comparator: EqualTo
          IntegerValues: [1]
-         ActionsGuarded: DiscoverPreviewAndAccept
       -  QualificationTypeId: "000000000000000000L0"  # percentage approved
          Comparator: GreaterThan
-         IntegerValues: [99]
-         ActionsGuarded: DiscoverPreviewAndAccept
+         IntegerValues: [95]
       -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
          Comparator: DoesNotExist
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+         Comparator: Exists
          ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-gpt-persona-wisebeing-01.db'   # this will be placed in task dir
-  SQLALCHEMY_TRACK_MODIFICATIONS: falseq
-  # SERVER_NAME: darmaeval.cutelab.name
-  # PREFERRED_URL_SCHEME: https
+  DATABASE_FILE_NAME: 'sqlite-database-prod-eng-curt-01.db'   # this will be placed in task dir
+  SQLALCHEMY_TRACK_MODIFICATIONS: false
+  SERVER_NAME: darmaeval.cutelab.name
+  PREFERRED_URL_SCHEME: https
+  
