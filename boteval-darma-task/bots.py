@@ -70,7 +70,6 @@ class GPTBot(BotAgent):
         n_toks = len(turn.strip().split())
         self.context.append((turn, n_toks))
 
-        
     def get_seed_turns(self) -> str:
         seed_turns = ''
         ctx_len = 0
@@ -81,19 +80,44 @@ class GPTBot(BotAgent):
             seed_turns = turn + '\n' + seed_turns
         return seed_turns.strip()
 
+    def force_completion(self):
+        prompt = self.get_seed_turns()
+        # few_shot_example=""
+        # p = self.prompt_compose(
+        #     self.instruction, self.persona, 
+        #     few_shot_example, seed_turns, 
+        #     talk=False
+        # )
+        resp = self.query_completion_api(prompt, engine=self.engine)
+
+        final_message_text = resp
+        final_message_text = final_message_text.strip()
+        
+        self.feed(final_message_text)
+        act_out = {}
+        act_out['text'] = final_message_text
+        act_out['user_id'] = "Forced Completion"
+        return {**act_out, 'episode_done': False}
+    
     def talk(self, timeout=None):
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
         seed_turns = self.get_seed_turns()
-        p = self.prompt_compose(self.instruction, self.persona, few_shot_example, seed_turns)
+        
+        prompt = self.prompt_compose(
+                self.instruction, self.persona, 
+                few_shot_example, seed_turns, 
+                talk=True
+            )
 
         if self.turn_idx == 0:
-            resp = self.query_completion_api(p, engine=self.engine)
+            final_message_text =\
+                self.query_completion_api(prompt, engine=self.engine)
         else:
-            resp = self.query_completion_api(p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
-        final_message_text = resp
+            final_message_text =\
+                self.query_completion_api(prompt, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = final_message_text.strip()
 
         self.context_append(self.persona, final_message_text)
@@ -218,7 +242,14 @@ class GPTBot(BotAgent):
         return timeout_response
 
     @staticmethod
-    def prompt_compose(instr, persona, few_shot_example, seed_turns):
+    def prompt_compose(instr, persona, few_shot_example, seed_turns, talk=True):
         if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}\nuser {persona}:'
-        return f'{instr}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n{persona}:'
+            prompt = f'{instr}\n\n{seed_turns}\n'
+        else:
+            prompt = f'{instr}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n'
+        if talk:
+            prompt += f'user {persona}:'
+        return prompt
+    
+    def back_space(self):
+        return self.context.pop()

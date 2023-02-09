@@ -92,24 +92,52 @@ class MixedBots:
           
     def talk(self, verbose=True):     
         replies = self._iterate(lambda x: x.talk())
-
         if verbose:
+            self._print_responses(replies)
+        return replies
+    
+    def force_completion(self, verbose=True):
+        replies = self._iterate(lambda x: x.force_completion())
+        if verbose:
+            table = self.fill_table([
+                textwrap.wrap(
+                    f'{x["text"]}',
+                    width=self.sub_width
+                ) for x in replies
+            ])
+            self._print_responses(table, wrapped=True)
+        return replies
+
+    
+    def back_space(self, verbose=True):
+        removes = self._iterate(lambda x: x.back_space())
+        return removes
+    
+    def _print_responses(self, responses, wrapped=False):
+        if not wrapped:
             table = self.fill_table([
                 textwrap.wrap(
                     f'User {x[0]}: {x[1]["text"]}',
                     width=self.sub_width
-                ) for x in zip(self.titles, replies)
+                ) for x in zip(self.titles, responses)
             ])
-            table = np.vstack([
-                self.ids,
-                table.T
-            ]) 
-            print(tabulate(table, headers="firstrow"))
-            print('='*self.print_width)
-        
-        return replies
-        
+        else:
+            table = responses
+        table = np.vstack([
+            self.ids,
+            table.T
+        ]) 
+        print(tabulate(table, headers="firstrow"))
+        print('='*self.print_width)
+    
+    
+    def view_seed(self):
+        print('\n'.join(
+            textwrap.wrap(self.bots[0].get_seed_turns(), 
+            width=PRINT_WIDTH)
+        ))
             
+    
 def print_wrap_text(txt, width=None,
                     prefix='#', 
                     subsequent_indent=' ',
@@ -151,13 +179,13 @@ def load_persona_confs(confs_filename='persona_configs.json'):
         # json_formatted_str = json.dumps(conf_json, indent=2)
         # print(json_formatted_str)
         for i, conf in enumerate(confs_json):
-            print("="*100)
+            print("="*PRINT_WIDTH)
             print(f'# {i+1} :: id({conf["id"]})')
             print(f'# Notes: {conf["notes"]}')
             print(f'# Title: {conf["title"]}')
             print('# Instruction:')
             print_wrap_text(conf['instruction'])
-            print("="*100)
+            print("="*PRINT_WIDTH)
         
     choices = pick_valid_choice(confs_json)
     personas = [
@@ -218,16 +246,18 @@ def interactive_session(
         
         print(f'Conversation ID: {existing_conv["id"]}')
         print(f'Conversation Name: {existing_conv["name"]}')
+        users_list = set()
         print('='*PRINT_WIDTH)
         for msg in existing_conv['conversation']:
             bots.hear(msg)
+            users_list.add(msg["speaker_id"])
             print_wrap_text(f'User {msg["speaker_id"]}: {msg["text"]}')
             final_user = msg['speaker_id']
             print('='*PRINT_WIDTH)
         replies = bots.talk()
-
         
         while True:
+            print('='*PRINT_WIDTH)
             line = input(f'[User {final_user}]: ')
             line = line.strip()
             if not line:
@@ -235,14 +265,37 @@ def interactive_session(
             if line == "exit":
                 break
             if line.startswith("\\\\"):
-                bots.feed(line[2:])
+                feed = line[2:]
+                feeding_text = True
+                if feed.endswith("\\\\"):
+                    feeding_text = False
+                    feed = feed[:-2]
+                else:
+                    print("Enter '\\\\' to end feed.")
+                    
+                while feeding_text:
+                    feed += '\n' + input()
+                    if feed.endswith("\\\\"):
+                        feeding_text = False
+                        feed = feed[:-2]
+                        break
+                print(f'(Feeding text):\n{feed}')
+                bots.feed(feed)
+                print('='*PRINT_WIDTH)
+                bots.force_completion()
+            elif line.startswith("\\view_seed"):
+                print('Seeds')
+                bots.view_seed()
+            elif line.startswith("\\back_space"):
+                print('Removing context:')
+                print(bots.back_space())
             else:
                 bots.hear({
                     'speaker_id': final_user,
                     'text': line
                 })
-            print('='*PRINT_WIDTH)
-            reply = bots.talk()
+                print('='*PRINT_WIDTH)
+                reply = bots.talk()
 
         query = input('Do you want to continue? ')
         if query.lower() in ['q', 'quit']:
@@ -286,7 +339,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Alignment Options and Configs.')
     parser.add_argument('-inter', default=True, type=bool,
                         help='Run interactive session')
-    parser.add_argument('-conv_id',  default='chat51', type=str,
+    parser.add_argument('-conv_id',  default='chat410', type=str,
                         help='Selected conversation id')
     parser.add_argument('-conv_file', default='chat_topics_eng.json', type=str,
                         help='Conversations filepath')
