@@ -8,9 +8,12 @@ import json
 
 from boteval import log, C, registry as R
 from boteval.bots import BotAgent
-from .prompt_generator import PromptGenerator
 
-
+try:
+    from .prompt_generator import PromptGenerator
+except:
+    from prompt_generator import PromptGenerator
+    
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
 

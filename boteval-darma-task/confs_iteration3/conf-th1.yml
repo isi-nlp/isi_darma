@@ -3,14 +3,14 @@ chat_dir: data-prod
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: chat_topics_eng_pp.json
+  topics_file: chat_topics_eng.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    persona_id: em1
+    persona_id: th1
 
 #  transforms:
 #    human:
@@ -100,7 +100,7 @@ flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-gpt-persona-em1-01.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-gpt-persona-th1-01.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   # SERVER_NAME: darmaeval.cutelab.name
   # PREFERRED_URL_SCHEME: https

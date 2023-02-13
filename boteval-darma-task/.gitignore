@@ -6,3 +6,4 @@ boteval-darma-task/data.bak/
 .history*
 __pycache__
 *.pyc
+*.png
