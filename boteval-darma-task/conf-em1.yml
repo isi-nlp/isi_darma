@@ -10,7 +10,7 @@ chatbot:
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    prompt: em1
+    persona_id: em1
 
 #  transforms:
 #    human:

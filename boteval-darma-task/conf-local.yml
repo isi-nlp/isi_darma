@@ -9,7 +9,7 @@ chatbot:
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    prompt: wisebeing 
+    persona_id: wisebeing 
     # 
 
   transforms:
