@@ -10,7 +10,7 @@ chatbot:
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    prompt: advocate
+    persona_id: advocate
 
 #  transforms:
 #    human:

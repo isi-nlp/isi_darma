@@ -9,12 +9,15 @@ import json
 from boteval import log, C, registry as R
 from boteval.bots import BotAgent
 
-
-
+try:
+    from .prompt_generator import PromptGenerator
+except:
+    from prompt_generator import PromptGenerator
+    
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
 
-    def __init__(self, engine: str, prompt: str,
+    def __init__(self, engine: str, persona_id: str,
             *args, api_key='',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
@@ -23,7 +26,7 @@ class GPTBot(BotAgent):
         
         self.max_ctx_len = max_ctx_len
         self.engine = engine
-        self.prompt = prompt
+        self.prompt_generator_id = persona_id
         self.few_shot_example = few_shot_example # e.g. nvc
 
         api_key = api_key or os.environ.get('OPENAI_KEY', '')
@@ -33,18 +36,21 @@ class GPTBot(BotAgent):
                             " You may obtain key from https://beta.openai.com/account/api-keys")
         openai.api_key = api_key
 
-        self.load_persona(
-            prompt,
+        self.prompt_generator = self.load_persona(
+            persona_id,
             configs_relative_filepath=\
-                persona_configs_relative_filepath
+                persona_configs_relative_filepath,
+            few_shot_example=self.few_shot_example
         )
+        
         self.turn_idx = 0
-        log.info(f"Initialized GPT bot with {self.engine=} {self.prompt=} {self.persona=}\n{self.instruction=}")
+        log.info(f"Initialized GPT bot with {self.engine=} {self.prompt_generator_id=} {self.prompt_generator.title=}\n{self.prompt_generator.instruction=}")
         self.context = []
 
     def load_persona(self, 
-                     prompt,
-                     configs_relative_filepath='persona_configs.json'):
+                     persona_id:str,
+                     configs_relative_filepath='persona_configs.json',
+                     few_shot_example=None):
         
         configs_filepath =\
             os.path.join(
@@ -55,14 +61,19 @@ class GPTBot(BotAgent):
         with open(configs_filepath, mode='r') as f:
             persona_jsons = json.load(f)
             matching_personas = [
-                (x['title'], x['instruction'])
-                for x in persona_jsons if x['id']==prompt
+                x
+                for x in persona_jsons if x['id']==persona_id
             ]
-                        
-            if matching_personas:
-                self.persona, self.instruction = matching_personas[0]
-            else:
-                raise Exception(f'Unknown prompt: {prompt}')
+            
+            assert len(matching_personas) == 1
+            return PromptGenerator(
+                matching_personas[0], 
+                lambda prompt, **args: self.query_completion_api(
+                    prompt, engine=self.engine, **args
+                ),
+                few_shot_example=few_shot_example)
+            
+            #     raise Exception(f'Unknown prompt: {prompt}')
         
 
     def context_append(self, user, text):
@@ -70,7 +81,6 @@ class GPTBot(BotAgent):
         n_toks = len(turn.strip().split())
         self.context.append((turn, n_toks))
 
-        
     def get_seed_turns(self) -> str:
         seed_turns = ''
         ctx_len = 0
@@ -81,22 +91,29 @@ class GPTBot(BotAgent):
             seed_turns = turn + '\n' + seed_turns
         return seed_turns.strip()
 
-    def talk(self, timeout=None):
-        if self.few_shot_example == 'nvc':
-            few_shot_example = self.get_fewshot_example(self.turn_idx)
-        else:
-            few_shot_example = ""
+    def force_completion(self):
         seed_turns = self.get_seed_turns()
-        p = self.prompt_compose(self.instruction, self.persona, few_shot_example, seed_turns)
+        resp = self.query_completion_api(seed_turns, engine=self.engine)
 
-        if self.turn_idx == 0:
-            resp = self.query_completion_api(p, engine=self.engine)
-        else:
-            resp = self.query_completion_api(p, engine=self.engine, frequency_penalty=2, presence_penalty=2, temperature=1)
         final_message_text = resp
         final_message_text = final_message_text.strip()
+        
+        self.feed(final_message_text)
+        act_out = {}
+        act_out['text'] = final_message_text
+        act_out['user_id'] = "Forced Completion"
+        return {**act_out, 'episode_done': False}
+    
+    def talk(self, timeout=None):
+        seed_turns = self.get_seed_turns()
+        
+        final_message_text = self.prompt_generator.run(
+            seed_turns,
+            self.turn_idx
+        )
+        final_message_text = final_message_text.strip()
 
-        self.context_append(self.persona, final_message_text)
+        self.context_append(self.prompt_generator.title, final_message_text)
         act_out = {}
         act_out['text'] = final_message_text
         act_out['user_id'] = "Moderator"
@@ -116,30 +133,16 @@ class GPTBot(BotAgent):
         n_toks = len(text.strip().split())
         self.context.append((text, n_toks))
         
+    def back_space(self):
+        return self.context.pop()
+    
+    
     @staticmethod
-    def get_fewshot_example(turn_idx):
-        full_example = [
-                        "user A: The Most Arrogant Speaker We've Ever Had!\n"\
-                        "wisebeing: Are you reacting to my having taken thirty straight minutes to present my views before giving you a chance to talk?\n",
-                        "user A: No, you make it sound so simple.\n"\
-                        "wisebeing: Are you reacting to my not having said anything about how the process can be difficult for some people to apply?\n",
-                        "user A: No, not some people—you!\n"\
-                        "wisebeing: So you're reacting to my not having said that the process can be difficult for me at times?\n",
-                        "user A: That's right.\n"\
-                        "wisebeing: Are you feeling annoyed because you would have liked some sign from me that indicated that I have some problems with the process myself?\n",
-                        "user A: That's right.\n"\
-                        "wisebeing: Would you like me to admit right now that this process can be a struggle for me to apply?\n",
-                        "use A: Yes\n"\
-                        "wisebeing: Yes, this process is often difficult for me. As we continue with the workshop,"\
-                            "you'll probably hear me describe several incidents where I've struggled… or completely lost touch… "\
-                            "with this process, this consciousness, that I am presenting here to you. But what keeps me in the struggle "\
-                            "are the close connections to other people that happen when I do stay with the process."
-                        ]
-        return "".join(full_example[:turn_idx+1])
-
-    @staticmethod
-    def query_completion_api(prompt, engine,
-                             frequency_penalty=0, presence_penalty=0, temperature=0.7):
+    def query_completion_api(
+            prompt, engine,
+            frequency_penalty=0, presence_penalty=0,
+            temperature=0.7, n=1
+        ):
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):
             # GPT-3 Generation
@@ -149,6 +152,7 @@ class GPTBot(BotAgent):
                 temperature=temperature,
                 max_tokens=1024,
                 top_p=1,
+                n=n,
                 frequency_penalty=frequency_penalty,
                 presence_penalty=presence_penalty,
                 stop=["user A:", "user B:", "user C:", "user D:"]
@@ -216,9 +220,3 @@ class GPTBot(BotAgent):
         # if timeout, then return something generic
         timeout_response = "I don't really know what to say about that."
         return timeout_response
-
-    @staticmethod
-    def prompt_compose(instr, persona, few_shot_example, seed_turns):
-        if few_shot_example == "":
-            return f'{instr}\n\n{seed_turns}\nuser {persona}:'
-        return f'{instr}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n{persona}:'

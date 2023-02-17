@@ -8,8 +8,8 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-003
-    prompt: wisebeing
+    engine: text-davinci-002
+    persona_id: wisebeing
 
   # transforms:
   #   human:

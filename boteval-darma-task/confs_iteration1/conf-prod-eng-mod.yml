@@ -10,7 +10,7 @@ chatbot:
   bot_name: gpt
   bot_args:
     engine: text-davinci-003
-    prompt: moderator
+    persona_id: moderator
 
 #  transforms:
 #    human:

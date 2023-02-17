@@ -15,7 +15,6 @@ import numpy as np
 
 from bots import GPTBot
 from tabulate import tabulate
-
 PRINT_WIDTH=-1 # Modified by argparse
 
 class MixedBots:
@@ -33,9 +32,7 @@ class MixedBots:
         self.bots = [
             GPTBot(
                 engine=engine,
-                prompt=persona_id,
-                # title=persona_title,
-                # instruction=persona_instruction,
+                persona_id=persona_id,
                 # few_shot_example=existing_conv,
                 max_ctx_len=max_ctx_len,
             )
@@ -92,24 +89,52 @@ class MixedBots:
           
     def talk(self, verbose=True):     
         replies = self._iterate(lambda x: x.talk())
-
         if verbose:
+            self._print_responses(replies)
+        return replies
+    
+    def force_completion(self, verbose=True):
+        replies = self._iterate(lambda x: x.force_completion())
+        if verbose:
+            table = self.fill_table([
+                textwrap.wrap(
+                    f'{x["text"]}',
+                    width=self.sub_width
+                ) for x in replies
+            ])
+            self._print_responses(table, wrapped=True)
+        return replies
+
+    
+    def back_space(self, verbose=True):
+        removes = self._iterate(lambda x: x.back_space())
+        return removes
+    
+    def _print_responses(self, responses, wrapped=False):
+        if not wrapped:
             table = self.fill_table([
                 textwrap.wrap(
                     f'User {x[0]}: {x[1]["text"]}',
                     width=self.sub_width
-                ) for x in zip(self.titles, replies)
+                ) for x in zip(self.titles, responses)
             ])
-            table = np.vstack([
-                self.ids,
-                table.T
-            ]) 
-            print(tabulate(table, headers="firstrow"))
-            print('='*self.print_width)
-        
-        return replies
-        
+        else:
+            table = responses
+        table = np.vstack([
+            self.ids,
+            table.T
+        ]) 
+        print(tabulate(table, headers="firstrow"))
+        print('='*self.print_width)
+    
+    
+    def view_seed(self):
+        print('\n'.join(
+            textwrap.wrap(self.bots[0].get_seed_turns(), 
+            width=PRINT_WIDTH)
+        ))
             
+    
 def print_wrap_text(txt, width=None,
                     prefix='#', 
                     subsequent_indent=' ',
@@ -129,7 +154,7 @@ def print_wrap_text(txt, width=None,
 
 def pick_valid_choice(alist, statement='Enter config #: '):
     def is_valid(x):
-        return x >= 0 and x < len(alist)
+        return x in range(0, len(alist))
     def verified_input(xs):
         valids = list(map(lambda x: is_valid(x), xs))
         return np.prod(valids) and len(xs) > 0
@@ -151,13 +176,13 @@ def load_persona_confs(confs_filename='persona_configs.json'):
         # json_formatted_str = json.dumps(conf_json, indent=2)
         # print(json_formatted_str)
         for i, conf in enumerate(confs_json):
-            print("="*100)
+            print("="*PRINT_WIDTH)
             print(f'# {i+1} :: id({conf["id"]})')
             print(f'# Notes: {conf["notes"]}')
             print(f'# Title: {conf["title"]}')
             print('# Instruction:')
             print_wrap_text(conf['instruction'])
-            print("="*100)
+            print("="*PRINT_WIDTH)
         
     choices = pick_valid_choice(confs_json)
     personas = [
@@ -172,33 +197,21 @@ def load_conversation(filepath='chat_topics_eng.json', conv_id=None):
 
     print('# Pick')
     print_wrap_text(
-        str([c['id'] for c in convs_json]),
+        str([f'#{i+1}: {c["id"]}' for i, c in enumerate(convs_json)]),
         print_border=True,
         title='Conversation IDs',
     )
     
     if conv_id:
-        choice = [
-            i for i, c in enumerate(convs_json) 
+        conv = [
+            c for c in convs_json
             if c['id'] == conv_id
         ][0]
     else:
-        choice = 0 #pick_valid_choice(convs_json, statement='Enter conv ID:')
-    conv = convs_json[choice]
-        
+        conv = pick_valid_choice(convs_json, statement='Enter # of conv: ')[0]
+                
     print(f'Conversation ID: {conv["id"]}')
     print(f'Conversation Name: {conv["name"]}')
-    
-    # def prepare_msg(json_obj):
-    #     return {
-    #         'user_id': json_obj['speaker_id'],
-    #         'data': json_obj['text'] 
-    #     }
-    #     # return f"User {json_obj['speaker_id']}: {json_obj['text']}"
-    
-    # conv = [
-    #     prepare_msg(j) for j in conv['conversation']
-    # ]
     
     return conv
 
@@ -206,6 +219,7 @@ def interactive_session(
         engine='text-davinci-003',
         max_ctx_len=2048
     ):
+    
     while(True):
         personas = load_persona_confs()
         bots = MixedBots(
@@ -218,31 +232,72 @@ def interactive_session(
         
         print(f'Conversation ID: {existing_conv["id"]}')
         print(f'Conversation Name: {existing_conv["name"]}')
+        users_list = set()
         print('='*PRINT_WIDTH)
         for msg in existing_conv['conversation']:
             bots.hear(msg)
+            users_list.add(msg["speaker_id"])
             print_wrap_text(f'User {msg["speaker_id"]}: {msg["text"]}')
             final_user = msg['speaker_id']
             print('='*PRINT_WIDTH)
         replies = bots.talk()
-
         
+        def view_seed():
+            print('Seeds')
+            bots.view_seed()
+    
+        def back_space():
+            print('Removing context:')
+            print(bots.back_space())
+
+        def retry():
+            print('Retrying')
+            bots.back_space()
+            bots.talk()
+            
+        options = {
+            "\\view_seed": view_seed,
+            "\\back_space": back_space,
+            "\\retry": retry
+        }
         while True:
+            print('='*PRINT_WIDTH)
             line = input(f'[User {final_user}]: ')
             line = line.strip()
             if not line:
                 continue
             if line == "exit":
                 break
+            
+            
             if line.startswith("\\\\"):
-                bots.feed(line[2:])
+                feed = line[2:]
+                feeding_text = True
+                if feed.endswith("\\\\"):
+                    feeding_text = False
+                    feed = feed[:-2]
+                else:
+                    print("Enter '\\\\' to end feed.")
+                    
+                while feeding_text:
+                    feed += '\n' + input()
+                    if feed.endswith("\\\\"):
+                        feeding_text = False
+                        feed = feed[:-2]
+                        break
+                print(f'(Feeding text):\n{feed}')
+                bots.feed(feed)
+                print('='*PRINT_WIDTH)
+                bots.force_completion()
+            elif options.get(line):
+                options[line]()
             else:
                 bots.hear({
                     'speaker_id': final_user,
                     'text': line
                 })
-            print('='*PRINT_WIDTH)
-            reply = bots.talk()
+                print('='*PRINT_WIDTH)
+                _ = bots.talk()
 
         query = input('Do you want to continue? ')
         if query.lower() in ['q', 'quit']:
@@ -286,7 +341,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Alignment Options and Configs.')
     parser.add_argument('-inter', default=True, type=bool,
                         help='Run interactive session')
-    parser.add_argument('-conv_id',  default='chat51', type=str,
+    parser.add_argument('-conv_id',  default=None, type=str,
                         help='Selected conversation id')
     parser.add_argument('-conv_file', default='chat_topics_eng.json', type=str,
                         help='Conversations filepath')
