@@ -12,10 +12,13 @@ import textwrap
 import logging
 import argparse
 import numpy as np
-
 from bots import GPTBot
 from tabulate import tabulate
+from multiprocessing.pool import ThreadPool
+
+
 PRINT_WIDTH=-1 # Modified by argparse
+
 
 class MixedBots:
     
@@ -41,6 +44,8 @@ class MixedBots:
         self.print_width = print_width
         self.sub_width =\
             int((self.print_width-1)/len(self.personas))
+        
+        self.threadPool = ThreadPool()
 
         
     def __len__(self) -> int:
@@ -76,10 +81,7 @@ class MixedBots:
         return np.array(ndlist)
     
     def _iterate(self, func):
-        outcome = []
-        for b in self.bots:
-            outcome.append(func(b))
-        return outcome
+        return self.threadPool.map(func, self.bots)
             
     def hear(self, msg):     
         self._iterate(lambda x: x.hear(msg))       
