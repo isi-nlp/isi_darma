@@ -135,6 +135,20 @@ class MixedBots:
             textwrap.wrap(self.bots[0].get_seed_turns(), 
             width=PRINT_WIDTH)
         ))
+        
+    def view_prompt_dict(self):
+        def view_if_applicable(bot: GPTBot):
+            if bot.prompt_generator.variables:
+                print( 
+                    json.dumps(
+                        bot.prompt_generator.variables,
+                        indent = 2
+                    )    
+                )
+            else:
+                print('Empty')
+        self._iterate(lambda x: view_if_applicable(x))
+
             
     
 def print_wrap_text(txt, width=None,
@@ -257,10 +271,16 @@ def interactive_session(
             bots.back_space()
             bots.talk()
             
+        def view_prompt_dict():
+            print('Prompt Dictionary')
+            bots.view_prompt_dict()
+            
+            
         options = {
             "\\view_seed": view_seed,
             "\\back_space": back_space,
-            "\\retry": retry
+            "\\retry": retry,
+            "\\view_prompt_dict": view_prompt_dict,
         }
         while True:
             print('='*PRINT_WIDTH)
@@ -300,6 +320,7 @@ def interactive_session(
                 })
                 print('='*PRINT_WIDTH)
                 _ = bots.talk()
+                
 
         query = input('Do you want to continue? ')
         if query.lower() in ['q', 'quit']:

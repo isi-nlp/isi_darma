@@ -2,7 +2,26 @@
 import re
 from multiprocessing import Lock
 from multiprocessing.pool import ThreadPool
+import textwrap
 
+PRINT_WIDTH = 150
+def print_wrap_text(txt, width=None,
+                    prefix='#', 
+                    subsequent_indent=' ',
+                    print_border=False,
+                    title=''):
+    if not width:
+        width=PRINT_WIDTH
+    if print_border:
+        print('='*(width+1))
+    if title:
+        print(f'{prefix} {title}')
+    for s in textwrap.wrap(txt, width=width,
+                           subsequent_indent=subsequent_indent):
+        print(f'{prefix} {s}')
+    if print_border:
+        print('='*(width+1))
+        
 
 TOKEN_REGEX = '<([\w-]+)>'
 ROOT_TOKEN_REGEX = '([\w]+)'
@@ -72,6 +91,7 @@ class PromptGenerator:
                 
         return final_message_text.strip()
         
+        
     def _prompt_compose(self, seed_turns, turn_idx):
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(turn_idx)
@@ -86,8 +106,9 @@ class PromptGenerator:
             prompt = f'{instruction}\n\n{seed_turns}\n'
         else:
             prompt = f'{instruction}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n'
-            
-        # print('Instruction:', instruction)
+
+        print_wrap_text(f'Generated Instruction: {instruction}')
+               
         return prompt + f'user {self.title}:'
 
     def _decode_tokens(self, statement, seed_turns):
@@ -111,7 +132,7 @@ class PromptGenerator:
                                 leaf_prompt['instruction'], seed_turns
                             )    
                         ]))
-            
+                    
                     leaf_prompt['value'] = self.reduce(leaf_prompt, seed_turns)
                              
             # Support other value formats such as 'value-list'
