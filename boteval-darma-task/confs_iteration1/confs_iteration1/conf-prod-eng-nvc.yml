@@ -1,0 +1,106 @@
+# sandbox chat_dir: data
+chat_dir: data-prod
+
+chatbot:
+  display_name: 'Moderator'
+  topics_file: chat_topics_eng.json
+  #bot_name: hf-transformers
+  #bot_args:
+  #  model_name: facebook/blenderbot_small-90M
+  bot_name: gpt
+  bot_args:
+    engine: text-davinci-003
+    persona_id: wisebeing
+
+#  transforms:
+#    human:
+#      - name: rtg-api
+#        args:
+#          api_url: http://localhost:6060/many-eng/v1/translate
+#    bot:
+#      - name: nllb-api
+#        args:
+#          api_url: http://localhost:6062/nllb/translate
+#          src_lang: eng_Latn
+#          tgt_lang: fra_Latn
+#
+
+limits:
+  max_threads_per_user: 10
+  max_threads_per_topic: &max_assignments 8
+  max_turns_per_thread: 6
+  reward: &reward '1.5' # dollars
+  
+onboarding:
+  agreement_file: user-agreement.html
+  instructions_file: instructions.html
+  checkboxes:
+    instructions_read: I have read the instructions.
+    iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
+    #know_french: I can read and write fluently in French and I agree to write in French in this task.
+
+ratings:
+  - question: How Coherent was the conversation?
+    choices: &choices
+      - Not at all
+      - Mostly not
+      - So-so
+      - Somewhat
+      - Very
+  - question: How likely are you to continue chatting with the moderator?
+    choices: *choices
+  - question: To what degree did the moderator understand your point of view?
+    choices: *choices
+  - question:  To what degree did the moderator convince you to change your behavior?
+    choices: *choices
+
+# rename _mturk -> mturk to enable crowd backend
+mturk: 
+  client:
+    profile: default # the [default] profile in ~/.aws/credentials file
+    sandbox: false  # sandbox: false to go live
+  seamless_login: true  # auto signup and login for mturk user
+  hit_settings:
+    # config values are sent directly to mturk API
+    # https://boto3.amazonaws.com/v1/documentation/api/1.11.9/reference/services/mturk.html#MTurk.Client.create_hit
+    MaxAssignments: *max_assignments
+    AutoApprovalDelayInSeconds: 86400     # 7 days = 604k sec
+    LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
+    AssignmentDurationInSeconds: 7200      # 1 hour = 3.6k sec
+    Reward: *reward
+    Title: 'Evaluate a moderator chatbot (Adult Content)'
+    Keywords: 'chat,conversation,dialog,partner'
+    Description: Evaluate a moderator chatbot after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    QualificationRequirements: 
+      # -  QualificationTypeId: "00000000000000000071"  # locale qualification
+      #    Comparator: In
+      #    LocaleValues:
+      #       - Country: US
+      #       - Country: CA
+      #       - Country: GB
+      #       - Country: AU
+      -  QualificationTypeId: "00000000000000000040"  # 5k hits
+         Comparator: GreaterThan
+         IntegerValues: [5000]
+      -  QualificationTypeId: "00000000000000000060"  # adult content
+         Comparator: EqualTo
+         IntegerValues: [1]
+      -  QualificationTypeId: "000000000000000000L0"  # percentage approved
+         Comparator: GreaterThan
+         IntegerValues: [95]
+      -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
+         Comparator: DoesNotExist
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+         Comparator: Exists
+         ActionsGuarded: DiscoverPreviewAndAccept
+
+flask_config:
+  # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
+  #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
+  # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-prod-eng-nvc-01.db'   # this will be placed in task dir
+  SQLALCHEMY_TRACK_MODIFICATIONS: false
+  SERVER_NAME: darmaeval.cutelab.name
+  PREFERRED_URL_SCHEME: https
+  

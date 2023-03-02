@@ -1,8 +1,0 @@
-darma_chat/frontend/_generated
-**__pycache__**
-**.pyc
-*.egg-info
-build/
-outputs/
-model_chat
-.env

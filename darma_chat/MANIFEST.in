@@ -1,8 +1,0 @@
-include darma_chat/test_text.json
-include darma_chat/frontend/main.js
-prune darma_chat/frontend/_generated
-graft darma_chat/frontend/components
-graft darma_chat/hydra_configs
-graft darma_chat/task_config
-global-exclude __pycache__
-global-exclude *.pyc

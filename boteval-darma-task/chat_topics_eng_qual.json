@@ -1,0 +1,41 @@
+[
+    {
+        "id": "chat55",
+        "name": "chat 55 - controversy",
+        "conversation": [
+            {
+                "speaker_id": "c",
+                "text": "The lack of respect and open-mindedness in political discussions may be due to affective polarization, the belief those with opposing views are immoral or unintelligent. Intellectual humility, the willingness to change beliefs when presented with evidence, was linked to lower affective polarization."
+            },
+            {
+                "speaker_id": "d",
+                "text": "to be fair, what i\u2019m seeing right now at the capital building would suggest that i might have a point"
+            },
+            {
+                "speaker_id": "b",
+                "text": "did the right have a point about the riots during the blm protests?"
+            },
+            {
+                "speaker_id": "d",
+                "text": "blm didn\u2019t take the capitol building in an attempted coup d\u2019\u00e9tat incited by a sitting president and the democratic party didn\u2019t encourage looting."
+            },
+            {
+                "speaker_id": "b",
+                "text": "why deomize the entire right or the entire left when this stuff happens? surely it's a minority responsible in both examples."
+            },
+            {
+                "speaker_id": "d",
+                "text": "i think you\u2019ve yeed enough haws for one day sunshine, time to stfu and let the adults do the talking"
+            },
+            {
+                "speaker_id": "a",
+                "text": "totally not a mature way to end an argument. just saying..."
+            },
+            {
+                "speaker_id": "d",
+                "text": "yeah i haven\u2019t got a lot of patience for you idiots today."
+            }
+        ],
+        "target_user": "d"
+    }
+]
