@@ -3,7 +3,7 @@
         "id": "dyn-b",
         "notes": "first attempt of dynamic prompts",
         "title": "Agent",
-        "preprocess_prompts": [
+        "preprocess_variables": [
             {
                 "id": "to_be_moderated_users",
                 "instruction": "Classify using Yes or No whether each user need moderation based on their responses in the conversation:",

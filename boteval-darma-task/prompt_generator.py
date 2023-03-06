@@ -2,30 +2,63 @@
 import re
 from multiprocessing import Lock
 from multiprocessing.pool import ThreadPool
-import textwrap
 
-PRINT_WIDTH = 150
-def print_wrap_text(txt, width=None,
-                    prefix='#', 
-                    subsequent_indent=' ',
-                    print_border=False,
-                    title=''):
-    if not width:
-        width=PRINT_WIDTH
-    if print_border:
-        print('='*(width+1))
-    if title:
-        print(f'{prefix} {title}')
-    for s in textwrap.wrap(txt, width=width,
-                           subsequent_indent=subsequent_indent):
-        print(f'{prefix} {s}')
-    if print_border:
-        print('='*(width+1))
-        
 
 TOKEN_REGEX = '<([\w-]+)>'
 ROOT_TOKEN_REGEX = '([\w]+)'
+class Variable: pass # Implemented Below
 
+
+class Variable:
+    """
+    A class used to organize variable/instruction updates and easily extend to
+    trace history or current replacements in tokens.
+    """
+    def __init__(self, parameters):
+        if not isinstance(parameters, dict):
+            parameters = {"instruction": parameters}
+        self.parameters = parameters
+        self.instruction_raw = self.parameters.get('instruction')
+        self.variables = {
+            t: None
+            for t in re.findall(TOKEN_REGEX, self.instruction_raw)
+        }
+    
+    def get_tokens(self):
+        return self.variables.keys()
+    
+    def replace(self, token, value) -> Variable:
+        self.variables[token] = value
+        return self
+    
+    def get(self, name:str, default:str=None):
+        return self.parameters.get(name, default)
+    
+    def __getitem__(self, name: str):
+        return self.get(name)
+    
+    def __setitem__(self, name: str, val):
+        self.parameters[name] = val
+    
+    def update(self, _dict: dict):
+        self.parameters.update(_dict)
+    
+    def trace(self, debug=True):
+        statement = self.instruction_raw
+        if debug:
+            decoding_placeholder = '\033[96m{decoding}\033[00m'
+        else:
+            decoding_placeholder = '{decoding}'
+        for token, decoding in self.variables.items():
+            statement = statement.replace(
+                f'<{token}>',
+                decoding_placeholder.format(decoding=decoding)
+            )
+        return statement
+    
+    def __str__(self):
+        return self.trace(debug=False)
+    
 class PromptGenerator:
     """
     A class used to adapt to dynamic formulation of persona configuration.
@@ -39,110 +72,155 @@ class PromptGenerator:
     - Parsing embeddable post-regex; Saving their (TOKEN)-list variable
     - Parsing embeddable post-func
     - API agnostic
+    - Multiple endpoints
+    - Tracing of recent assignments of variable-tokens per instruction/variable
 
     TODO make post-processing routines somehow (such as detecting end)
-    TODO allow logging of pre-processing prompts respones
-    TODO instead of using pre-processing prompts, include access to other end-points
-    TODO make it turn aware if needed
-    
-    
+    TODO make it turn aware if needed (frequency)
+
+
     @author: Basem Rizk
     
     """
     
     def __init__(self, config_json: dict,
-                 query_lm,
-                 few_shot_example=None):
-        self.query_lm = query_lm
+                 endpoints: dict,
+                 few_shot_example=None,
+                 default_endpoint='query_lm'):
+        """
+
+        Args:
+            config_json (dict): JSON formatted persona configuration
+            endpoints (dict): dictionary of endpoint function calls including lm call
+            few_shot_example (_type_, optional): Not tested but added for backward 
+            compatibility. Defaults to None.
+            default_endpoint (str, optional): Name of endpoint to a lm call. Defaults 
+            to 'query_lm'.
+        """
+        self.endpoints = endpoints
+        self.default_endpoint = default_endpoint
         self.id = config_json['id']
         self.notes = config_json['notes']
         self.title = config_json['title']    
-        self.instruction = config_json['instruction']
+        self.instruction = Variable({
+            "instruction": config_json['instruction']
+        })
         self.few_shot_example = few_shot_example     
-           
+        
         self.threadPool = ThreadPool()
-        self.variables = config_json.get('preprocess_prompts')
+        self.variables = config_json.get('preprocess_variables')
         if self.variables:
             self.variables = {
-                x['id'] : x for x in self.variables
+                x['id'] : Variable(x) for x in self.variables
             }
             self.variables_master_lock = Lock()
             self.variables_locks = {
                 k: Lock() for k in self.variables
             }
 
+    def run(self, seed_turns: str, turn_idx: int) -> str:
+        """
 
+        Args:
+            seed_turns (str): concatentation of all past turns of the conversation
+            turn_idx (int): turn number in the conversation used to set args of
+            language model calls
 
-    def run(self, seed_turns, turn_idx):
+        Returns:
+            str: bot response given the generated/constant prompt using the default lm
+        """
         prompt = self._prompt_compose(
             seed_turns, turn_idx
         )
         
         if turn_idx == 0:
-            final_message_text =\
-                self.query_lm(prompt, n=10)
+            response =\
+                self.endpoints[self.default_endpoint](prompt, n=10)
         else:
-            final_message_text =\
-                self.query_lm(
+            response =\
+                self.endpoints[self.default_endpoint](
                     prompt, frequency_penalty=2, 
                     presence_penalty=2,
                     temperature=1
                 )
                 
-        return final_message_text.strip()
+        return response.strip()
         
         
-    def _prompt_compose(self, seed_turns, turn_idx):
+    def _prompt_compose(self, seed_turns: str, turn_idx: int) -> str:
+        """
+
+        Args:
+            seed_turns (str): concatentation of all past turns of the conversation
+            turn_idx (int): turn number in the conversation used to set args of
+            language model calls
+
+        Returns:
+            str: Prepared and generated/constant prompt appended to seed_turns and 
+            properly to feed for completion llm call.
+        """
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(turn_idx)
         else:
             few_shot_example = ""
 
-        instruction = self.instruction
-        tokens = re.findall(TOKEN_REGEX, instruction)
-        if tokens:
-            instruction = self._decode_tokens(self.instruction, seed_turns)
+        # tokens = re.findall(TOKEN_REGEX, self.instruction_out)
+        # if tokens:
+        self._decode_tokens(self.instruction, seed_turns)
         if few_shot_example == "":
-            prompt = f'{instruction}\n\n{seed_turns}\n'
+            prompt = f'{self.instruction}\n\n{seed_turns}\n'
         else:
-            prompt = f'{instruction}\n\n{few_shot_example}\n\n###\n\n{seed_turns}\n'
-
-        print_wrap_text(f'Generated Instruction: {instruction}')
-               
+            prompt = f'{self.instruction}\n\n{few_shot_example}\n\n' +\
+                f'###\n\n{seed_turns}\n'
+        
         return prompt + f'user {self.title}:'
-
-    def _decode_tokens(self, statement, seed_turns):
-        def _decode_token(token):
+    
+    def _decode_tokens(self, variable, seed_turns: str) -> Variable:
+        def _decode_token(token: str):
             token_split = re.findall(ROOT_TOKEN_REGEX, token)
             token_root = token_split[0]
             with self.variables_master_lock:
                 variable_lock = self.variables_locks[token_root]
                 
             with variable_lock:
-                leaf_prompt = self.variables.get(token_root)
-                if not leaf_prompt:
-                    raise Exception(f'{token_root} not defined in preprocess prompts.')
+                leaf_variable = self.variables.get(token_root)
+                if not leaf_variable:
+                    raise Exception(
+                        f'{token_root} not defined in preprocess variables.'
+                    )
                     
-                if not leaf_prompt.get('value'):     
+                if not leaf_variable.get('value'):     
                     # Need to be queried      
-                    leaf_prompt['response'] = self.query_lm(
+                    leaf_variable['response'] =\
+                        self.endpoints[
+                            leaf_variable.get(
+                                'endpoint',
+                                self.default_endpoint
+                            )
+                        ](
                         "\n".join([
                             seed_turns, 
-                            self._decode_tokens(
-                                leaf_prompt['instruction'], seed_turns
-                            )    
+                            str(
+                                self._decode_tokens(
+                                    leaf_variable, 
+                                    seed_turns
+                                ) 
+                            )   
                         ]))
                     
-                    leaf_prompt['value'] = self.reduce(leaf_prompt, seed_turns)
+                    leaf_variable['value'] =\
+                        self.reduce(leaf_variable, seed_turns)
                              
             # Support other value formats such as 'value-list'
-            return leaf_prompt["-".join(['value'] + token_split[1:])]
+            return leaf_variable["-".join(['value'] + token_split[1:])]
         
-        tokens = re.findall(TOKEN_REGEX, statement) 
+        if not isinstance(variable, Variable):
+            breakpoint()
+        tokens = variable.get_tokens()
         for token, decoding in zip(tokens, self.threadPool.map(_decode_token, tokens)):
-            statement = statement.replace(f'<{token}>', decoding)
+            variable.replace(token, decoding)
 
-        return statement
+        return variable
     
     @staticmethod
     def get_fewshot_example(turn_idx):
@@ -166,27 +244,38 @@ class PromptGenerator:
         return "".join(full_example[:turn_idx+1])
     
     
-    def reduce(self, leaf_prompt, seed_turns):
-        reduction = leaf_prompt['response']
-        if leaf_prompt.get('post_regex'):
+    def reduce(self, leaf_variable, seed_turns):
+        reduction = leaf_variable['response']
+        if leaf_variable.get('post_regex'):
             reduction = re.findall(
-                self._decode_tokens(
-                    leaf_prompt['post_regex'].lower(), 
+                str(self._decode_tokens(
+                    Variable(leaf_variable['post_regex'].lower()), 
                     seed_turns
-                ),
+                )),
                 reduction.lower()
             )
-            leaf_prompt.update({
+            leaf_variable.update({
                 'value-list': str(reduction)
             })
         
-        post_func = leaf_prompt.get('post_func')
+        post_func = leaf_variable.get('post_func')
         if post_func:
             if not isinstance(post_func, list):
                 post_func = [post_func]
             for func in post_func:
-                reduction = eval(
-                    self._decode_tokens(func, seed_turns)
-                )(reduction)
+                reduction = eval(str(
+                    self._decode_tokens(
+                        Variable(func),
+                        seed_turns
+                    )
+                ))(reduction)
         
         return reduction
+    
+    def debug_prompt(self):
+        return self.instruction.trace()
+
+    def is_dynamic_prompt(self):
+        if self.instruction.variables:
+            return True
+        return False

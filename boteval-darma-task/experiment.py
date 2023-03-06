@@ -24,7 +24,7 @@ class MixedBots:
     
     def __init__(self, personas, engine, max_ctx_len,
                  print_width=100):
-        # personas = [(<id>, <title>, <insturction>), ..]
+        # personas = [(<id>, <title>, <instruction>), ..]
         self.personas = personas
         self.ids = []
         self.titles = []
@@ -89,8 +89,19 @@ class MixedBots:
     def feed(self, txt):     
         self._iterate(lambda x: x.feed(txt))     
           
-    def talk(self, verbose=True):     
-        replies = self._iterate(lambda x: x.talk())
+    def talk(self, verbose=2): 
+        def talk_and_debug_gen_instruction(bot):
+            reply = bot.talk()
+            if verbose >= 2 and bot.prompt_generator.is_dynamic_prompt():
+                reply['text'] +=\
+                    f'\n\nGiven the Generated Instruction:' +\
+                    f'\n{bot.prompt_generator.debug_prompt()}'
+            return reply
+        
+        replies = self._iterate(
+            lambda x: talk_and_debug_gen_instruction(x)
+        )
+    
         if verbose:
             self._print_responses(replies)
         return replies
@@ -117,7 +128,8 @@ class MixedBots:
             table = self.fill_table([
                 textwrap.wrap(
                     f'User {x[0]}: {x[1]["text"]}',
-                    width=self.sub_width
+                    width=self.sub_width,
+                    replace_whitespace=False
                 ) for x in zip(self.titles, responses)
             ])
         else:
@@ -148,7 +160,6 @@ class MixedBots:
             else:
                 print('Empty')
         self._iterate(lambda x: view_if_applicable(x))
-
             
     
 def print_wrap_text(txt, width=None,

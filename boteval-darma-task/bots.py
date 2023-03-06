@@ -36,21 +36,43 @@ class GPTBot(BotAgent):
                             " You may obtain key from https://beta.openai.com/account/api-keys")
         openai.api_key = api_key
 
+        self.setup_endpoints()
         self.prompt_generator = self.load_persona(
             persona_id,
             configs_relative_filepath=\
                 persona_configs_relative_filepath,
-            few_shot_example=self.few_shot_example
         )
         
         self.turn_idx = 0
-        log.info(f"Initialized GPT bot with {self.engine=} {self.prompt_generator_id=} {self.prompt_generator.title=}\n{self.prompt_generator.instruction=}")
+        log.info(
+            f"Initialized GPT bot with {self.engine=} {self.prompt_generator_id=}"\
+            f"{self.prompt_generator.title=}\n{self.prompt_generator.instruction.instruction_raw=}")
         self.context = []
+
+    def setup_endpoints(self):
+        def query_lm(complete_prompt, **args):
+            return self.query_completion_api(
+                complete_prompt,
+                engine=self.engine, 
+                **args
+            )
+            
+        def dumb_classifier(_input, **args):
+            breakpoint()
+            return f"Not implemented classifier output given _input = {_input}, and args {args}"
+            
+        self.endpoints = {
+            "query_lm": query_lm, # default
+            "dumb_classifier": dumb_classifier,
+            # TODO add new endpoints/classifiers
+        }
+        self.default_endpoint = "query_lm"
+        endpoints_listing = "\n".join([f"- {k}" for k in self.endpoints.keys()])
+        log.info(f"Available endpoints:\n{endpoints_listing}\nwhile default is {self.default_endpoint}")
 
     def load_persona(self, 
                      persona_id:str,
-                     configs_relative_filepath='persona_configs.json',
-                     few_shot_example=None):
+                     configs_relative_filepath='persona_configs.json'):
         
         configs_filepath =\
             os.path.join(
@@ -65,16 +87,17 @@ class GPTBot(BotAgent):
                 for x in persona_jsons if x['id']==persona_id
             ]
             
-            assert len(matching_personas) == 1
+            if len(matching_personas) < 1:
+                raise Exception(f'Unknown persona: {persona_id}')
+            elif len(matching_personas) > 0:
+                log.warning(f'Redundant personas with id "{persona_id}" exist!')
+
             return PromptGenerator(
                 matching_personas[0], 
-                lambda prompt, **args: self.query_completion_api(
-                    prompt, engine=self.engine, **args
-                ),
-                few_shot_example=few_shot_example)
-            
-            #     raise Exception(f'Unknown prompt: {prompt}')
-        
+                self.endpoints,
+                default_endpoint=self.default_endpoint,
+                few_shot_example=self.few_shot_example
+            )
 
     def context_append(self, user, text):
         turn = f'user {user}: {text}'
