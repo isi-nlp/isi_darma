@@ -1,64 +1,113 @@
 
 import re
+from boteval import log
 from multiprocessing import Lock
 from multiprocessing.pool import ThreadPool
 
-
-TOKEN_REGEX = '<([\w-]+)>'
 ROOT_TOKEN_REGEX = '([\w]+)'
+TOKEN_REGEX = '<([\w-]+)>'
+# Difference is TOKEN_REGEX accepts '-<SOME_FORMAT>'
+# which would correspond to middle transformation of value
+# such as '-list', which is list format
+
 class Variable: pass # Implemented Below
-
-
 class Variable:
     """
-    A class used to organize variable/instruction updates and easily extend to
-    trace history or current replacements in tokens.
+    A very flexible class used to organize variable/instruction updates 
+    and easily extend to trace history or current replacements in tokens.
     """
     def __init__(self, parameters):
         if not isinstance(parameters, dict):
-            parameters = {"instruction": parameters}
-        self.parameters = parameters
-        self.instruction_raw = self.parameters.get('instruction')
-        self.variables = {
+            parameters = { 'instruction': parameters }
+        self._parameters = parameters
+        self.instruction_raw = self._parameters.get('instruction')
+        self._variables = {
             t: None
             for t in re.findall(TOKEN_REGEX, self.instruction_raw)
         }
+        self._assign_cnt = 0
+        self._assignments = {} # tracking assignments of value
     
-    def get_tokens(self):
-        return self.variables.keys()
+    def get_tokens(self): return self._variables.keys()
     
-    def replace(self, token, value) -> Variable:
-        self.variables[token] = value
-        return self
+    def replace(self, token, value, format=None) -> Variable:
+        if format:
+            token = f'{token}-{format}'
+        self._variables[token] = value
     
     def get(self, name:str, default:str=None):
-        return self.parameters.get(name, default)
+        return self._parameters.get(name, default)
     
-    def __getitem__(self, name: str):
-        return self.get(name)
+    def __getitem__(self, name: str): return self.get(name)
     
-    def __setitem__(self, name: str, val):
-        self.parameters[name] = val
+    def __setitem__(self, name: str, val): self._parameters[name] = val
     
-    def update(self, _dict: dict):
-        self.parameters.update(_dict)
+    def update(self, _dict: dict): self._parameters.update(_dict)
     
-    def trace(self, debug=True):
+    def get_assignment(self, format=None):
+        key = 'value'
+        if format:
+            key = f'{key}-{format}' 
+        return self._parameters[key]
+        
+    def trace(self):
         statement = self.instruction_raw
-        if debug:
-            decoding_placeholder = '\033[96m{decoding}\033[00m'
-        else:
-            decoding_placeholder = '{decoding}'
-        for token, decoding in self.variables.items():
+        decoding_placeholder =\
+            "[\033[95m{cnt}\033[00m : \033[96m{decoding}\033[00m]"
+        for token, (var, format) in self._variables.items():
             statement = statement.replace(
-                f'<{token}>',
-                decoding_placeholder.format(decoding=decoding)
+                f'<{token}>', 
+                decoding_placeholder.format(
+                    cnt=var._assign_cnt,
+                    decoding=var.get_assignment(format=format) 
+                )
             )
         return statement
-    
+
     def __str__(self):
-        return self.trace(debug=False)
+        statement = self.instruction_raw
+        for token, (var, format) in self._variables.items():
+            decoding = var.get_assignment(format=format)
+            statement = statement.replace(
+                f'<{token}>', decoding
+            )
+        return statement
+
+    def is_assignable(self, turn_idx):
+        if self.get('value') is None:
+            return True
+        if self._assignments.get(turn_idx) is not None:
+            return False
+        freq = self.get('frequency', turn_idx + 2)
+        return ((turn_idx + 1) % freq) == 0
     
+    def assign(self, value, turn_idx=None, format=None):
+        if format is not None:
+            key = f'value-{format}'
+        else:
+            # print(f"token [{self.get('id')}] = [{self.get('value') is not None}]")
+            key = 'value'
+            self._assign_cnt += 1
+            self._assignments[turn_idx] = value
+        self._parameters[key] = value
+
+        if not value:
+            log.critical(
+                f'Empty Assignment @ => #{self._assign_cnt}: '
+                f'{key}({self.get("id")}) = {value}'
+            )
+        else:
+            log.debug(
+                f'Assignment #{self._assign_cnt}: '
+                f'{key}({self.get("id")}) = {value}'
+            )
+        
+    def backspace(self): 
+        if self._assignments.get(self._assign_cnt):
+            self._assignments.__delitem__(self._assign_cnt)
+        self._assign_cnt -= 1
+    def is_constant(self): return not self._variables
+
 class PromptGenerator:
     """
     A class used to adapt to dynamic formulation of persona configuration.
@@ -74,10 +123,9 @@ class PromptGenerator:
     - API agnostic
     - Multiple endpoints
     - Tracing of recent assignments of variable-tokens per instruction/variable
-
+    - Turn aware variables according to frequency of assigning
+    
     TODO make post-processing routines somehow (such as detecting end)
-    TODO make it turn aware if needed (frequency)
-
 
     @author: Basem Rizk
     
@@ -129,9 +177,10 @@ class PromptGenerator:
         Returns:
             str: bot response given the generated/constant prompt using the default lm
         """
-        prompt = self._prompt_compose(
-            seed_turns, turn_idx
-        )
+        
+        self.seed_turns = seed_turns
+        self.turn_idx = turn_idx
+        prompt = self._prompt_compose()
         
         if turn_idx == 0:
             response =\
@@ -147,35 +196,34 @@ class PromptGenerator:
         return response.strip()
         
         
-    def _prompt_compose(self, seed_turns: str, turn_idx: int) -> str:
+    def _prompt_compose(self) -> str:
         """
-
-        Args:
-            seed_turns (str): concatentation of all past turns of the conversation
-            turn_idx (int): turn number in the conversation used to set args of
-            language model calls
-
         Returns:
             str: Prepared and generated/constant prompt appended to seed_turns and 
             properly to feed for completion llm call.
         """
         if self.few_shot_example == 'nvc':
-            few_shot_example = self.get_fewshot_example(turn_idx)
+            few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
 
         # tokens = re.findall(TOKEN_REGEX, self.instruction_out)
         # if tokens:
-        self._decode_tokens(self.instruction, seed_turns)
+        self._decode_tokens(self.instruction)
         if few_shot_example == "":
-            prompt = f'{self.instruction}\n\n{seed_turns}\n'
+            prompt = f'{self.instruction}\n\n{self.seed_turns}\n'
         else:
             prompt = f'{self.instruction}\n\n{few_shot_example}\n\n' +\
-                f'###\n\n{seed_turns}\n'
+                f'###\n\n{self.seed_turns}\n'
         
         return prompt + f'user {self.title}:'
     
-    def _decode_tokens(self, variable, seed_turns: str) -> Variable:
+    def _decode_tokens(self, variable: str) -> Variable:
+        def _get_endpoint(leaf_variable):
+            return leaf_variable.get(
+                'endpoint',
+                self.default_endpoint
+            )
         def _decode_token(token: str):
             token_split = re.findall(ROOT_TOKEN_REGEX, token)
             token_root = token_split[0]
@@ -189,36 +237,52 @@ class PromptGenerator:
                         f'{token_root} not defined in preprocess variables.'
                     )
                     
-                if not leaf_variable.get('value'):     
+                if leaf_variable.is_assignable(self.turn_idx):  
                     # Need to be queried      
+
+                    log.debug(
+                        f'From {variable.get("id", "init")} '
+                        f'Executig call #{leaf_variable._assign_cnt + 1} '
+                        f'to obtain variable {leaf_variable["id"]}'
+                    )
+                    # print(
+                    #     f'From {variable.get("id", "init")} '
+                    #     f'Executig call #{leaf_variable._assign_cnt + 1} '
+                    #     f'to obtain variable {leaf_variable["id"]}'
+                    # )
+          
                     leaf_variable['response'] =\
-                        self.endpoints[
-                            leaf_variable.get(
-                                'endpoint',
-                                self.default_endpoint
-                            )
-                        ](
+                        self.endpoints[_get_endpoint(leaf_variable)](
                         "\n".join([
-                            seed_turns, 
+                            self.seed_turns, 
                             str(
                                 self._decode_tokens(
                                     leaf_variable, 
-                                    seed_turns
                                 ) 
                             )   
                         ]))
                     
-                    leaf_variable['value'] =\
-                        self.reduce(leaf_variable, seed_turns)
-                             
+                    value = self.reduce(leaf_variable)
+                    if value is None:
+                        log.critical(
+                            'Multiple calls in the same turn might arise as'
+                            'None reduction is observed'
+                        )
+                    leaf_variable.assign(
+                        value,
+                        turn_idx=self.turn_idx
+                    )
+            
             # Support other value formats such as 'value-list'
-            return leaf_variable["-".join(['value'] + token_split[1:])]
+            token_format = '-'.join(token_split[1:])
+            return leaf_variable, token_format
         
-        if not isinstance(variable, Variable):
-            breakpoint()
         tokens = variable.get_tokens()
-        for token, decoding in zip(tokens, self.threadPool.map(_decode_token, tokens)):
-            variable.replace(token, decoding)
+        for token, decoding_var__format in zip(
+            tokens, 
+            self.threadPool.map(_decode_token, tokens
+        )):
+            variable.replace(token, decoding_var__format)
 
         return variable
     
@@ -243,20 +307,15 @@ class PromptGenerator:
         ]
         return "".join(full_example[:turn_idx+1])
     
-    
-    def reduce(self, leaf_variable, seed_turns):
+    def reduce(self, leaf_variable):
         reduction = leaf_variable['response']
         if leaf_variable.get('post_regex'):
-            reduction = re.findall(
-                str(self._decode_tokens(
+            reduction = re.findall(str(self._decode_tokens(
                     Variable(leaf_variable['post_regex'].lower()), 
-                    seed_turns
                 )),
                 reduction.lower()
             )
-            leaf_variable.update({
-                'value-list': str(reduction)
-            })
+            leaf_variable.assign(str(reduction), format='list')
         
         post_func = leaf_variable.get('post_func')
         if post_func:
@@ -265,17 +324,38 @@ class PromptGenerator:
             for func in post_func:
                 reduction = eval(str(
                     self._decode_tokens(
-                        Variable(func),
-                        seed_turns
+                        Variable(func)
                     )
                 ))(reduction)
         
         return reduction
     
-    def debug_prompt(self):
-        return self.instruction.trace()
 
-    def is_dynamic_prompt(self):
-        if self.instruction.variables:
-            return True
-        return False
+    def is_dynamic_prompt(self): 
+        return not self.instruction.is_constant()
+    
+    def backspace(self): 
+        [v.backspace() for v in self.variables.values()]
+            
+    def debug_prompt(self): return self.instruction.trace()
+
+    def debug_variables(self):
+        out = ""
+        for k, v in self.variables.items():
+            out += f'###### Variable({k})\n'
+            out += f'### assign_cnt: {v._assign_cnt}\n'
+            out += f'### assignments:\n' 
+            out += "\n".join(
+                [f"- @{k}: {v}" for k, v in v._assignments.items()]
+            ) + "\n"
+            out += f'### tokens:\n'
+            out += "\n".join(
+                [f'- {k} = {v}' for k, v in v._variables.items()]
+            ) + "\n"
+            out += f'### instruction-out: {str(v)}\n'
+            out += '### extra parameters:\n'
+            out += "- \n".join(
+                [f'- {k}: {v}' for k, v in v._parameters.items()]
+            ) + "\n"
+        return out
+    

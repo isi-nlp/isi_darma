@@ -156,8 +156,10 @@ class GPTBot(BotAgent):
         n_toks = len(text.strip().split())
         self.context.append((text, n_toks))
         
-    def back_space(self):
-        return self.context.pop()
+    def backspace(self):
+        self.turn_idx -= 1
+        self.prompt_generator.backspace()
+        return [self.context.pop() for _ in range(2)]
     
     
     @staticmethod

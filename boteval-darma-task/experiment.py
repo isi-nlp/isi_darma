@@ -9,8 +9,8 @@ A script meant for interactive analysis and automated processes for fast experim
 import os
 import json
 import textwrap
-import logging
 import argparse
+import logging as log
 import numpy as np
 from bots import GPTBot
 from tabulate import tabulate
@@ -90,20 +90,24 @@ class MixedBots:
         self._iterate(lambda x: x.feed(txt))     
           
     def talk(self, verbose=2): 
-        def talk_and_debug_gen_instruction(bot):
-            reply = bot.talk()
-            if verbose >= 2 and bot.prompt_generator.is_dynamic_prompt():
-                reply['text'] +=\
-                    f'\n\nGiven the Generated Instruction:' +\
-                    f'\n{bot.prompt_generator.debug_prompt()}'
+        def get_gen_instruction(bot):
+            reply = {"text": "Constant"}
+            if bot.prompt_generator.is_dynamic_prompt():
+                reply['text'] = f'{bot.prompt_generator.debug_prompt()}'
             return reply
         
         replies = self._iterate(
-            lambda x: talk_and_debug_gen_instruction(x)
+            lambda x: x.talk()
         )
-    
+            
         if verbose:
             self._print_responses(replies)
+            gen_prompts = self._iterate(lambda x: get_gen_instruction(x))
+            if verbose >= 2:
+                self._print_responses(
+                    gen_prompts,
+                    title_placeholder="{} given the generated instruction:\n"
+                )
         return replies
     
     def force_completion(self, verbose=True):
@@ -115,22 +119,43 @@ class MixedBots:
                     width=self.sub_width
                 ) for x in replies
             ])
-            self._print_responses(table, wrapped=True)
+            self._print_responses(
+                table,
+                title_placeholder='Completion at {}:\n',
+                wrapped=True
+            )
         return replies
-
     
-    def back_space(self, verbose=True):
-        removes = self._iterate(lambda x: x.back_space())
-        return removes
+    def view_seed(self):
+        def get_seed(b):
+            return {
+                'text': b.get_seed_turns()
+            }
+        print('Seeds')
+        seeds = self._iterate(get_seed)
+        self._print_responses(
+            seeds,
+            title_placeholder='Seed of {}:\n',
+        )
     
-    def _print_responses(self, responses, wrapped=False):
+    def _print_responses(
+        self, responses, title_placeholder='User {}:',
+        wrapped=False
+    ):
         if not wrapped:
+            out_texts = [
+                f'{title_placeholder.format(title)} {response["text"]}'
+                for title, response in zip(self.titles, responses)
+            ]
             table = self.fill_table([
-                textwrap.wrap(
-                    f'User {x[0]}: {x[1]["text"]}',
-                    width=self.sub_width,
-                    replace_whitespace=False
-                ) for x in zip(self.titles, responses)
+                sum([
+                    textwrap.wrap(
+                        line,
+                        width=self.sub_width,
+                    )
+                    for line in text.split('\n')
+                ], [])
+                for text in out_texts
             ])
         else:
             table = responses
@@ -141,26 +166,22 @@ class MixedBots:
         print(tabulate(table, headers="firstrow"))
         print('='*self.print_width)
     
-    
-    def view_seed(self):
-        print('\n'.join(
-            textwrap.wrap(self.bots[0].get_seed_turns(), 
-            width=PRINT_WIDTH)
-        ))
-        
-    def view_prompt_dict(self):
-        def view_if_applicable(bot: GPTBot):
-            if bot.prompt_generator.variables:
-                print( 
-                    json.dumps(
-                        bot.prompt_generator.variables,
-                        indent = 2
-                    )    
-                )
-            else:
-                print('Empty')
-        self._iterate(lambda x: view_if_applicable(x))
+    def backspace(self, verbose=True):
+        removes = self._iterate(lambda x: x.backspace())
+        return removes
             
+    def view_variables(self):
+        print('Variables:')
+        def get_variables_desc(bot: GPTBot):
+            desc = 'Empty due to Constant Prompt'
+            if bot.prompt_generator.is_dynamic_prompt():
+                desc = bot.prompt_generator.debug_variables()
+            return {"text": desc}
+        descs = self._iterate(lambda x: get_variables_desc(x))        
+        self._print_responses(descs, title_placeholder='Variables of {}:\n')
+    
+    def view_turn(self):
+        print(f'This turn is {self.bots[0].turn_idx}')        
     
 def print_wrap_text(txt, width=None,
                     prefix='#', 
@@ -198,18 +219,21 @@ def pick_valid_choice(alist, statement='Enter config #: '):
     return list(map(alist.__getitem__, nums))
 
 def load_persona_confs(confs_filename='persona_configs.json'):
-    with open(confs_filename) as f:
-        confs_json = json.load(f)
-        # json_formatted_str = json.dumps(conf_json, indent=2)
-        # print(json_formatted_str)
-        for i, conf in enumerate(confs_json):
-            print("="*PRINT_WIDTH)
-            print(f'# {i+1} :: id({conf["id"]})')
-            print(f'# Notes: {conf["notes"]}')
-            print(f'# Title: {conf["title"]}')
-            print('# Instruction:')
-            print_wrap_text(conf['instruction'])
-            print("="*PRINT_WIDTH)
+    try:
+        with open(confs_filename) as f:
+            confs_json = json.load(f)
+            # json_formatted_str = json.dumps(conf_json, indent=2)
+            # print(json_formatted_str)
+            for i, conf in enumerate(confs_json):
+                print("="*PRINT_WIDTH)
+                print(f'# {i+1} :: id({conf["id"]})')
+                print(f'# Notes: {conf["notes"]}')
+                print(f'# Title: {conf["title"]}')
+                print('# Instruction:')
+                print_wrap_text(conf['instruction'])
+                print("="*PRINT_WIDTH)
+    except:
+        raise Exception(f"{confs_filename} properly not a proper Json formatted file")
         
     choices = pick_valid_choice(confs_json)
     personas = [
@@ -268,31 +292,24 @@ def interactive_session(
             final_user = msg['speaker_id']
             print('='*PRINT_WIDTH)
         replies = bots.talk()
-        
-        def view_seed():
-            print('Seeds')
-            bots.view_seed()
     
-        def back_space():
+        def backspace():
             print('Removing context:')
-            print(bots.back_space())
+            print(bots.backspace())
 
         def retry():
-            print('Retrying')
-            bots.back_space()
+            bots.backspace()
             bots.talk()
             
-        def view_prompt_dict():
-            print('Prompt Dictionary')
-            bots.view_prompt_dict()
-            
-            
         options = {
-            "\\view_seed": view_seed,
-            "\\back_space": back_space,
+            "\\view_seed": bots.view_seed,
+            "\\backspace": backspace,
             "\\retry": retry,
-            "\\view_prompt_dict": view_prompt_dict,
+            "\\view_variables": bots.view_variables,
+            "\\view_turn": bots.view_turn,
+            'error': lambda: print('This option is not defined (NOT LLM ANSWER); Try again.\n')
         }
+        
         while True:
             print('='*PRINT_WIDTH)
             line = input(f'[User {final_user}]: ')
@@ -322,8 +339,8 @@ def interactive_session(
                 bots.feed(feed)
                 print('='*PRINT_WIDTH)
                 bots.force_completion()
-            elif options.get(line):
-                options[line]()
+            elif line.startswith("\\"):
+                options.get(line, 'error')()
             else:
                 bots.hear({
                     'speaker_id': final_user,
@@ -390,8 +407,9 @@ if __name__ == "__main__":
     PRINT_WIDTH = args.print_width
     
     if args.suppress_log:
-            logging.getLogger().setLevel(logging.CRITICAL)
-            
+            log.getLogger().setLevel(log.CRITICAL)
+    # log.getLogger().setLevel(log.DEBUG)
+
     if args.inter:
         existing_conv = load_conversation(filepath=args.conv_file, conv_id=args.conv_id)
         mturk_data_dir = '/mnt/c/Users/basem/Projects/ISI/isi_darma/boteval-darma-task/data/data'
@@ -401,5 +419,5 @@ if __name__ == "__main__":
         # TODO inject mturk responses into conversation
         # breakpoint()
         interactive_session()
-    
+
     

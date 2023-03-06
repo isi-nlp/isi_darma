@@ -1,5 +1,54 @@
 [
     {
+        "id": "dyn-2nd",
+        "notes": "attempt to enforce constraints over dyn-b",
+        "title": "Alexa",
+        "preprocess_variables": [
+            {
+                "id": "to_be_moderated_users",
+                "instruction": "Classify using Yes or No whether each user need moderation based on their responses in the conversation:",
+                "post_regex": "(User \\w+): Yes",
+                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
+                "post_func": "lambda x: ' and '.join(x)",
+                "frequency": 1
+            },
+            {
+                "id": "moderation_reasoning",
+                "instruction": "Reason why does <to_be_moderated_users> require moderation:",
+                "frequency": 2
+            },
+            {
+                "id": "users_emotions",
+                "instruction": "Pick each user top 1 emotion category based on the responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
+                "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
+                "post_func": [
+                    "lambda x: {u[0]: u[1] for u in x}",
+                    "lambda x: [x[name] for name in <to_be_moderated_users-list>]",
+                    "lambda x: ', '.join(x)"
+                ]
+            },
+            {
+                "id": "to_be_moderated_with_their_emotions",
+                "instruction": "Pick each user top 1 emotion category based on the responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
+                "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
+                "post_func": [
+                    "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
+                    "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
+                    "lambda x: ' and '.join(x) "
+                ],
+                "frequency": 3
+            },
+            { 
+                "id": "moderator_strategy",
+                "instruction": "Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and that <to_be_moderated_users> emotions classified as <users_emotions> respectively in the converation. Explain how would a moderator convince <to_be_moderated_users> to adapt non violent communication rules:",
+                "frequency": 1
+            }
+        ],
+        "instruction": "Alexa is an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy> Alexa should refer to <to_be_moderated_users> by name in the conversation. Alexa identity is secret and should not be revealed to conversers. Alexa should not reveal its plan to users in this conversation."
+    },
+    {
         "id": "dyn-b",
         "notes": "first attempt of dynamic prompts",
         "title": "Agent",
@@ -8,8 +57,8 @@
                 "id": "to_be_moderated_users",
                 "instruction": "Classify using Yes or No whether each user need moderation based on their responses in the conversation:",
                 "post_regex": "(User \\w+): Yes",
-                "post_func": "lambda x: ' and '.join(x)",
-                "validation": "https://regex101.com/r/Gn1dyY/1"
+                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
+                "post_func": "lambda x: ' and '.join(x)"
             },
             {
                 "id": "moderation_reasoning",
@@ -19,30 +68,30 @@
                 "id": "users_emotions",
                 "instruction": "Pick each user top 1 emotion category based on the responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
                 "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
                 "post_func": [
                     "lambda x: {u[0]: u[1] for u in x}",
                     "lambda x: [x[name] for name in <to_be_moderated_users-list>]",
                     "lambda x: ', '.join(x)"
-                ],
-                "validation": "https://regex101.com/r/sV4IQw/1"
+                ]
             },
             {
                 "id": "to_be_moderated_with_their_emotions",
                 "instruction": "Pick each user top 1 emotion category based on the responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
                 "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
                 "post_func": [
                     "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
                     "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
                     "lambda x: ' and '.join(x) "
-                ],
-                "validation": "https://regex101.com/r/sV4IQw/1"
+                ]
             },
             { 
                 "id": "moderator_strategy",
                 "instruction": "Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and that <to_be_moderated_users> emotions classified as <users_emotions> respectively in the converation. Explain how would a moderator convince <to_be_moderated_users> to adapt non violent communication rules:"
             }
         ],
-        "instruction": "Agent is an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy>"
+        "instruction": "Agent is an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy> Ensure to point to <to_be_moderated_users> as you speak."
     },
     {
         "id": "th1",
