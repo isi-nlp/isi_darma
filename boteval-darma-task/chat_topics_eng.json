@@ -9,7 +9,7 @@
             },
             {
                 "speaker_id": "d",
-                "text": "to be fair, what i\u2019m seeing right now at the capital building would suggest that i might have a point"
+                "text": "to be fair, what i'm seeing right now at the capital building would suggest that i might have a point"
             },
             {
                 "speaker_id": "b",
@@ -17,7 +17,7 @@
             },
             {
                 "speaker_id": "d",
-                "text": "blm didn\u2019t take the capitol building in an attempted coup d\u2019\u00e9tat incited by a sitting president and the democratic party didn\u2019t encourage looting."
+                "text": "blm didn't take the capitol building in an attempted coup d'\u00e9tat incited by a sitting president and the democratic party didn't encourage looting."
             },
             {
                 "speaker_id": "b",
@@ -25,15 +25,7 @@
             },
             {
                 "speaker_id": "d",
-                "text": "i think you\u2019ve yeed enough haws for one day sunshine, time to stfu and let the adults do the talking"
-            },
-            {
-                "speaker_id": "a",
-                "text": "totally not a mature way to end an argument. just saying..."
-            },
-            {
-                "speaker_id": "d",
-                "text": "yeah i haven\u2019t got a lot of patience for you idiots today."
+                "text": "i think you've yeed enough haws for one day sunshine, time to stfu and let the adults do the talking"
             }
         ],
         "target_user": "d"
@@ -75,7 +67,7 @@
         "conversation": [
             {
                 "speaker_id": "b",
-                "text": "A \u201cgroundbreaking\u201d new study suggests the ancestors of both humans and Neanderthals were cooking lots of starchy foods at least 600,000 years ago.And they had already adapted to eating more starchy plants long before the invention of agriculture 10,000 years ago."
+                "text": "A \"groundbreaking\" new study suggests the ancestors of both humans and Neanderthals were cooking lots of starchy foods at least 600,000 years ago.And they had already adapted to eating more starchy plants long before the invention of agriculture 10,000 years ago."
             },
             {
                 "speaker_id": "a",
@@ -122,7 +114,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "i would say a friendship where you have to avoid discussing politics with is one that\u2019s pretty weak. my closest friends and i have always been able to openly talk politics. we don\u2019t have to have a 100% agreement on everything, but that\u2019s where healthy debate happens.meanwhile, i\u2019ve cut off family members for having toxic political views."
+                "text": "i would say a friendship where you have to avoid discussing politics with is one that's pretty weak. my closest friends and i have always been able to openly talk politics. we don't have to have a 100% agreement on everything, but that's where healthy debate happens.meanwhile, i've cut off family members for having toxic political views."
             },
             {
                 "speaker_id": "a",
@@ -131,13 +123,9 @@
             {
                 "speaker_id": "c",
                 "text": "if you vote for trump, i don't want you in my life. period. i have cut family members out of my life for this. i am not wasting my time with racist idiots."
-            },
-            {
-                "speaker_id": "b",
-                "text": "cutting anyone out of your life who votes for a candidate you don't like is toxic in it's own right. i know plenty of people who vote for a variety of candidates for various reasons, and their voting record isn't a reason for me to judge the entirety of their character."
             }
         ],
-        "target_user": "b"
+        "target_user": "c"
     },
     {
         "id": "chat332",
@@ -175,41 +163,6 @@
         "target_user": "a"
     },
     {
-        "id": "chat410",
-        "name": "chat 410 - controversy",
-        "conversation": [
-            {
-                "speaker_id": "a",
-                "text": "The CIA's Appalling Human Experiments With Mind Control."
-            },
-            {
-                "speaker_id": "d",
-                "text": "pales in comparison to facebook."
-            },
-            {
-                "speaker_id": "b",
-                "text": "idk, they dosed an entire towns water supply with lsd and didn't tell anyone."
-            },
-            {
-                "speaker_id": "c",
-                "text": "facebook manipulates information for around 1,000,000,000 people and harvests their data to later use against them and for profit.an entire town tripping balls for a day? bfd."
-            },
-            {
-                "speaker_id": "b",
-                "text": "they also aren't being forced to use it. people in the town kinda had to drink water."
-            },
-            {
-                "speaker_id": "c",
-                "text": "yeah. sure. it\u2019s fucked up. let\u2019s just agree to hate facebook."
-            },
-            {
-                "speaker_id": "b",
-                "text": "i'm currently on a 30 day ban due to a post from over five years ago. i have another 30 days after that then a 3 day ban after that. fuuuuuck facebook"
-            }
-        ],
-        "target_user": "b"
-    },
-    {
         "id": "chat476",
         "name": "chat 476 - controversy",
         "conversation": [
@@ -219,7 +172,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "\u201clet\u2019s just mask up for 2 weeks, so we can stop the curve\u201d - the entire world, match 2020. what a fuckin joke"
+                "text": "\"let's just mask up for 2 weeks, so we can stop the curve\" - the entire world, match 2020. what a fuckin joke"
             },
             {
                 "speaker_id": "d",
@@ -227,18 +180,14 @@
             },
             {
                 "speaker_id": "c",
-                "text": "lemme guess, it\u2019s because we\u2019re going on the better part of a year and still doing the same failed, wasteful thing? i mean trying to same methodology to solve a very basic problem for 365 days yet failing to meet the quota every single step of the way seems like a massive failure to most people, thus making it a joke."
+                "text": "lemme guess, it's because we're going on the better part of a year and still doing the same failed, wasteful thing? i mean trying to same methodology to solve a very basic problem for 365 days yet failing to meet the quota every single step of the way seems like a massive failure to most people, thus making it a joke."
             },
             {
                 "speaker_id": "a",
-                "text": "we haven\u2019t done it right yet in a whole year yet because of dumb fucks like you."
-            },
-            {
-                "speaker_id": "c",
-                "text": "strong words for someone with a fragile immune system"
+                "text": "we haven't done it right yet in a whole year yet because of dumb fucks like you."
             }
         ],
-        "target_user": "c"
+        "target_user": "a"
     },
     {
         "id": "chat51",
@@ -282,57 +231,10 @@
             },
             {
                 "speaker_id": "c",
-                "text": "i have to ask. do you really not retain what you post? because your behavior is literally the the subject material that the op covers.and please, try not to respond with some dumb quip like you\u2019ve done to everyone else, you\u2019ve only made yourself look dumber."
-            },
-            {
-                "speaker_id": "e",
-                "text": "i've only responded with a dumb quip when people respond to me with something stupid, like \"do you really not retain what you post?\" actually, not even every post because the post above i'm genuinely asking!show me where my behavior is \"literally the the subject material the op covers\" because people who have been engaging me without insults i've engaged back."
+                "text": "i have to ask. do you really not retain what you post? because your behavior is literally the the subject material that the op covers.and please, try not to respond with some dumb quip like you've done to everyone else, you've only made yourself look dumber."
             }
         ],
-        "target_user": "e"
-    },
-    {
-        "id": "chat68",
-        "name": "chat 68 - controversy",
-        "conversation": [
-            {
-                "speaker_id": "c",
-                "text": "US politicians who engage in \u201cnegative partisanship\u201d, referring to hostile, nonsubstantive rhetoric about an opposing party or statements emphasizing defeats of partisan opponents, are not rewarded with higher evaluations from citizens. Voters don\u2019t want representation focused around polarization."
-            },
-            {
-                "speaker_id": "a",
-                "text": "...and yet those representatives get re-elected.is it just a matter of not wanting to hear the baseless rhetoric, but reap the benefits of the equally baseless policies?"
-            },
-            {
-                "speaker_id": "b",
-                "text": "it is hard to rationalize the results of this study with the strong support of trump and his rhetoric by the republican party during the last 4 years. there was [an article]() from a few weeks ago that found that republican politicians were far more likely to vote against policy that their constituents favored, but they were less likely than democrat politicians to be punished for it indicating that the republican party is more built around identity than policy."
-            },
-            {
-                "speaker_id": "d",
-                "text": "but the democrats ran on a \"we're not trump\" policy. and the number 1 thing voters wanted was a strong economy and they thought trump was best in that regard.so your idea has some holes in it."
-            },
-            {
-                "speaker_id": "b",
-                "text": "and the number 1 thing voters wanted was a strong economy and they thought trump was best in that regard.source?"
-            },
-            {
-                "speaker_id": "d",
-                "text": " you have paid no attention to the election until now. you're a low information voter, a low information person. you're a joke.learn to google."
-            },
-            {
-                "speaker_id": "b",
-                "text": "so conservatives say they care about the economy, yet [only 29% of the gdp]() was produced in trump voting counties this election (down from 36% in 2016). trump clearly failed with revitalizing the economy of his base, but they voted for him anyway.i would say the low information voters are the ones that claim to care about something, but not hold their politicians accountable."
-            },
-            {
-                "speaker_id": "d",
-                "text": "the pandemic has destroyed small business so larger companies which will be based in large cities will be making more of the gdp. this doesn't prove or mean anything.also you are comparing the relative percentages rather than actual figures so to then say:trump clearly failed with revitalizing the economy of his baseis stupid and simplistic. trump grew the economy so it went up everywhere, all you are saying is that it went up a bit more in large cities which is to be expected.as i said, low information, low ability to process what things mean."
-            },
-            {
-                "speaker_id": "b",
-                "text": "the pandemic has destroyed small business so larger companies which will be based in large cities will be making more of the gdp. this doesn't prove or mean anything.why arent conservatives where the major companies are? why are conservatives incapable of creating successful economic environments in urban areas? is stupid and simplistic. trump grew the economy so it went up everywhere, all you are saying is that it went up a bit more in large cities which is to be expected.again, why are cities all liberal? it is because liberal cities support strong and well run cities that are diverse with large infrastructure investments and that are desirable for college educated people to live. conservative cities just can't compete. as i said, low information, low ability to process what things mean.i would say 45% of the population being responsible for only 29% of the economy suggests pretty low information."
-            }
-        ],
-        "target_user": "b"
+        "target_user": "c"
     },
     {
         "id": "chat132",
@@ -383,7 +285,7 @@
         "conversation": [
             {
                 "speaker_id": "c",
-                "text": "Tom Hanks' COVID-19 diagnosis likely shaped behaviors, thoughts toward virus. Hanks\u2019 disclosure inspired some people to seek more information and/or take stricter precautions. Public health advocates may want to use celebrity announcements to reach people who may be harder to reach."
+                "text": "Tom Hanks' COVID-19 diagnosis likely shaped behaviors, thoughts toward virus. Hanks' disclosure inspired some people to seek more information and/or take stricter precautions. Public health advocates may want to use celebrity announcements to reach people who may be harder to reach."
             },
             {
                 "speaker_id": "d",
@@ -396,21 +298,9 @@
             {
                 "speaker_id": "a",
                 "text": "do you just not know how stupid you look?"
-            },
-            {
-                "speaker_id": "b",
-                "text": "explain why please. enlighten me."
-            },
-            {
-                "speaker_id": "a",
-                "text": "girl, if you seriously need to have qanon being stupid explained to you then you're more of a simpleton than previously thought.but since you're all about enlightenment, can you let me know when the storm is happening? i must have marked the date wrong in my calendar, didn't you guys say it was happening the other day? strange how it didn't!"
-            },
-            {
-                "speaker_id": "b",
-                "text": "im not qanon and i dont know are you even talking about. im not even from the us. i talked about tom hanks in my comment, nothing else. these are facts: isaac kappy, an actor on the rise, accused tom hanks and seth green of being pedophiles; isaac was found a week after those claims dead on the road; he left a \"suicide note on twitter \" days after stating he isnt suicidal; he also stated that he has a incriminating video; week after his death a video surfaced on internet in wich you can see young girls in some luxury bathhouse; no one could identify the bathhouse."
             }
         ],
-        "target_user": "b"
+        "target_user": "a"
     },
     {
         "id": "chat365",
@@ -501,15 +391,15 @@
             },
             {
                 "speaker_id": "a",
-                "text": "ooh! wikipedia! i bow down to your superior intellect. sorry, but i\u2019m going to keep calling your pseudoscience, pseudoscience. because that\u2019s what it is when someone makes sweeping claims like that more men are highly intelligent, or that they have superior at \u201cmathematical intelligence.\u201d *snort* anyone who\u2019s actually smart knows this sort of pseudoscience is...pseudoscience. i\u2019ll say it one more time: pseudoscience. :)"
+                "text": "ooh! wikipedia! i bow down to your superior intellect. sorry, but i'm going to keep calling your pseudoscience, pseudoscience. because that's what it is when someone makes sweeping claims like that more men are highly intelligent, or that they have superior at \"mathematical intelligence.\" *snort* anyone who's actually smart knows this sort of pseudoscience is...pseudoscience. i'll say it one more time: pseudoscience. :)"
             },
             {
                 "speaker_id": "b",
-                "text": "ooh! wikipedia! i bow down to your superior intellect.as i stated, you provided no counter proof, so i had no reason to waste time finding proof, so i just sent you to the page listing the most notable studies. that has nothing to do with my intellect, but clearly shows you're an idiot. because that\u2019s what it is when someone makes sweeping claims like that more men are highly intelligenti never said that, you just didn't read correctly what i wrote. or that they have superior at \u201cmathematical intelligence.\u201dyep, that's true. it's proven. so what? anyone who\u2019s actually smart knows this sort of pseudoscience is...pseudoscience. i\u2019ll say it one more time: pseudoscience. :)\"you're wrong because i'm smarter\" this whole sentence is a contradiction. please, learn to argue by bringing something into the conversation, otherwise you just seem even dumber than what you are."
+                "text": "ooh! wikipedia! i bow down to your superior intellect.as i stated, you provided no counter proof, so i had no reason to waste time finding proof, so i just sent you to the page listing the most notable studies. that has nothing to do with my intellect, but clearly shows you're an idiot. because that's what it is when someone makes sweeping claims like that more men are highly intelligenti never said that, you just didn't read correctly what i wrote. or that they have superior at \"mathematical intelligence.\"yep, that's true. it's proven. so what? anyone who's actually smart knows this sort of pseudoscience is...pseudoscience. i'll say it one more time: pseudoscience. :)\"you're wrong because i'm smarter\" this whole sentence is a contradiction. please, learn to argue by bringing something into the conversation, otherwise you just seem even dumber than what you are."
             },
             {
                 "speaker_id": "a",
-                "text": "just wanted to let anyone who is reading this dude\u2019s comment know that there is no evidence that women are inferior in \u201cmathematical ability\u201d to men."
+                "text": "just wanted to let anyone who is reading this dude's comment know that there is no evidence that women are inferior in \"mathematical ability\" to men."
             },
             {
                 "speaker_id": "b",
@@ -587,7 +477,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "what\u2019s most striking to me is that we know that this might be true since spring 2020. the lack of recommendation to supplement makes me actually believe all the big pharma influence on politics stuff. in a cost benefit analysis supplementing vitd by default in a bad flu season is an absolute nobrainer. there is no way someone could overdose on it if taking the usual recommendation on top of being outside a lot. so how does this fit in a world view where as many people as possible should be saved from illness?"
+                "text": "what's most striking to me is that we know that this might be true since spring 2020. the lack of recommendation to supplement makes me actually believe all the big pharma influence on politics stuff. in a cost benefit analysis supplementing vitd by default in a bad flu season is an absolute nobrainer. there is no way someone could overdose on it if taking the usual recommendation on top of being outside a lot. so how does this fit in a world view where as many people as possible should be saved from illness?"
             },
             {
                 "speaker_id": "b",
@@ -595,7 +485,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "if covid is really such a life or death scenario, what does it matter if it\u2019s useless? this is a pretty evident case of either a) stupidity from the government side or b) malice.tell me one reason to not recommend vitd to a 70+ year old?"
+                "text": "if covid is really such a life or death scenario, what does it matter if it's useless? this is a pretty evident case of either a) stupidity from the government side or b) malice.tell me one reason to not recommend vitd to a 70+ year old?"
             },
             {
                 "speaker_id": "b",
@@ -609,41 +499,6 @@
         "target_user": "c"
     },
     {
-        "id": "chat785",
-        "name": "chat 785 - controversy",
-        "conversation": [
-            {
-                "speaker_id": "c",
-                "text": "States with the lowest levels of mask adherence were most likely to have high COVID-19 rates in the subsequent month, finds a new study of the 50 US states. Of the 8 states with at least 75% mask adherence, none reported a high COVID-19 rate. (PLOS One, 14 Apr 2021)"
-            },
-            {
-                "speaker_id": "b",
-                "text": "there are two factors that determine the covid-19 rate:1) how dense the population is.2) how dense the population is."
-            },
-            {
-                "speaker_id": "a",
-                "text": "this is not accurate."
-            },
-            {
-                "speaker_id": "b",
-                "text": "found the anti-masker."
-            },
-            {
-                "speaker_id": "a",
-                "text": "i found the idiot.there is no evidence high population density results in high death or infection rates per capita."
-            },
-            {
-                "speaker_id": "b",
-                "text": "i refuse to believe that my joke went over your head. if it did you must be denser than the people spreading the virus"
-            },
-            {
-                "speaker_id": "a",
-                "text": "it was a stupid joke, if it was one."
-            }
-        ],
-        "target_user": "a"
-    },
-    {
         "id": "chat858",
         "name": "chat 858 - controversy",
         "conversation": [
@@ -653,7 +508,7 @@
             },
             {
                 "speaker_id": "e",
-                "text": "i\u2019m a doctor and let me tell you, this is the worst idea i\u2019ve ever heard. we\u2019re already losing the war on infection hard, so the big brain idea is to start pouring our antibiotics on dying coral. it will immediately be diluted to impotence by the literal ocean around it, and go to work breeding even more resistant strains. meanwhile, here i am required by the ama and state board to literally watch certain infections in the hope that they don\u2019t get worse because we don\u2019t want to overuse antibiotics on ourselves.fml. let\u2019s up the ante by treating cave stalagmites for covid-19."
+                "text": "i'm a doctor and let me tell you, this is the worst idea i've ever heard. we're already losing the war on infection hard, so the big brain idea is to start pouring our antibiotics on dying coral. it will immediately be diluted to impotence by the literal ocean around it, and go to work breeding even more resistant strains. meanwhile, here i am required by the ama and state board to literally watch certain infections in the hope that they don't get worse because we don't want to overuse antibiotics on ourselves.fml. let's up the ante by treating cave stalagmites for covid-19."
             },
             {
                 "speaker_id": "b",
@@ -661,23 +516,23 @@
             },
             {
                 "speaker_id": "e",
-                "text": "it is then instantly diluted by surrounding sea water. it has the same effect. i didn\u2019t see them erecting any kind of cofferdam around the coral to ensure the dose stays put and uncontaminated. there will absolutely be a positive effect \u2014 no one has been stupid enough to waste amoxicillin on coral, so there\u2019s little to no resistance as of yet. but dilute antibiotic is the best way to breed resistance , so it won\u2019t stay effective for long."
+                "text": "it is then instantly diluted by surrounding sea water. it has the same effect. i didn't see them erecting any kind of cofferdam around the coral to ensure the dose stays put and uncontaminated. there will absolutely be a positive effect \u2014 no one has been stupid enough to waste amoxicillin on coral, so there's little to no resistance as of yet. but dilute antibiotic is the best way to breed resistance , so it won't stay effective for long."
             },
             {
                 "speaker_id": "a",
-                "text": "i can tell you don\u2019t grow coral, at all, because your \u201cno one has been stupid enough to waste amoxicillin on coral\u201d line is false. there are marketed products in fact. you don\u2019t know what you\u2019re talking about as far as corals go."
+                "text": "i can tell you don't grow coral, at all, because your \"no one has been stupid enough to waste amoxicillin on coral\" line is false. there are marketed products in fact. you don't know what you're talking about as far as corals go."
             },
             {
                 "speaker_id": "e",
-                "text": "i know exactly what i\u2019m talking about. it\u2019s bad enough to waste lifesaving drugs on coral in an aquarium, but at least those are isolated ecosystems and unlikely to result in widespread issues, as the bacteria are semi-isolated. now we\u2019re just talking about dumping it straight on wild coral in the form of a paste, with no cofferdam or other barrier to keep it on the coral itself. i\u2019m sure that won\u2019t cause any problems at all, especially since the article talks about dumping it on dying coral beds, some miles in size. utter stupidity."
+                "text": "i know exactly what i'm talking about. it's bad enough to waste lifesaving drugs on coral in an aquarium, but at least those are isolated ecosystems and unlikely to result in widespread issues, as the bacteria are semi-isolated. now we're just talking about dumping it straight on wild coral in the form of a paste, with no cofferdam or other barrier to keep it on the coral itself. i'm sure that won't cause any problems at all, especially since the article talks about dumping it on dying coral beds, some miles in size. utter stupidity."
             },
             {
                 "speaker_id": "c",
-                "text": "now we\u2019re just talking about dumping it straight on wild coral in the form of a paste, with no cofferdam or other barrier to keep it on the coral itself.the silicone paste is the barrier. yes, you don't know what you're talking about..."
+                "text": "now we're just talking about dumping it straight on wild coral in the form of a paste, with no cofferdam or other barrier to keep it on the coral itself.the silicone paste is the barrier. yes, you don't know what you're talking about..."
             },
             {
                 "speaker_id": "e",
-                "text": "no, the silicone slows the _release_ of the antibiotic to the degradation rate of the silicone. however, even healthy coral is porous, as anyone who has ever combed a beach will tell you. there is no barrier in effect here. a full cofferdam around the coral would be needed to keep the amoxicillin in place.did you actually read the paper yourself? what are your qualifications? or are you just someone\u2019s alt account?"
+                "text": "no, the silicone slows the _release_ of the antibiotic to the degradation rate of the silicone. however, even healthy coral is porous, as anyone who has ever combed a beach will tell you. there is no barrier in effect here. a full cofferdam around the coral would be needed to keep the amoxicillin in place.did you actually read the paper yourself? what are your qualifications? or are you just someone's alt account?"
             }
         ],
         "target_user": "e"
@@ -733,49 +588,7 @@
         ],
         "target_user": "a"
     },
-    {
-        "id": "chat570",
-        "name": "chat 570 - controversy",
-        "conversation": [
-            {
-                "speaker_id": "a",
-                "text": "New article shows evidence that many US voters \"live virtually without exposure to the other party's voters in their residential environment\", and this can lead to political polarization and distrust."
-            },
-            {
-                "speaker_id": "d",
-                "text": "qonservatives segregating themselves from those they deem to be lower life forms? why i never would have guessed they prefer an echo chamber..."
-            },
-            {
-                "speaker_id": "b",
-                "text": "or just one city crammed with more liberals than there are conservatives combined in several states."
-            },
-            {
-                "speaker_id": "d",
-                "text": "almost as if having a selfish conservative ideology doesn't work so well when you live in a dense community..."
-            },
-            {
-                "speaker_id": "b",
-                "text": "or people believe the bs the democrats in charge of the cities for the last 40 years have been telling them although nothing has gotten better."
-            },
-            {
-                "speaker_id": "c",
-                "text": "thanks to u/dbdude and u/kagesama1919 for providing today's demonstration. as you can see, people have lost basic human decency and no longer see the symmetries of the corruption in our political system. the problems necessarily come entirely from \"the other side.\"does anyone have any questions? who would like to show the class their close-reading analysis of the dehumanizing and pointlessly aggressive language utilized by our demonstrators?"
-            },
-            {
-                "speaker_id": "d",
-                "text": "\"both sides!!1!1\" drivel is why people are done being civil with dip shits like him and you. there is one side doing the vast majority of the corruption and you disingenuously trying to make it seem like its a bipartisan issue is either na\u00efve or willfully spouting rhetoric..."
-            },
-            {
-                "speaker_id": "c",
-                "text": "you've utterly missed the point of the demonstration. if we were talking about policy or ideology, i would agree that one side is far worse than the other. but we're talking about polarization, siloing, and dehumanization/othering. even though one side worked hard to create the dynamic by manufacturing an entire propaganda ecosystem, it is now firmly entrenched all over the place. the echo chambers are very much a problem on both sides. being unable or unwilling to see that is a symptom of the corruption. the fact that being caught up in the process tends to blind people to the full scope of that process is part of the reason that it's so hazardous."
-            },
-            {
-                "speaker_id": "d",
-                "text": "keep spouting your \"both sides!\" drivel....."
-            }
-        ],
-        "target_user": "d"
-    },
+
     {
         "id": "chat1141",
         "name": "chat 1141 - controversy",
@@ -790,7 +603,7 @@
             },
             {
                 "speaker_id": "a",
-                "text": "and here i am getting turned down three times for requesting metronidazole for what i believed to be a giardia infection, finally after a month of suffering and shitting blood the tests i had to fight for came back positive for giardia, and finally on the fourth visit i was given the metronidazole i asked for. hopefully someday soon we can get prescriptions in a way that\u2019s not so error prone and so dependent on stroking doctor\u2019s massive egos in just the right way."
+                "text": "and here i am getting turned down three times for requesting metronidazole for what i believed to be a giardia infection, finally after a month of suffering and shitting blood the tests i had to fight for came back positive for giardia, and finally on the fourth visit i was given the metronidazole i asked for. hopefully someday soon we can get prescriptions in a way that's not so error prone and so dependent on stroking doctor's massive egos in just the right way."
             },
             {
                 "speaker_id": "c",
@@ -806,7 +619,7 @@
             },
             {
                 "speaker_id": "a",
-                "text": "forcing a patient to suffer for a month shitting blood is hardly a success, my digestion was horrible for several years after that. had the doctor\u2019s ego not gotten in the way of things he would have ordered tests after the first visit rather than sending me home to eat bananas and rice. he didn\u2019t even order the test until my third visit."
+                "text": "forcing a patient to suffer for a month shitting blood is hardly a success, my digestion was horrible for several years after that. had the doctor's ego not gotten in the way of things he would have ordered tests after the first visit rather than sending me home to eat bananas and rice. he didn't even order the test until my third visit."
             }
         ],
         "target_user": "a"
@@ -825,7 +638,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "but only if it\u2019s earned not given to someone for being \u201cdiverse\u201d"
+                "text": "but only if it's earned not given to someone for being \"diverse\""
             },
             {
                 "speaker_id": "a",
@@ -833,7 +646,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "the average person doesn\u2019t need to be qualified. in this case and it applies to other examples, the people signing the player should be educated and qualified enough to gauge his skill, mine and your unqualified opinion on this dudes soccer skills shouldn\u2019t affect their decision, not should race one way or their other. can he do the job should be the only question. if he were signed to the team and sucked (i dunno how good he is i don\u2019t follow soccer) it would backfire and rightfully so. representation is a big deal but if you hand unqualified people jobs for guilts sake you\u2019re not doing anyone any good. you that folks making my argument are doing it out of insecurity. wrong. giving a brown guy a job for being brown is insecurity because they\u2019re scared of appearing to be racist."
+                "text": "the average person doesn't need to be qualified. in this case and it applies to other examples, the people signing the player should be educated and qualified enough to gauge his skill, mine and your unqualified opinion on this dudes soccer skills shouldn't affect their decision, not should race one way or their other. can he do the job should be the only question. if he were signed to the team and sucked (i dunno how good he is i don't follow soccer) it would backfire and rightfully so. representation is a big deal but if you hand unqualified people jobs for guilts sake you're not doing anyone any good. you that folks making my argument are doing it out of insecurity. wrong. giving a brown guy a job for being brown is insecurity because they're scared of appearing to be racist."
             },
             {
                 "speaker_id": "e",
@@ -849,7 +662,7 @@
             },
             {
                 "speaker_id": "c",
-                "text": "that\u2019s a literal misquote you dipshit. you did the exact opposite. wanna try again ?"
+                "text": "that's a literal misquote you dipshit. you did the exact opposite. wanna try again ?"
             }
         ],
         "target_user": "c"
