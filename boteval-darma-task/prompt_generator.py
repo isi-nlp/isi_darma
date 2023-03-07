@@ -29,7 +29,14 @@ class Variable:
     
     def get_tokens(self): return self._variables.keys()
     
-    def replace(self, token, value, format=None):
+    def replace(self, token: str, value, format: str=None):
+        """
+
+        Args:
+            token (str): token/key name pointing to  an existing value; however, if new token is given, it will still be forceably added.
+            value (_type_): value of assignment/replacement
+            format (str, optional): name of the format of the type of value; if not provided then assignment refers to original format of the value. Defaults to None. Defaults to None.
+        """
         if format:
             token = f'{token}-{format}'
         self._variables[token] = value
@@ -43,13 +50,26 @@ class Variable:
     
     def update(self, _dict: dict): self._parameters.update(_dict)
     
-    def get_assignment(self, format=None):
+    def get_assignment(self, format: str=None):
+        """
+
+        Args:
+            format (str, optional): name of the format of the type of value; if not provided then assignment refers to original format of the value. Defaults to None. Defaults to None.
+
+        Returns:
+            any: value of assignment
+        """
         key = 'value'
         if format:
             key = f'{key}-{format}' 
         return self._parameters[key]
         
-    def trace(self):
+    def trace(self) -> str:
+        """
+
+        Returns:
+            str: debug of insturction with colored format to be printed in console, including assignment count and value of assignment between square brackets inline.
+        """
         statement = self.instruction_raw
         decoding_placeholder =\
             "[\033[95m{cnt}\033[00m : \033[96m{decoding}\033[00m]"
@@ -63,7 +83,7 @@ class Variable:
             )
         return statement
 
-    def __str__(self):
+    def __str__(self) -> str:
         statement = self.instruction_raw
         for token, (var, format) in self._variables.items():
             decoding = var.get_assignment(format=format)
@@ -72,7 +92,14 @@ class Variable:
             )
         return statement
 
-    def is_assignable(self, turn_idx):
+    def is_assignable(self, turn_idx:int) -> bool:
+        """
+        Args:
+            turn_idx (int): globally defined value representing the current turn of the conversation
+
+        Returns:
+            bool: indicator whether the variable value can be assigned at current turn or not.
+        """
         if self.get('value') is None:
             return True
         if self._assignments.get(turn_idx) is not None:
@@ -80,7 +107,14 @@ class Variable:
         freq = self.get('frequency', turn_idx + 2)
         return ((turn_idx + 1) % freq) == 0
     
-    def assign(self, value, turn_idx=None, format=None):
+    def assign(self, value, turn_idx: int=None, format:str=None):
+        """
+
+        Args:
+            value (any): value to be assigned
+            turn_idx (int, optional): globally defined value representing the current turn of the conversation. requried if arg `format` is not provided Defaults to None.
+            format (str, optional): name of the format of the type of value to be assigned; if not provided then assignment refers to original format of the value. Defaults to None.
+        """
         if format is not None:
             key = f'value-{format}'
         else:
@@ -102,9 +136,13 @@ class Variable:
             )
         
     def backspace(self): 
+        """
+        Goes back in time one step
+        """
         if self._assignments.get(self._assign_cnt):
             self._assignments.__delitem__(self._assign_cnt)
         self._assign_cnt -= 1
+        
     def is_constant(self): return not self._variables
 
 class PromptGenerator:
