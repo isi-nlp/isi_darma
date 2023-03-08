@@ -1,7 +1,0 @@
-src/darma_online/creds.yaml
-**egg-info**
-creds.yaml
-**__pycache__**
-**/**.egg-info/
-logs/
-.DS_Store
