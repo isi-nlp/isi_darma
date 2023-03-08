@@ -13,24 +13,27 @@ from boteval.bots import BotAgent
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
 
-    def __init__(self, engine: str, persona_id: str,
-            *args, api_key='',
+    def __init__(self, persona_id: str,
+            *args, engine: str=None, api_key='',
             default_endpoint='gpt3',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
-        self.engine = engine
         self.max_ctx_len = max_ctx_len
         self.few_shot_example = few_shot_example # e.g. nvc
         self.default_endpoint = default_endpoint
+        
+        if engine:
+            os.environ['OPENAI_ENGINE'] = engine
         
         if api_key:
             # Read by endpoint implementation
             os.environ['OPENAI_KEY'] = api_key
 
         self.setup_endpoints()
+        
         self.prompt_generator = self.load_persona(
             persona_id,
             configs_relative_filepath=\
@@ -41,7 +44,7 @@ class GPTBot(BotAgent):
         self.context = []
         
         log.info(
-            f"Initialized GPT bot with {self.engine=}"
+            f"Initialized GPT bot with {engine=}"
             f"{self.prompt_generator.id=}"
             f"{self.prompt_generator.title=}\n"
             f"{self.prompt_generator.instruction.instruction_raw=}")
@@ -147,9 +150,7 @@ class GPTBot(BotAgent):
             dict: similar output to talk
         """
         seed_turns = self.get_seed_turns()
-        resp = self.endpoints[self.default_endpoint](
-                seed_turns, engine=self.engine
-        )
+        resp = self.endpoints[self.default_endpoint](seed_turns)
 
         final_message_text = resp
         final_message_text = final_message_text.strip()

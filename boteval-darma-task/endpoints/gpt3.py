@@ -9,11 +9,7 @@ class GPT3:
     name = 'gpt3'
     
     def __init__(self):
-        # engine = os.environ.get('ENGINE', '')
-        # if engine:
-        #     # Force replace if it was provide
-        #     self.engine = engine
-        
+        self.override_engine  = os.environ.get('OPENAI_ENGINE', None)        
         api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
             raise Exception("OpenAI API key is not set."
@@ -22,6 +18,7 @@ class GPT3:
         openai.api_key = api_key
     
     def query(self, complete_prompt: str, engine='text-davinci-003', **args):
+        engine = self.override_engine if self.override_engine else engine
         return self.query_completion_api(
             complete_prompt, 
             engine=engine,
