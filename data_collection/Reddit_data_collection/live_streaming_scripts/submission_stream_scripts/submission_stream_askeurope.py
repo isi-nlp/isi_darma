@@ -49,7 +49,7 @@ while True:
       if time.time() > timeout:
         print("------Collected "+ str(counter) + " posts in one hour for subreddit __ASKEUROPE__")
 
-        submissions.to_csv('/nas/home/asharma/data/askeurope/sub_stream_askeurope.csv', mode = 'a', header=False, index=False, columns=list(submissions.axes[1]))
+        submissions.to_csv('/nas/home/asharma/controversy_data/askeurope/sub_stream_askeurope.csv', mode = 'a', header=False, index=False, columns=list(submissions.axes[1]))
 
         timeout = time.time() + 60*60
         submissions = pd.DataFrame()
