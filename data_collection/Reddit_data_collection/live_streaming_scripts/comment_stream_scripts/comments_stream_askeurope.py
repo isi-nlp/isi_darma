@@ -16,14 +16,14 @@ reddit = praw.Reddit(client_id = creds['client_id'],
                     redirect_uri = creds['redirect_uri'],
                     refresh_token = creds['refresh_token'])
 
-subreddit = reddit.subreddit("europe")
+subreddit = reddit.subreddit("askeurope")
 
 comments = pd.DataFrame()
 counter = 0
 
 timeout = time.time() + 60*60 #1hr
 
-print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__EUROPE__ Comments")
+print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__ASKEUROPE__ Comments")
 
 while True:
   try:
@@ -48,13 +48,13 @@ while True:
       counter = counter + 1
 
       if time.time() > timeout:
-        print("------Collected "+ str(counter) + " comments in one hour for subreddit __EUROPE__")
+        print("------Collected "+ str(counter) + " comments in one hour for subreddit __ASKEUROPE__")
 
-        comments.to_csv('/nas/home/asharma/data/europe/com_stream_europe.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
-        
+        comments.to_csv('/nas/home/asharma/controversy_data/askeurope/com_stream_askeurope.csv', mode = 'a', header=False, index=False, columns=list(comments.axes[1]))
+
         timeout = time.time() + 60*60
         comments = pd.DataFrame()
         counter = 0
   except Exception as err:
-    print(err, 'Sleeping for 10 seconds...  __EUROPE__ Comments')
+    print(err, 'Sleeping for 10 seconds...  __ASKEUROPE__ Comments')
     time.sleep(10)

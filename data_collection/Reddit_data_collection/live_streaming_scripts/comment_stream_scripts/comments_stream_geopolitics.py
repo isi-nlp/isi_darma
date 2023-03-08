@@ -16,14 +16,14 @@ reddit = praw.Reddit(client_id = creds['client_id'],
                     redirect_uri = creds['redirect_uri'],
                     refresh_token = creds['refresh_token'])
 
-subreddit = reddit.subreddit("rance")
+subreddit = reddit.subreddit("geopolitics")
 
 comments = pd.DataFrame()
 counter = 0
 
 timeout = time.time() + 60*60 #1hr
 
-print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__RANCE__ Comments")
+print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__GEOPOLITICS__ Comments")
 
 while True:
   try:
@@ -48,13 +48,13 @@ while True:
       counter = counter + 1
 
       if time.time() > timeout:
-        print("------Collected "+ str(counter) + " comments in one hour for subreddit __RANCE__")
+        print("------Collected "+ str(counter) + " comments in one hour for subreddit __GEOPOLITICS__")
 
-        comments.to_csv('/nas/home/asharma/data/rance/com_stream_rance.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
+        comments.to_csv('/nas/home/asharma/controversy_data/geopolitics/com_stream_geopolitics.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
         
         timeout = time.time() + 60*60
         comments = pd.DataFrame()
         counter = 0
   except Exception as err:
-    print(err, 'Sleeping for 10 seconds...  __RANCE__ Comments')
+    print(err, 'Sleeping for 10 seconds...  __GEOPOLITICS__ Comments')
     time.sleep(10)

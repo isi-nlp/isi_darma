@@ -50,7 +50,7 @@ while True:
       if time.time() > timeout:
         print("------Collected "+ str(counter) + " comments in one hour for subreddit __FRANCE__")
 
-        comments.to_csv('/nas/home/asharma/data/france/com_stream_france.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
+        comments.to_csv('/nas/home/asharma/controversy_data/france/com_stream_france.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
         
         timeout = time.time() + 60*60
         comments = pd.DataFrame()
