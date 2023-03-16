@@ -18,17 +18,17 @@ class GPT3:
                             " You may obtain key from https://beta.openai.com/account/api-keys")            
         openai.api_key = api_key
     
-    def query(self, prompt: Union[str, List[Dict[str,str]]], engine: str, **args):
+    def query(self, messages, engine: str, **args):
 
         return self.query_completion_api(
-            prompt=prompt, 
+            messages=messages,  
             engine=engine,
             **args
         )
     
     @staticmethod
     def query_completion_api(
-            prompt:Union[str,Dict[str,str]], engine:str,
+            messages: List[Dict[str,str]], engine:str,
             frequency_penalty=0, presence_penalty=0,
             temperature=0.7, n=1
         ):
@@ -37,8 +37,9 @@ class GPT3:
             # GPT-3 Generation
             
             if "text" in engine:
-                if not isinstance(prompt, str): 
-                    log.error(f"Prompt must be a string when using engine: {engine}. Instead, got: {prompt}")
+                
+                prompt = "\n".join([msg["content"] for msg in messages]) + "\n"
+                
                 response = openai.Completion.create(
                     model=engine,
                     prompt=prompt,
@@ -54,11 +55,9 @@ class GPT3:
                 response_text = response.choices[0].text.strip()
                 
             else: 
-                if not isinstance(prompt, list): 
-                    log.error(f"Prompt must be a list of dictionaries with a str:str mapping when using engine: {engine}. Instead, got: {prompt}")
                 response = openai.ChatCompletion.create(
                     model=engine,
-                    messages = prompt, 
+                    messages = messages, 
                     temperature=temperature,
                     max_tokens=1024,
                     top_p=1,

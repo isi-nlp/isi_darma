@@ -86,6 +86,7 @@ class GPTBot(BotAgent):
             return PromptGenerator(
                 matching_personas[0], 
                 self.endpoints,
+                self.engine,
                 default_endpoint=self.default_endpoint,
                 few_shot_example=self.few_shot_example
             )
@@ -113,7 +114,6 @@ class GPTBot(BotAgent):
         seed_turns = self._get_seed_turns(self.context)
         
         final_message_text = self.prompt_generator.run(
-            self.engine, 
             seed_turns,
             self.turn_idx
         )

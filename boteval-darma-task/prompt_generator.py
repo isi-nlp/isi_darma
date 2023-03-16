@@ -86,8 +86,8 @@ class Variable:
 
     def __str__(self) -> str:
         statement = self.instruction_raw
-        for token, (var, format) in self._variables.items():
-            decoding = var.get_assignment(format=format)
+        for token, (var, format_) in self._variables.items():
+            decoding = var.get_assignment(format=format_)
             statement = statement.replace(
                 f'<{token}>', decoding
             )
@@ -126,7 +126,7 @@ class Variable:
         self._parameters[key] = value
 
         if not value:
-            log.critical(
+            log.error(
                 f'Empty Assignment @ => #{self._assign_cnt}: '
                 f'{key}({self.get("id")}) = {value}'
             )
@@ -171,6 +171,7 @@ class PromptGenerator:
     
     def __init__(self, config_json: dict,
                  endpoints: dict,
+                 engine: str,
                  few_shot_example=None,
                  default_endpoint='query_lm'):
         """
@@ -184,6 +185,7 @@ class PromptGenerator:
             to 'query_lm'.
         """
         self.endpoints = endpoints
+        self.engine = engine 
         self.default_endpoint = default_endpoint
         self.id = config_json['id']
         self.notes = config_json['notes']
@@ -204,7 +206,7 @@ class PromptGenerator:
                 k: Lock() for k in self.variables
             }
 
-    def run(self, engine:str, seed_turns: List[str], turn_idx: int) -> str:
+    def run(self, seed_turns: List[str], turn_idx: int) -> str:
         """
 
         Args:
@@ -217,25 +219,25 @@ class PromptGenerator:
         """
         
         self.turn_idx = turn_idx
+        self.seed_turns = seed_turns 
         
-        if "text" in engine: 
-            # format prompt as single string
-            prompt = self._string_prompt_compose(seed_turns)
-        else: 
-            # format prompt as a list of messages: https://platform.openai.com/docs/api-reference/chat/create
-            prompt = self._messages_compose(seed_turns)
+        
+        self._decode_tokens(self.instruction)
+        messages = self._messages_compose(seed_turns)
+            
+        log.debug(messages)
             
         if turn_idx == 0:
             response =\
                 self.endpoints[self.default_endpoint](
-                    engine=engine,
-                    prompt=prompt, 
+                    engine=self.engine,
+                    messages=messages, 
                     n=10)
         else:
             response =\
                 self.endpoints[self.default_endpoint](
-                    engine=engine,
-                    prompt=prompt, 
+                    engine=self.engine,
+                    messages=messages, 
                     frequency_penalty=2, 
                     presence_penalty=2,
                     temperature=1
@@ -243,41 +245,25 @@ class PromptGenerator:
 
                 
         return response.strip()
-        
+
     def _messages_compose(self, seed_turns: List[str]): 
         """
-        messages input for chatgpt endpoint (gpt-3.5-turbo)
+        messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
         """
+        
+        if self.few_shot_example == 'nvc':
+            few_shot_example = self.get_fewshot_example(self.turn_idx)
+
+            if few_shot_example != "":
+                self.instruction = f'{self.instruction}\n{few_shot_example}\n'
+        
         messages = [
             {"role": "system", "content": str(self.instruction)}, 
             {"role": "user", "content": "\n".join(seed_turns).strip()}
         ]
         
         return messages
-    
-    def _string_prompt_compose(self, seed_turns) -> str:
-        """
-        Returns:
-            str: Prepared and generated/constant prompt appended to seed_turns and 
-            properly to feed for completion llm call for text-davinci models 
-        """
         
-        seed_conversation_as_str = "\n".join(seed_turns).strip()
-        
-        if self.few_shot_example == 'nvc':
-            few_shot_example = self.get_fewshot_example(self.turn_idx)
-        else:
-            few_shot_example = ""
-
-        self._decode_tokens(self.instruction)
-        if few_shot_example == "":
-            prompt = f'{self.instruction}\n\n{seed_conversation_as_str}\n'
-        else:
-            prompt = f'{self.instruction}\n\n{few_shot_example}\n\n' +\
-                f'###\n\n{seed_conversation_as_str}\n'
-        
-        return prompt + f'user {self.title}:'
-    
     def _decode_tokens(self, variable: str) -> Variable:
         def _get_endpoint(leaf_variable):
             return leaf_variable.get(
@@ -310,21 +296,22 @@ class PromptGenerator:
                     #     f'Executig call #{leaf_variable._assign_cnt + 1} '
                     #     f'to obtain variable {leaf_variable["id"]}'
                     # )
+                    
+                    sub_instruction = str(self._decode_tokens(leaf_variable,))   
+                    
+                    messages = [
+                        {"role": "system", "content": "\n".join(self.seed_turns + [sub_instruction]).strip()}
+                    ]
           
                     leaf_variable['response'] =\
                         self.endpoints[_get_endpoint(leaf_variable)](
-                        "\n".join([
-                            self.seed_turns, 
-                            str(
-                                self._decode_tokens(
-                                    leaf_variable, 
-                                ) 
-                            )   
-                        ]))
+                            engine=self.engine, 
+                            messages=messages
+                        )
                     
                     value = self.reduce(leaf_variable)
                     if value is None:
-                        log.critical(
+                        log.error(
                             'Multiple calls in the same turn might arise as'
                             'None reduction is observed'
                         )
