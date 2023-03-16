@@ -3,6 +3,7 @@ import re
 from boteval import log
 from multiprocessing import Lock
 from multiprocessing.pool import ThreadPool
+from typing import List
 
 ROOT_TOKEN_REGEX = '([\w]+)'
 TOKEN_REGEX = '<([\w-]+)>'
@@ -203,7 +204,7 @@ class PromptGenerator:
                 k: Lock() for k in self.variables
             }
 
-    def run(self, seed_turns: str, turn_idx: int) -> str:
+    def run(self, engine:str, seed_turns: List[str], turn_idx: int) -> str:
         """
 
         Args:
@@ -215,43 +216,65 @@ class PromptGenerator:
             str: bot response given the generated/constant prompt using the default lm
         """
         
-        self.seed_turns = seed_turns
         self.turn_idx = turn_idx
-        prompt = self._prompt_compose()
         
+        if "text" in engine: 
+            # format prompt as single string
+            prompt = self._string_prompt_compose(seed_turns)
+        else: 
+            # format prompt as a list of messages: https://platform.openai.com/docs/api-reference/chat/create
+            prompt = self._messages_compose(seed_turns)
+            
         if turn_idx == 0:
             response =\
-                self.endpoints[self.default_endpoint](prompt, n=10)
+                self.endpoints[self.default_endpoint](
+                    engine=engine,
+                    prompt=prompt, 
+                    n=10)
         else:
             response =\
                 self.endpoints[self.default_endpoint](
-                    prompt, frequency_penalty=2, 
+                    engine=engine,
+                    prompt=prompt, 
+                    frequency_penalty=2, 
                     presence_penalty=2,
                     temperature=1
                 )
+
                 
         return response.strip()
         
+    def _messages_compose(self, seed_turns: List[str]): 
+        """
+        messages input for chatgpt endpoint (gpt-3.5-turbo)
+        """
+        messages = [
+            {"role": "system", "content": str(self.instruction)}, 
+            {"role": "user", "content": "\n".join(seed_turns).strip()}
+        ]
         
-    def _prompt_compose(self) -> str:
+        return messages
+    
+    def _string_prompt_compose(self, seed_turns) -> str:
         """
         Returns:
             str: Prepared and generated/constant prompt appended to seed_turns and 
-            properly to feed for completion llm call.
+            properly to feed for completion llm call for text-davinci models 
         """
+        
+        seed_conversation_as_str = "\n".join(seed_turns).strip()
+        
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(self.turn_idx)
         else:
             few_shot_example = ""
 
-        # tokens = re.findall(TOKEN_REGEX, self.instruction_out)
-        # if tokens:
         self._decode_tokens(self.instruction)
         if few_shot_example == "":
-            prompt = f'{self.instruction}\n\n{self.seed_turns}\n'
+            prompt = f'{self.instruction}\n\n{seed_conversation_as_str}\n'
         else:
             prompt = f'{self.instruction}\n\n{few_shot_example}\n\n' +\
-                f'###\n\n{self.seed_turns}\n'
+                f'###\n\n{seed_conversation_as_str}\n'
         
         return prompt + f'user {self.title}:'
     

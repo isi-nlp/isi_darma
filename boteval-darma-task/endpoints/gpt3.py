@@ -1,7 +1,8 @@
 import os
 import openai
-
+from typing import Union, List, Dict
 from . import Endpoint
+from boteval import log
 
 @Endpoint.register
 class GPT3:
@@ -9,7 +10,7 @@ class GPT3:
     name = 'gpt3'
     
     def __init__(self):
-        self.override_engine  = os.environ.get('OPENAI_ENGINE', None)        
+    
         api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
             raise Exception("OpenAI API key is not set."
@@ -17,40 +18,62 @@ class GPT3:
                             " You may obtain key from https://beta.openai.com/account/api-keys")            
         openai.api_key = api_key
     
-    def query(self, complete_prompt: str, engine='text-davinci-003', **args):
-        engine = self.override_engine if self.override_engine else engine
+    def query(self, prompt: Union[str, List[Dict[str,str]]], engine: str, **args):
+
         return self.query_completion_api(
-            complete_prompt, 
+            prompt=prompt, 
             engine=engine,
             **args
         )
     
     @staticmethod
     def query_completion_api(
-            prompt, engine,
+            prompt:Union[str,Dict[str,str]], engine:str,
             frequency_penalty=0, presence_penalty=0,
             temperature=0.7, n=1
         ):
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):
             # GPT-3 Generation
-            response = openai.Completion.create(
-                model=engine,
-                prompt=prompt,
-                temperature=temperature,
-                max_tokens=1024,
-                top_p=1,
-                n=n,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty,
-                stop=["user A:", "user B:", "user C:", "user D:"]
-            )
+            
+            if "text" in engine:
+                if not isinstance(prompt, str): 
+                    log.error(f"Prompt must be a string when using engine: {engine}. Instead, got: {prompt}")
+                response = openai.Completion.create(
+                    model=engine,
+                    prompt=prompt,
+                    temperature=temperature,
+                    max_tokens=1024,
+                    top_p=1,
+                    n=n,
+                    frequency_penalty=frequency_penalty,
+                    presence_penalty=presence_penalty,
+                    stop=["user A:", "user B:", "user C:", "user D:"]
+                )
+                
+                response_text = response.choices[0].text.strip()
+                
+            else: 
+                if not isinstance(prompt, list): 
+                    log.error(f"Prompt must be a list of dictionaries with a str:str mapping when using engine: {engine}. Instead, got: {prompt}")
+                response = openai.ChatCompletion.create(
+                    model=engine,
+                    messages = prompt, 
+                    temperature=temperature,
+                    max_tokens=1024,
+                    top_p=1,
+                    n=n,
+                    frequency_penalty=frequency_penalty,
+                    presence_penalty=presence_penalty,
+                    stop=["user A:", "user B:", "user C:", "user D:"]
+                )
+                
+                response_text = response.choices[0]['message']['content'].strip() 
 
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
             # 0: safe, 1: sensitive, 2: unsafe
             # We want to make sure the generation is not unsafe
-            response_text = response.choices[0].text.strip()
             classification_response = openai.Completion.create(
                 model="content-filter-alpha",
                 prompt = "<|endoftext|>"+ response_text +"\n--\nLabel:",

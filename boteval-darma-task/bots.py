@@ -24,6 +24,7 @@ class GPTBot(BotAgent):
         self.max_ctx_len = max_ctx_len
         self.few_shot_example = few_shot_example # e.g. nvc
         self.default_endpoint = default_endpoint
+        self.engine = engine 
         
         if engine:
             os.environ['OPENAI_ENGINE'] = engine
@@ -56,8 +57,8 @@ class GPTBot(BotAgent):
             f"- {k}" for k in self.endpoints.keys()
         ])
         log.info(
-            f"Available endpoints:\n{endpoints_listing}\n"
-            f"while default is {self.default_endpoint}"
+            f"Available endpoints:\n\t{endpoints_listing}\n"
+            f"\twhile default is {self.default_endpoint}"
         )
 
     def load_persona(self, 
@@ -79,7 +80,7 @@ class GPTBot(BotAgent):
             
             if len(matching_personas) < 1:
                 raise Exception(f'Unknown persona: {persona_id}')
-            elif len(matching_personas) > 0:
+            elif len(matching_personas) > 1:
                 log.warning(f'Redundant personas with id "{persona_id}" exist!')
 
             return PromptGenerator(
@@ -93,21 +94,26 @@ class GPTBot(BotAgent):
         turn = f'user {user}: {text}'
         n_toks = len(turn.strip().split())
         self.context.append((turn, n_toks))
-
-    def get_seed_turns(self) -> str:
-        seed_turns = ''
+    
+    
+    def _get_seed_turns(self, context) -> str:
+        # truncate to not exceed max input context length 
+        seed_turns = []
         ctx_len = 0
-        for turn, turn_len in reversed(self.context):
+        
+        for turn, turn_len in reversed(context):
             ctx_len += turn_len
             if ctx_len >= self.max_ctx_len:
                 break
-            seed_turns = turn + '\n' + seed_turns
-        return seed_turns.strip()
-    
+            seed_turns = [turn] + seed_turns
+        return seed_turns      
+
     def talk(self, timeout=None):
-        seed_turns = self.get_seed_turns()
+        
+        seed_turns = self._get_seed_turns(self.context)
         
         final_message_text = self.prompt_generator.run(
+            self.engine, 
             seed_turns,
             self.turn_idx
         )
@@ -149,8 +155,8 @@ class GPTBot(BotAgent):
         Returns:
             dict: similar output to talk
         """
-        seed_turns = self.get_seed_turns()
-        resp = self.endpoints[self.default_endpoint](seed_turns)
+
+        resp = self.endpoints[self.default_endpoint](self.context)
 
         final_message_text = resp
         final_message_text = final_message_text.strip()
