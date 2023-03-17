@@ -1,5 +1,6 @@
 import os
 import openai
+import logging as log
 
 from . import Endpoint
 
@@ -9,7 +10,8 @@ class GPT3:
     name = 'gpt3'
     
     def __init__(self):
-        self.override_engine  = os.environ.get('OPENAI_ENGINE', None)        
+        self.override_engine  = os.environ.get('OPENAI_ENGINE', None)  
+              
         api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
             raise Exception("OpenAI API key is not set."
@@ -17,23 +19,30 @@ class GPT3:
                             " You may obtain key from https://beta.openai.com/account/api-keys")            
         openai.api_key = api_key
     
-    def query(self, complete_prompt: str, engine='text-davinci-003', **args):
+    def query(self, complete_prompt: str, engine='text-davinci-003', **kwargs):
         engine = self.override_engine if self.override_engine else engine
         return self.query_completion_api(
             complete_prompt, 
             engine=engine,
-            **args
+            **kwargs
         )
     
     @staticmethod
     def query_completion_api(
             prompt, engine,
-            frequency_penalty=0, presence_penalty=0,
-            temperature=0.7, n=1
+            frequency_penalty=0, 
+            presence_penalty=0,
+            temperature=0.7,
+            n=1,
+            max_timeout_rounds = 5
         ):
-        max_timeout_rounds = 5
-        for _ in range(max_timeout_rounds):
+        
+        for i in range(max_timeout_rounds):
             # GPT-3 Generation
+            if i > 0:
+                log.critical(f'GPT timeout - retry #{i}')
+                
+            # breakpoint()
             response = openai.Completion.create(
                 model=engine,
                 prompt=prompt,
@@ -45,7 +54,7 @@ class GPT3:
                 presence_penalty=presence_penalty,
                 stop=["user A:", "user B:", "user C:", "user D:"]
             )
-
+            # breakpoint()
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
             # 0: safe, 1: sensitive, 2: unsafe

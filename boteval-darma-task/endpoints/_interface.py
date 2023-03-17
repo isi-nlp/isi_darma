@@ -4,7 +4,7 @@ class Endpoint(metaclass=abc.ABCMeta):
     
     name = None
     
-    def query(self, _input: str, **args) -> str:
+    def query(self, _input: str, *args, **kwargs) -> str:
         raise NotImplementedError
     
     @classmethod

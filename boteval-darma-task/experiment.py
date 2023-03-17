@@ -6,10 +6,8 @@ A script meant for interactive analysis and automated processes for fast experim
 
 """
 
-import os
-import json
-import textwrap
-import argparse
+import os, argparse
+import re, json, textwrap
 import logging as log
 import numpy as np
 from bots import GPTBot
@@ -18,7 +16,8 @@ from multiprocessing.pool import ThreadPool
 
 
 PRINT_WIDTH=-1 # Modified by argparse
-
+BOT_SPEAKER_ID_REGEX = 'bot\\d+'
+EXPERIMENT_OPTS_REGEX = '\\\(\w+)(\\\((\w+)\\\))?'
 
 class MixedBots:
     
@@ -170,18 +169,19 @@ class MixedBots:
         removes = self._iterate(lambda x: x.backspace())
         return removes
             
-    def view_variables(self):
+    def view_variables(self, var_name=None):
         print('Variables:')
-        def get_variables_desc(bot: GPTBot):
+        def get_variables_desc(bot: GPTBot, ):
             desc = 'Empty due to Constant Prompt'
             if bot.prompt_generator.is_dynamic_prompt():
                 desc = bot.prompt_generator.debug_variables()
+                desc = desc.get(var_name) if var_name else desc
             return {"text": desc}
         descs = self._iterate(lambda x: get_variables_desc(x))        
         self._print_responses(descs, title_placeholder='Variables of {}:\n')
     
-    def view_turn(self):
-        print(f'This turn is {self.bots[0].turn_idx}')        
+    def get_turn_idx(self):
+        return self.bots[0].turn_idx               
     
 def print_wrap_text(txt, width=None,
                     prefix='#', 
@@ -214,8 +214,11 @@ def pick_valid_choice(alist, statement='Enter config #: '):
                 lambda x: int(x)-1,
                 selection.split(',')
             ))
-        except:
+        except:    
+            if is_break_query():
+                break
             print('Please enter appropriate value.')    
+            
     return list(map(alist.__getitem__, nums))
 
 def load_persona_confs(confs_filename='persona_configs.json'):
@@ -267,11 +270,20 @@ def load_conversation(filepath='chat_topics_eng.json', conv_id=None):
     return conv
 
 def interactive_session(
+        conv_file, 
+        conv_id,
         engine='text-davinci-003',
-        max_ctx_len=2048
+        max_ctx_len=2048,
+        feed_history=False
     ):
     
+    
     while(True):
+        existing_conv = load_conversation(filepath=conv_file, conv_id=conv_id)
+        
+        if feed_history:
+            mturk_chats = load_mturk_chats_per_id(mturk_data_dir, existing_conv['id'])
+        
         personas = load_persona_confs()
         bots = MixedBots(
             personas, 
@@ -301,14 +313,49 @@ def interactive_session(
             bots.backspace()
             bots.talk()
             
+        def respond_with_mturk_history():
+            choice_idx = np.random.choice(np.arange(len(mturk_chats)))
+            line = mturk_chats[choice_idx][bots.get_turn_idx()]['text']
+            print_wrap_text(f'[User {final_user}]: {line}')
+            continue_conversation(line)
+                
         options = {
-            "\\view_seed": bots.view_seed,
-            "\\backspace": backspace,
-            "\\retry": retry,
-            "\\view_variables": bots.view_variables,
-            "\\view_turn": bots.view_turn,
-            'error': lambda: print('This option is not defined (NOT LLM ANSWER); Try again.\n')
+            "view_seed": lambda _: bots.view_seed(),
+            "backspace": lambda _: backspace(),
+            "retry": lambda _: retry(),
+            "view_variables": lambda var_name: bots.view_variables(var_name=var_name),
+            "view_turn": lambda _: print(f'This turn is {bots.get_turn()}') ,
+            'send_mturk_res': lambda _: respond_with_mturk_history(),
         }
+        
+        def initiate_force_feeding(line):
+            feed = line[2:]
+            feeding_text = True
+            if feed.endswith("\\\\"):
+                feeding_text = False
+                feed = feed[:-2]
+            else:
+                print("Enter '\\\\' to end feed.")
+                
+            while feeding_text:
+                feed += '\n' + input()
+                if feed.endswith("\\\\"):
+                    feeding_text = False
+                    feed = feed[:-2]
+                    break
+            print(f'(Feeding text):\n{feed}')
+            bots.feed(feed)
+            print('='*PRINT_WIDTH)
+            bots.force_completion()
+            
+        def continue_conversation(line):
+            bots.hear({
+                    'speaker_id': final_user,
+                    'text': line
+                })
+            print('='*PRINT_WIDTH)
+            _ = bots.talk()
+                
         
         while True:
             print('='*PRINT_WIDTH)
@@ -318,45 +365,29 @@ def interactive_session(
                 continue
             if line == "exit":
                 break
-            
-            
+   
             if line.startswith("\\\\"):
-                feed = line[2:]
-                feeding_text = True
-                if feed.endswith("\\\\"):
-                    feeding_text = False
-                    feed = feed[:-2]
-                else:
-                    print("Enter '\\\\' to end feed.")
-                    
-                while feeding_text:
-                    feed += '\n' + input()
-                    if feed.endswith("\\\\"):
-                        feeding_text = False
-                        feed = feed[:-2]
-                        break
-                print(f'(Feeding text):\n{feed}')
-                bots.feed(feed)
-                print('='*PRINT_WIDTH)
-                bots.force_completion()
-            elif line.startswith("\\"):
-                options.get(line, 'error')()
+                initiate_force_feeding(line)
+            elif match := re.match(EXPERIMENT_OPTS_REGEX, line):
+                groups = match.groups()
+                options.get(
+                    groups[0],
+                    lambda _: print('This option is not defined (NOT LLM ANSWER); Try again.\n')
+                )(groups[2])
             else:
-                bots.hear({
-                    'speaker_id': final_user,
-                    'text': line
-                })
-                print('='*PRINT_WIDTH)
-                _ = bots.talk()
+                continue_conversation(line)
                 
-
-        query = input('Do you want to continue? ')
-        if query.lower() in ['q', 'quit']:
-            print('Quitting')
+        if is_break_query():
             break
-        
 
-def load_chats_per_id(chat_dir, conv_id, n=3):
+def is_break_query(quit_statement='Quitting'):
+    query = input('Do you want to continue? ')
+    if query.lower() in ['q', 'quit']:
+        print(quit_statement)
+        return True
+    return False
+
+def load_mturk_chats_per_id(chat_dir, conv_id, n=3, drop_org_text=True, drop_bot_res=True):
     convs_filepaths = []
     for root, dirs, files in os.walk(chat_dir, topdown=False):
         for f in files:
@@ -376,17 +407,19 @@ def load_chats_per_id(chat_dir, conv_id, n=3):
                 else:
                     speaker_id = msg['user_id']
                     org_text = False
-                
-                msgs_prepared.append({
-                    'org_text': org_text,
-                    'speaker_id': speaker_id,
-                    'text': msg['text']
-                })
+
+                if not drop_org_text or not org_text:
+                    if not drop_bot_res or not re.match(BOT_SPEAKER_ID_REGEX, speaker_id):
+                        msgs_prepared.append({
+                            'org_text': org_text,
+                            'speaker_id': speaker_id,
+                            'text': msg['text']
+                        })
                 
             convs_cleaned.append(msgs_prepared)
     return convs_cleaned
         
-        
+
 if __name__ == "__main__":
     
     parser = argparse.ArgumentParser(description='Alignment Options and Configs.')
@@ -411,13 +444,16 @@ if __name__ == "__main__":
     # log.getLogger().setLevel(log.DEBUG)
 
     if args.inter:
-        existing_conv = load_conversation(filepath=args.conv_file, conv_id=args.conv_id)
         mturk_data_dir = '/mnt/c/Users/basem/Projects/ISI/isi_darma/boteval-darma-task/data/data'
         
         # interactive_session()
-        # mturk_chats = load_chats_per_id(mturk_data_dir, existing_conv['id'])
         # TODO inject mturk responses into conversation
         # breakpoint()
-        interactive_session()
+
+        interactive_session(
+            conv_file=args.conv_file, 
+            conv_id=args.conv_id,
+            feed_history=True
+        )
 
     

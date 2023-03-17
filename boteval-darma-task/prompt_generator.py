@@ -1,7 +1,6 @@
-
 import re
 from boteval import log
-from multiprocessing import Lock
+from multiprocessing import Lock, cpu_count
 from multiprocessing.pool import ThreadPool
 
 ROOT_TOKEN_REGEX = '([\w]+)'
@@ -20,13 +19,24 @@ class Variable:
             parameters = { 'instruction': parameters }
         self._parameters = parameters
         self.instruction_raw = self._parameters.get('instruction')
+        self.endpoint_kwargs = self._parameters.get('endpoint_kwargs', {})
         self._variables = {
             t: None
             for t in re.findall(TOKEN_REGEX, self.instruction_raw)
         }
         self._assign_cnt = 0
         self._assignments = {} # tracking assignments of value
+        self._look_up = self._parameters.get('look_up', None)
     
+    def prepare_context(self, seed_turns: str):
+        if not self._look_up:
+            return seed_turns
+        seed_turns = seed_turns.split('\n')
+        if self._look_up > 0:
+            return '\n'.join(seed_turns[:self._look_up])
+        else:
+            return '\n'.join(seed_turns[self._look_up:])
+            
     def get_tokens(self): return self._variables.keys()
     
     def replace(self, token: str, value, format: str=None):
@@ -171,7 +181,8 @@ class PromptGenerator:
     def __init__(self, config_json: dict,
                  endpoints: dict,
                  few_shot_example=None,
-                 default_endpoint='query_lm'):
+                 default_endpoint='query_lm',
+                 num_threads=None):
         """
 
         Args:
@@ -187,12 +198,12 @@ class PromptGenerator:
         self.id = config_json['id']
         self.notes = config_json['notes']
         self.title = config_json['title']    
-        self.instruction = Variable({
-            "instruction": config_json['instruction']
-        })
+        self.instruction = Variable(config_json) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
-        self.threadPool = ThreadPool()
+        if not num_threads:
+            num_threads = cpu_count()
+        self.thread_pool = ThreadPool(processes=num_threads)
         self.variables = config_json.get('preprocess_variables')
         if self.variables:
             self.variables = {
@@ -202,6 +213,8 @@ class PromptGenerator:
             self.variables_locks = {
                 k: Lock() for k in self.variables
             }
+        
+        log.info(f'Init PromptGenerator using {self.thread_pool._processes}')
 
     def run(self, seed_turns: str, turn_idx: int) -> str:
         """
@@ -219,16 +232,18 @@ class PromptGenerator:
         self.turn_idx = turn_idx
         prompt = self._prompt_compose()
         
-        if turn_idx == 0:
-            response =\
-                self.endpoints[self.default_endpoint](prompt, n=10)
-        else:
-            response =\
-                self.endpoints[self.default_endpoint](
-                    prompt, frequency_penalty=2, 
-                    presence_penalty=2,
-                    temperature=1
-                )
+        kwargs = dict(self.instruction.endpoint_kwargs)
+        if turn_idx > 0:
+            # For backward compatibility with previous experiments
+            kwargs.update(
+                frequency_penalty=2, 
+                presence_penalty=2,
+                temperature=1
+            )
+            
+        response = self._get_endpoint(self.instruction)(
+            prompt, **kwargs
+        )
                 
         return response.strip()
         
@@ -239,28 +254,26 @@ class PromptGenerator:
             str: Prepared and generated/constant prompt appended to seed_turns and 
             properly to feed for completion llm call.
         """
+        self._decode_tokens(self.instruction)
+        context = self.instruction.prepare_context(self.seed_turns)
+        
         if self.few_shot_example == 'nvc':
             few_shot_example = self.get_fewshot_example(self.turn_idx)
-        else:
-            few_shot_example = ""
-
-        # tokens = re.findall(TOKEN_REGEX, self.instruction_out)
-        # if tokens:
-        self._decode_tokens(self.instruction)
-        if few_shot_example == "":
-            prompt = f'{self.instruction}\n\n{self.seed_turns}\n'
-        else:
             prompt = f'{self.instruction}\n\n{few_shot_example}\n\n' +\
-                f'###\n\n{self.seed_turns}\n'
-        
+                f'###\n\n{context}\n'
+        else:
+            prompt = f'{self.instruction}\n\n{context}\n'
+
         return prompt + f'user {self.title}:'
     
+    def _get_endpoint(self, leaf_variable):                        
+        return self.endpoints[leaf_variable.get(
+            'endpoint',
+            self.default_endpoint
+        )]
+        
     def _decode_tokens(self, variable: str) -> Variable:
-        def _get_endpoint(leaf_variable):
-            return leaf_variable.get(
-                'endpoint',
-                self.default_endpoint
-            )
+        
         def _decode_token(token: str):
             token_split = re.findall(ROOT_TOKEN_REGEX, token)
             token_root = token_split[0]
@@ -288,16 +301,17 @@ class PromptGenerator:
                     #     f'to obtain variable {leaf_variable["id"]}'
                     # )
           
-                    leaf_variable['response'] =\
-                        self.endpoints[_get_endpoint(leaf_variable)](
+                    leaf_variable['response'] = self._get_endpoint(leaf_variable)(
                         "\n".join([
-                            self.seed_turns, 
+                            leaf_variable.prepare_context(self.seed_turns), 
                             str(
                                 self._decode_tokens(
                                     leaf_variable, 
                                 ) 
                             )   
-                        ]))
+                        ]),
+                        **leaf_variable.endpoint_kwargs
+                    )
                     
                     value = self.reduce(leaf_variable)
                     if value is None:
@@ -317,7 +331,7 @@ class PromptGenerator:
         tokens = variable.get_tokens()
         for token, decoding_var__format in zip(
             tokens, 
-            self.threadPool.map(_decode_token, tokens
+            self.thread_pool.map(_decode_token, tokens
         )):
             variable.replace(token, decoding_var__format)
 
@@ -377,22 +391,34 @@ class PromptGenerator:
     def debug_prompt(self): return self.instruction.trace()
 
     def debug_variables(self):
+        from colorama import Fore, Style
+        def colored(_str, color=Fore.CYAN):
+            return f'{color}{_str}{Style.RESET_ALL}'
         out = ""
         for k, v in self.variables.items():
-            out += f'###### Variable({k})\n'
-            out += f'### assign_cnt: {v._assign_cnt}\n'
-            out += f'### assignments:\n' 
+            out += f'###### Variable({colored(k)})\n'
+            out += f'### {colored("assign_cnt")}: {v._assign_cnt}\n'
+            out += f'### {colored("assignments")}:\n' 
             out += "\n".join(
-                [f"- @{k}: {v}" for k, v in v._assignments.items()]
+                [
+                    f"- @{colored(k, color=Fore.BLUE)}: {colored(str(v), color=Fore.YELLOW)}" 
+                    for k, v in v._assignments.items()
+                ]
             ) + "\n"
-            out += f'### tokens:\n'
+            out += f'### {colored("tokens")}:\n'
             out += "\n".join(
-                [f'- {k} = {v}' for k, v in v._variables.items()]
+                [
+                    f"- @{colored(k, color=Fore.BLUE)}: {colored(v.get_assignment(), color=Fore.YELLOW)}" 
+                    for k, v in v._variables.items()
+                ]
             ) + "\n"
-            out += f'### instruction-out: {str(v)}\n'
-            out += '### extra parameters:\n'
+            out += f'### {colored("instruction-out")}: {colored(str(v), Fore.YELLOW)}\n'
+            out += f'### {colored("extra parameters")}:\n'
             out += "- \n".join(
-                [f'- {k}: {v}' for k, v in v._parameters.items()]
-            ) + "\n"
+                [
+                    f"- @{colored(k, color=Fore.BLUE)}: {colored(str(v), color=Fore.YELLOW)}" 
+                    for k, v in v._parameters.items()
+                ]
+            ) + "\n\n"
         return out
     

@@ -18,6 +18,7 @@ class GPTBot(BotAgent):
             default_endpoint='gpt3',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
+            num_threads=None,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
@@ -38,6 +39,7 @@ class GPTBot(BotAgent):
             persona_id,
             configs_relative_filepath=\
                 persona_configs_relative_filepath,
+            num_threads=num_threads
         )
         
         self.turn_idx = 0
@@ -62,7 +64,8 @@ class GPTBot(BotAgent):
 
     def load_persona(self, 
                      persona_id:str,
-                     configs_relative_filepath='persona_configs.json'):
+                     configs_relative_filepath='persona_configs.json',
+                     num_threads=None):
         
         configs_filepath =\
             os.path.join(
@@ -86,7 +89,8 @@ class GPTBot(BotAgent):
                 matching_personas[0], 
                 self.endpoints,
                 default_endpoint=self.default_endpoint,
-                few_shot_example=self.few_shot_example
+                few_shot_example=self.few_shot_example,
+                num_threads=num_threads
             )
 
     def context_append(self, user, text):

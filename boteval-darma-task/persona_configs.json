@@ -3,6 +3,11 @@
         "id": "dyn-2nd",
         "notes": "attempt to enforce constraints over dyn-b",
         "title": "Alexa",
+        "instruction": "Alexa is an intelligent moderator agent. Alexa identity is secret and should not be revealed to conversers. Alexa should not reveal its plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <coherency_of_to_be_moderated_response>. <to_be_moderated_with_their_emotions>. <moderator_strategy> Alexa should refer to <to_be_moderated_users> by name in the conversation.",
+        "endpoint": "gpt3",
+        "endpoint_kwargs": {
+            "n": 10
+        },
         "preprocess_variables": [
             {
                 "id": "to_be_moderated_users",
@@ -10,7 +15,10 @@
                 "post_regex": "(User \\w+): Yes",
                 "regex_validation": "https://regex101.com/r/Gn1dyY/1",
                 "post_func": "lambda x: ' and '.join(x)",
-                "frequency": 1
+                "frequency": 1,
+                "endpoint_kwargs": {
+                    "n": 10
+                }
             },
             {
                 "id": "moderation_reasoning",
@@ -26,7 +34,8 @@
                     "lambda x: {u[0]: u[1] for u in x}",
                     "lambda x: [x[name] for name in <to_be_moderated_users-list>]",
                     "lambda x: ', '.join(x)"
-                ]
+                ],
+                "frequency": 1
             },
             {
                 "id": "to_be_moderated_with_their_emotions",
@@ -42,11 +51,17 @@
             },
             { 
                 "id": "moderator_strategy",
-                "instruction": "Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and that <to_be_moderated_users> emotions classified as <users_emotions> respectively in the converation. Explain how would a moderator convince <to_be_moderated_users> to adapt non violent communication rules:",
+                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions in the conversation are as follows: <to_be_moderated_with_their_emotions>. Explain how would a moderator convince and encourage <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotions:",
                 "frequency": 1
+            },
+            {
+                "id": "coherency_of_to_be_moderated_response",
+                "instruction": "Q: Are <to_be_moderated_users> recent responses coherent with the context of the converation? respond by yes or no",
+                "post_func": "lambda x: '<to_be_moderated_users> responses are coherent with the conversation' if 'yes' in x.lower() else '<to_be_moderated_users> responses are not coherent with the context of the conversation'",
+                "frequency": 1,
+                "look_up": -3
             }
-        ],
-        "instruction": "Alexa is an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy> Alexa should refer to <to_be_moderated_users> by name in the conversation. Alexa identity is secret and should not be revealed to conversers. Alexa should not reveal its plan to users in this conversation."
+        ]
     },
     {
         "id": "dyn-b",
