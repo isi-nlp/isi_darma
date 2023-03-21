@@ -29,6 +29,17 @@ def evaluate_conversation(
     conversation: List[str],
     engine: str = "gpt-3.5-turbo",
 ):
+    """
+        Evaluate a conversation using GPT 
+        
+        moderator_instruction: str - the instruction given to the moderator
+        moderated_user_instruction: str - the instruction given to the moderated user
+        conversation: List[str] - list of strings representing the conversation
+        engine: str - the engine to use for evaluation
+        
+        returns: Dict[str, float] - dictionary of scores for each metric
+    """
+    
     # metrics_of_interest = ['alignment', 'coherency', 'understanding', 'engaging', 'repetitiveness', 'persuasiveness']
 
     gpt_endpoint = GPT3()
@@ -71,7 +82,12 @@ def evaluate_conversation(
     scores = {}
     for ins in instructions:
         # create prompt
-        prompt = f"{ins['instruction']} {score_scale_text} {conversation}"
+        if ins['metric'] == 'bot_alignment':
+            prompt = f"{ins['instruction']}\n{score_scale_text}\nModerator instruction: {moderator_instruction}\n{conversation}"
+        elif ins['metric'] == 'user_alignment':
+            prompt = f"{ins['instruction']}\n{score_scale_text}\nModerated user instruction:{moderated_user_instruction}\n{conversation}"
+        else: 
+            prompt = f"{ins['instruction']}\n{score_scale_text}\n{conversation}"
 
         messages = [
             {"role": "system", "content": prompt},
