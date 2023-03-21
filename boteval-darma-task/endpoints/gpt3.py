@@ -40,6 +40,8 @@ class GPT3:
                 
                 prompt = "\n".join([msg["content"] for msg in messages]) + "\n"
                 
+                log.debug(f"Input prompt:\n\t{prompt}")
+                
                 response = openai.Completion.create(
                     model=engine,
                     prompt=prompt,
@@ -54,7 +56,11 @@ class GPT3:
                 
                 response_text = response.choices[0].text.strip()
                 
+                log.debug(f"Output:\n\t{response_text}")
+                
             else: 
+                log.debug(f"Input messages:\n\t{messages}")
+                
                 response = openai.ChatCompletion.create(
                     model=engine,
                     messages = messages, 
@@ -68,6 +74,9 @@ class GPT3:
                 )
                 
                 response_text = response.choices[0]['message']['content'].strip() 
+                
+                log.debug(f"Output:\n\t{response_text}")
+                
 
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter

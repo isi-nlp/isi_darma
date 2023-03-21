@@ -225,8 +225,6 @@ class PromptGenerator:
         self._decode_tokens(self.instruction)
         messages = self._messages_compose()
             
-        log.debug(messages)
-            
         if turn_idx == 0:
             response =\
                 self.endpoints[self.default_endpoint](
