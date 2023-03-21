@@ -146,11 +146,11 @@ def main():
     bot_ids = [
         # "dyn-2nd", 
         "goto_interest_simple", 
-        "mirror_simple", 
+        # "mirror_simple", 
         "stern", 
-        "wisebeing", 
-        "moderator", 
-        "persuasive"
+        # "wisebeing", 
+        # "moderator", 
+        # "persuasive"
     ]
 
     with open(args["seed_topic_path"], "r") as f: 
@@ -195,7 +195,7 @@ def main():
                 with open(fp, "w") as f: 
                     json.dump(results, f, indent=4)
                                 
-                if idx == 10: 
+                if idx == 5: 
                     break 
 
 if __name__ == "__main__":
