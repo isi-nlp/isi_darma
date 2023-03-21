@@ -197,6 +197,7 @@ class PromptGenerator:
         
         self.threadPool = ThreadPool()
         self.variables = config_json.get('preprocess_variables')
+        
         if self.variables:
             self.variables = {
                 x['id'] : Variable(x) for x in self.variables
@@ -206,11 +207,11 @@ class PromptGenerator:
                 k: Lock() for k in self.variables
             }
 
-    def run(self, seed_turns: List[str], turn_idx: int) -> str:
+    def run(self, turns: List[str], turn_idx: int) -> str:
         """
 
         Args:
-            seed_turns (str): concatentation of all past turns of the conversation
+            turns (str): concatentation of all past turns of the conversation
             turn_idx (int): turn number in the conversation used to set args of
             language model calls
 
@@ -219,11 +220,10 @@ class PromptGenerator:
         """
         
         self.turn_idx = turn_idx
-        self.seed_turns = seed_turns 
-        
-        
+        self.turns = turns 
+
         self._decode_tokens(self.instruction)
-        messages = self._messages_compose(seed_turns)
+        messages = self._messages_compose()
             
         log.debug(messages)
             
@@ -242,11 +242,10 @@ class PromptGenerator:
                     presence_penalty=2,
                     temperature=1
                 )
-
                 
         return response.strip()
 
-    def _messages_compose(self, seed_turns: List[str]): 
+    def _messages_compose(self): 
         """
         messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
         """
@@ -257,10 +256,22 @@ class PromptGenerator:
             if few_shot_example != "":
                 self.instruction = f'{self.instruction}\n{few_shot_example}\n'
         
+        seed_turns = [x[0] for x in self.turns if x[-1]]
+        non_seed_turns = [x[0] for x in self.turns if not x[-1]]
+                
         messages = [
             {"role": "system", "content": str(self.instruction)}, 
             {"role": "user", "content": "\n".join(seed_turns).strip()}
         ]
+        
+        role = "assistant"
+        for t in non_seed_turns: 
+            messages.append({
+                "role": role, 
+                "content": t
+            })
+            
+            role = "user" if role == "assistant" else "assistant"
         
         return messages
         
@@ -300,7 +311,7 @@ class PromptGenerator:
                     sub_instruction = str(self._decode_tokens(leaf_variable,))   
                     
                     messages = [
-                        {"role": "system", "content": "\n".join(self.seed_turns + [sub_instruction]).strip()}
+                        {"role": "system", "content": "\n".join([t[0] for t in self.turns] + [sub_instruction]).strip()}
                     ]
           
                     leaf_variable['response'] =\
