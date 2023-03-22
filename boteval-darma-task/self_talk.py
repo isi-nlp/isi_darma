@@ -51,10 +51,10 @@ def evaluate_conversation(
             "metric": "bot_alignment",
             "instruction": "Given the following instructions and conversation, how well-aligned is the moderator with the instruction it was given?",
         },
-        {
-            "metric": "user_alignment",
-            "instruction": "Given the following instructions and conversation, how well-aligned is the moderated user with the instruction it was given?",
-        },
+        # {
+        #     "metric": "user_alignment",
+        #     "instruction": "Given the following instructions and conversation, how well-aligned is the moderated user with the instruction it was given?",
+        # },
         {
             "metric": "coherency",
             "instruction": "How coherent is the moderator's response?",
@@ -204,6 +204,7 @@ def parse_args():
     parser.add_argument(
         "-p", "--persona_config_path", type=str, default="persona_configs.json"
     )
+    parser.add_argument("--self_eval", action="store_true", default=False)
 
     args = vars(parser.parse_args())
     return args
@@ -215,18 +216,27 @@ def main():
     with open(args["persona_config_path"], "r") as f:
         persona_configs = json.load(f)
 
-    user_personas = ["moderated_user_persona"]
+    user_personas = [
+        "rude_user_persona", 
+        # "stubborn_reasonable_user_persona"
+    ]
 
     bot_ids = [x["id"] for x in persona_configs if x["id"] not in user_personas]
 
     bot_ids = [
         # "dyn-2nd",
+        "witty", 
+        "goto_interest_dynamic_strategy_simple", 
         "goto_interest_simple",
+        "goto_interest_colloquial", 
+        "empathetic_colloquial",
+        "cognitive_reappraisal_paraphrase_suggestor", 
         # "mirror_simple",
         "stern",
-        # "wisebeing",
-        # "moderator",
-        # "persuasive"
+        "wisebeing",
+        "moderator",
+        "persuasive",
+        "sarcastic"
     ]
 
     with open(args["seed_topic_path"], "r") as f:
@@ -247,7 +257,10 @@ def main():
             else:
                 results = {}
 
-            for idx, topic in tqdm(enumerate(data)):
+            for idx, topic in tqdm(enumerate(data), total=len(data)):
+                if idx == 3:
+                    break
+                
                 id_ = topic["id"]
                 config_name = f"{args['engine']}-{bot_persona=}-{user_persona=}-{id_}"
 
@@ -266,25 +279,22 @@ def main():
                     generated_conversation["init_conv"]
                     + generated_conversation["continued_conv"]
                 )
-
-                # add automatic evaluation scores
-                scores = evaluate_conversation(
-                    generated_conversation["moderator_instruction"],
-                    generated_conversation["moderated_user_instruction"],
-                    conversation,
-                    engine=args["engine"],
-                )
-
                 results[config_name] = {
-                    "generated_conversation": generated_conversation,
-                    "scores": scores,
+                    "generated_conversation": generated_conversation,   
                 }
+                # add automatic evaluation scores
+                
+                if args["self_eval"]:
+                    scores = evaluate_conversation(
+                        generated_conversation["moderator_instruction"],
+                        generated_conversation["moderated_user_instruction"],
+                        conversation,
+                        engine=args["engine"],
+                    )
+                    results[config_name]["scores"] = scores
 
                 with open(fp, "w") as f:
                     json.dump(results, f, indent=4)
-
-                if idx == 5:
-                    break
 
 
 if __name__ == "__main__":
