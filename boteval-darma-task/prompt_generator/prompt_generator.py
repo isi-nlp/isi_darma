@@ -32,8 +32,7 @@ class PromptGenerator:
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
-                 num_threads:int=None,
-                 allow_endpoint_overload:bool=True):
+                 num_threads:int=None):
         """
 
         Args:
@@ -46,10 +45,7 @@ class PromptGenerator:
         """
                 
         self.endpoints = endpoints
-        # self.engine = engine 
         self.default_endpoint = default_endpoint
-        if allow_endpoint_overload:
-            self.default_endpoint = config_json.get('default_endpoint', default_endpoint)
         self.id = config_json['id']
         self.notes = config_json['notes']
         self.title = config_json['title']    

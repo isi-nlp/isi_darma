@@ -4,8 +4,7 @@ import logging as log
 from typing import List
 from . import Endpoint
 
-@Endpoint.register
-class GPT3:
+class GPT3(Endpoint):
 
     name = 'gpt3'
     
@@ -92,7 +91,6 @@ class GPT3:
             if i > 0:
                 log.critical(f'GPT timeout - retry #{i}')
                 
-            # breakpoint()
             response = openai.Completion.create(
                 model=engine,
                 prompt=prompt,
@@ -104,6 +102,7 @@ class GPT3:
                 presence_penalty=presence_penalty,
                 stop=["user A:", "user B:", "user C:", "user D:"]
             )
+            
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
             # 0: safe, 1: sensitive, 2: unsafe
