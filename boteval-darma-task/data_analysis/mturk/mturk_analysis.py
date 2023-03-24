@@ -32,6 +32,7 @@ ITERATION_DATES = {
 
 PLOT_WIDTH=12
 PLOT_HEIGHT=8
+MIN_TASK_COUNT = 3
 
 def extract_bot_type(endpoint: str) -> str:
     persona_configs = json.load(
@@ -44,6 +45,26 @@ def extract_bot_type(endpoint: str) -> str:
             return name
     return None
 
+def normalize_scores_by_user(df): 
+    import pdb; pdb.set_trace() 
+    # drop users with less than 2 datapoints
+    counts_per_worker = df.groupby("worker_id").agg("count")["coherency"]
+    workers_to_drop = counts_per_worker[counts_per_worker < MIN_TASK_COUNT].index.tolist()
+    df = df[~df["worker_id"].isin(workers_to_drop)]
+    
+    # get mean & std per dimension per worker id 
+    stats_per_worker = df.groupby("worker_id").agg(["mean", "std"])
+    
+    # adjust scores based on the mean and std 
+    metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+    for idx, row in df.iterrows(): 
+        worker_id = row["worker_id"]
+        for metric in metrics_to_normalize: 
+            stats = stats_per_worker.loc[worker_id][metric]
+            df.at[idx, metric] = (row[metric] - stats['mean']) / stats['std']
+    import pdb; pdb.set_trace()
+    
+    return df 
 
 def get_annotated_data_for_dates(dates: List[str]) -> List[str]:
     data_folders = [p for p in Path(BASE_DATA_DIR).glob("*") if int(p.name) in dates]
@@ -165,6 +186,9 @@ def create_bot_mean_plots(df, iteration_idx=None):
     import pdb ; pdb.set_trace()
 
     agg_by_bots = df.groupby("bot_type").agg(["mean", "median", "std", "count"])[eval_categories]
+    
+    import pdb; pdb.set_trace()
+    
     means_by_bot_type = {}
     for row in agg_by_bots.iterrows():
         means_by_bot_type[row[0]] = [round(row[1][l]["mean"], 2) for l in eval_categories]
@@ -186,8 +210,8 @@ def create_bot_mean_plots(df, iteration_idx=None):
         ax.bar_label(rects1, padding=3)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel("Scores [1-5]")
-    ax.set_ylim([1, 5])
+    ax.set_ylabel("Normalized Scores")
+    # ax.set_ylim([1, 5])
     ax.set_xticks(x, eval_categories)
     ax.set_xlabel("Evaluation categories")
     ax.legend()
@@ -220,7 +244,7 @@ def create_task_per_worker_plot(df, iteration_idx=None):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
-        "--iteration_idx", "-idx", type=int, default=1, help="iteration index: [1,2]"
+        "--iteration_idx", "-idx", type=int, default=2, help="iteration index: [1,2]"
     )
     args = parser.parse_args()
 
@@ -249,6 +273,15 @@ if __name__ == "__main__":
         list_item["bot_words"] = bot
 
     df = pd.DataFrame(all_mturk_results)
+    
+    # drop problematic bots 
+    if args.iteration_idx == 2: 
+        bots_to_ignore = ["stern", "advocate"]
+        df = df[~df['bot_type'].isin(bots_to_ignore)]
+    
+    # normalize scores by user 
+    df = normalize_scores_by_user(df)
+    
     create_bot_mean_plots(df, iteration_idx=args.iteration_idx)
     create_word_count_plots(df, iteration_idx=args.iteration_idx)
     create_task_per_worker_plot(df, iteration_idx=args.iteration_idx)

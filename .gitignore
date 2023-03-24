@@ -1,3 +1,4 @@
 .history*
 boteval-darma-task/data-prod/
 boteval-darma-task/data.bak/
+*.json

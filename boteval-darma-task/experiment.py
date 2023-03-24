@@ -82,8 +82,8 @@ class MixedBots:
     def _iterate(self, func):
         return self.threadPool.map(func, self.bots)
             
-    def hear(self, msg):     
-        self._iterate(lambda x: x.hear(msg))       
+    def hear(self, msg, is_seed=False):     
+        self._iterate(lambda x: x.hear(msg, is_seed=is_seed))       
     
     def feed(self, txt):     
         self._iterate(lambda x: x.feed(txt))     
@@ -298,7 +298,7 @@ def interactive_session(
         users_list = set()
         print('='*PRINT_WIDTH)
         for msg in existing_conv['conversation']:
-            bots.hear(msg)
+            bots.hear(msg, is_seed=True)
             users_list.add(msg["speaker_id"])
             print_wrap_text(f'User {msg["speaker_id"]}: {msg["text"]}')
             final_user = msg['speaker_id']
