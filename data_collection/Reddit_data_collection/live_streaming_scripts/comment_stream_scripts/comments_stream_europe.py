@@ -6,7 +6,8 @@ import praw
 import prawcore
 import time, datetime
 
-credentials = '/nas/home/asharma/ISI_reddit/client_secret.json'
+credentials = 'client_secret.json'
+
 with open(credentials) as f:
     creds = json.load(f)
 
@@ -16,14 +17,14 @@ reddit = praw.Reddit(client_id = creds['client_id'],
                     redirect_uri = creds['redirect_uri'],
                     refresh_token = creds['refresh_token'])
 
-subreddit = reddit.subreddit("france")
+subreddit = reddit.subreddit("europe")
 
 comments = pd.DataFrame()
 counter = 0
 
 timeout = time.time() + 60*60 #1hr
 
-print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__FRANCE__ Comments")
+print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__EUROPE__ Comments")
 
 while True:
   try:
@@ -48,13 +49,13 @@ while True:
       counter = counter + 1
 
       if time.time() > timeout:
-        print("------Collected "+ str(counter) + " comments in one hour for subreddit __FRANCE__")
+        print("------Collected "+ str(counter) + " comments in one hour for subreddit __EUROPE__")
 
-        comments.to_csv('/nas/home/asharma/data/france/com_stream_france.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
+        comments.to_csv('controversy_data/europe/com_stream_europe.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
         
         timeout = time.time() + 60*60
         comments = pd.DataFrame()
         counter = 0
   except Exception as err:
-    print(err, 'Sleeping for 10 seconds...  __GEOPOLITICS__ Comments')
+    print(err, 'Sleeping for 10 seconds...  __EUROPE__ Comments')
     time.sleep(10)

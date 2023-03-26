@@ -6,7 +6,7 @@ import praw
 import prawcore
 import time, datetime
 
-credentials = '/nas/home/asharma/ISI_reddit/client_secret.json'
+credentials = 'client_secret.json'
 with open(credentials) as f:
     creds = json.load(f)
 
@@ -16,14 +16,14 @@ reddit = praw.Reddit(client_id = creds['client_id'],
                     redirect_uri = creds['redirect_uri'],
                     refresh_token = creds['refresh_token'])
 
-subreddit = reddit.subreddit("rance")
+subreddit = reddit.subreddit("science")
 
 submissions = pd.DataFrame()
 counter = 0
 
 timeout = time.time() + 60*60 #1hr
 
-print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__RANCE__ Posts")
+print("Start time:", datetime.datetime.now().strftime("%d_%b_%Y_%H_%M_%S"), "__SCIENCE__ Posts")
 
 while True:
   try:
@@ -47,13 +47,13 @@ while True:
       counter = counter + 1
 
       if time.time() > timeout:
-        print("------Collected "+ str(counter) + " posts in one hour for subreddit __RANCE__")
+        print("------Collected "+ str(counter) + " posts in one hour for subreddit __SCIENCE__")
 
-        submissions.to_csv('/nas/home/asharma/data/rance/sub_stream_rance.csv', mode = 'a', header=False, index=False, columns=list(submissions.axes[1]))
+        submissions.to_csv('controversy_data/science/sub_stream_science.csv', mode = 'a', header=False, index=False, columns=list(submissions.axes[1]))
 
         timeout = time.time() + 60*60
         submissions = pd.DataFrame()
         counter = 0
   except Exception as err:
-    print(err, 'Sleeping for 10 seconds...  __RANCE__ Posts')
+    print(err, 'Sleeping for 10 seconds...  __SCIENCE__ Posts')
     time.sleep(10)

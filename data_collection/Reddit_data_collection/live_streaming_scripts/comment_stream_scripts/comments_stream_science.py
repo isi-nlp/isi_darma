@@ -6,7 +6,7 @@ import praw
 import prawcore
 import time, datetime
 
-credentials = '/nas/home/asharma/ISI_reddit/client_secret.json'
+credentials = 'client_secret.json'
 with open(credentials) as f:
     creds = json.load(f)
 
@@ -50,7 +50,7 @@ while True:
       if time.time() > timeout:
         print("------Collected "+ str(counter) + " comments in one hour for subreddit __SCIENCE__")
 
-        comments.to_csv('/nas/home/asharma/data/science/com_stream_science.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
+        comments.to_csv('controversy_data/science/com_stream_science.csv', mode='a', header=False, index=False, columns=list(comments.axes[1]))
         
         timeout = time.time() + 60*60
         comments = pd.DataFrame()
