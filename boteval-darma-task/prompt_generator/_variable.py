@@ -11,7 +11,7 @@ class Variable:
     """
     A very flexible class used to organize variable/instruction updates and easily extend to trace history or current replacements in tokens.
     """
-    def __init__(self, parameters, leaf_variable=True):
+    def __init__(self, parameters, leaf_variable=False):
         if not isinstance(parameters, dict):
             parameters = {'instruction': parameters}
         self._parameters = parameters

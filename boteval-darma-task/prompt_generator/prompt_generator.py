@@ -221,29 +221,30 @@ class PromptGenerator:
         def colored(_str, color=Fore.CYAN):
             return f'{color}{_str}{Style.RESET_ALL}'
         out = ""
-        for k, v in self.variables.items():
+        for k, var in self.variables.items():
             out += f'###### Variable({colored(k)})\n'
-            out += f'### {colored("assign_cnt")}: {v._assign_cnt}\n'
+            out += f'### {colored("assign_cnt")}: {var._assign_cnt}\n'
             out += f'### {colored("assignments")}:\n' 
             out += "\n".join(
                 [
                     f"- @{colored(k, color=Fore.BLUE)}: {colored(str(v), color=Fore.YELLOW)}" 
-                    for k, v in v._assignments.items()
+                    for k, v in var._assignments.items()
                 ]
             ) + "\n"
             out += f'### {colored("tokens")}:\n'
+            
             out += "\n".join(
                 [
-                    f"- @{colored(k, color=Fore.BLUE)}: {colored(v.get_assignment(), color=Fore.YELLOW)}" 
-                    for k, v in v._variables.items()
+                    f"- @{colored(k, color=Fore.BLUE)}: {colored(v.get_assignment(format=f), color=Fore.YELLOW)}" 
+                    for k, (v, f) in var._variables.items()
                 ]
             ) + "\n"
-            out += f'### {colored("instruction-out")}: {colored(str(v), Fore.YELLOW)}\n'
+            out += f'### {colored("instruction-out")}: {colored(str(var), Fore.YELLOW)}\n'
             out += f'### {colored("extra parameters")}:\n'
             out += "- \n".join(
                 [
                     f"- @{colored(k, color=Fore.BLUE)}: {colored(str(v), color=Fore.YELLOW)}" 
-                    for k, v in v._parameters.items()
+                    for k, v in var._parameters.items()
                 ]
             ) + "\n\n"
         return out
