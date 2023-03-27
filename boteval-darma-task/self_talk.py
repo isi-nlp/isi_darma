@@ -6,7 +6,6 @@ import json
 import openai
 import os
 from bots import GPTBot
-from endpoints.gpt3 import GPT3
 from typing import List, Dict
 from tqdm import tqdm
 from boteval.service import ChatService
@@ -24,26 +23,28 @@ openai.api_key = api_key
 
 # evaluate a conversation using the GPT3 class
 def evaluate_conversation(
-    moderator_instruction: str,
-    moderated_user_instruction: str,
-    conversation: List[str],
-    engine: str = "gpt-3.5-turbo",
-):
+        moderator_instruction: str,
+        moderated_user_instruction: str,
+        conversation: List[str],
+        endpoint:str="chatgpt"
+    ):
     """
         Evaluate a conversation using GPT 
         
         moderator_instruction: str - the instruction given to the moderator
         moderated_user_instruction: str - the instruction given to the moderated user
         conversation: List[str] - list of strings representing the conversation
-        engine: str - the engine to use for evaluation
+        endpoint: str - the name of endpoint to use for evaluation
         
         returns: Dict[str, float] - dictionary of scores for each metric
     """
     
     # metrics_of_interest = ['alignment', 'coherency', 'understanding', 'engaging', 'repetitiveness', 'persuasiveness']
 
-    gpt_endpoint = GPT3()
-
+    from endpoints import endpoints_dict
+    
+    endpoint_query_func = endpoints_dict[endpoint]
+    
     score_scale_text = "1: Not at all, 2: Slightly, 3: Moderately, 4: Very, 5: Extremely. Provide a numerical score and explain your reasoning as Score: {score}\nReasoning: {reasoning}."
 
     instructions = [
@@ -89,12 +90,16 @@ def evaluate_conversation(
         else: 
             prompt = f"{ins['instruction']}\n{score_scale_text}\n{conversation}"
 
-        messages = [
-            {"role": "system", "content": prompt},
-        ]
+        # messages = [
+        #     {"role": "system", "content": prompt},
+        # ]
 
-        response = gpt_endpoint.query(messages=messages, engine=engine)
-
+        response = endpoint_query_func(
+            prompt, # instruction
+            [], # turns/context (list of tuples of 3 items)
+            0, # turn_idx (set to 0; not used anyways)
+        )
+        
         if re.search(r"Score: (\d)", response) is None:
             metric_score = -1
         else:
@@ -195,8 +200,8 @@ def parse_args():
         description="Make bots self-talk for quick examination",
         formatter_class=ArgumentDefaultsHelpFormatter,
     )
-
-    parser.add_argument("-e", "--engine", type=str, default="gpt-3.5-turbo")
+    
+    parser.add_argument("-de", "--default_endpoint", type=str, default="chatgpt")
     parser.add_argument("-t", "--turns", type=int, default=2)
     parser.add_argument(
         "-s", "--seed_topic_path", type=str, default="chat_topics_eng.json"
@@ -221,10 +226,16 @@ def main():
         # "stubborn_reasonable_user_persona"
     ]
 
-    bot_ids = [x["id"] for x in persona_configs if x["id"] not in user_personas]
 
+    
+    bot_ids = [x["id"] for x in persona_configs if x["id"] not in user_personas]
+    
+    
     bot_ids = [
-        # "dyn-2nd",
+        # just added these two
+        "dyn-2nd-chatgpt",
+        # "dyn-2nd-gpt3", 
+
         "witty", 
         "goto_interest_dynamic_strategy_simple", 
         "goto_interest_simple",
@@ -245,11 +256,9 @@ def main():
     for bot_persona in bot_ids:
         for user_persona in user_personas:
             logger.info(f"Running {bot_persona} and {user_persona}")
-
-            fp = (
-                f"self-talk_engine={args['engine']}|{bot_persona=}|{user_persona=}.json"
-            )
-
+            
+            fp = f"self-talk_endpoint={args['default_endpoint']}|{bot_persona=}|{user_persona=}.json"
+                    
             # if results file already exists, load the data from the path and append to it
             if os.path.exists(fp):
                 with open(fp, "r") as f:
@@ -262,15 +271,15 @@ def main():
                     break
                 
                 id_ = topic["id"]
-                config_name = f"{args['engine']}-{bot_persona=}-{user_persona=}-{id_}"
-
+                config_name = f"{args['default_endpoint']}-{bot_persona=}-{user_persona=}-{id_}"
+                
                 if config_name in results:
                     continue
 
                 init_conv = topic["conversation"]
-                moderator_bot = GPTBot(bot_persona, engine=args["engine"])
-                moderated_user_bot = GPTBot(user_persona, engine=args["engine"])
-
+                moderator_bot = GPTBot(bot_persona, default_endpoint=args['default_endpoint'])
+                moderated_user_bot = GPTBot(user_persona, default_endpoint=args['default_endpoint'])
+                    
                 generated_conversation = generate_conversation(
                     moderator_bot, moderated_user_bot, init_conv, n_turns=args["turns"]
                 )
@@ -279,6 +288,7 @@ def main():
                     generated_conversation["init_conv"]
                     + generated_conversation["continued_conv"]
                 )
+                
                 results[config_name] = {
                     "generated_conversation": generated_conversation,   
                 }
@@ -289,7 +299,7 @@ def main():
                         generated_conversation["moderator_instruction"],
                         generated_conversation["moderated_user_instruction"],
                         conversation,
-                        engine=args["engine"],
+                        default_endpoint=args["default_endpoint"],
                     )
                     results[config_name]["scores"] = scores
 

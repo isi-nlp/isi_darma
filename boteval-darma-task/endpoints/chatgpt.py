@@ -1,99 +1,98 @@
 import os
 import openai
 import logging as log
-from typing import List
+from typing import Union, List, Dict
 from . import Endpoint
 
-class GPT3(Endpoint):
+class ChatGPT(Endpoint):
 
-    name = 'gpt3'
+    name = 'chatgpt'
     
     def __init__(self):
-        self.default_engine = 'text-davinci-003'
+        self.default_engine = 'gpt-3.5-turbo'
         
         # Override option for backward compatability
         self.engine  = os.environ.get(
             'OPENAI_ENGINE', 
             self.default_engine
         )  
-              
+             
         api_key = os.environ.get('OPENAI_KEY', '')
         if not api_key:
             raise Exception("OpenAI API key is not set."
                             " Please 'export OPENAI_KEY=<key>' and rerun."
                             " You may obtain key from https://beta.openai.com/account/api-keys")            
         openai.api_key = api_key
-    
+        
+        
     def query(self, 
               instruction: str, 
               turns:List[tuple],
               turn_idx: int,
               **kwargs):
-        
+
         return self.query_completion_api(
-            self._prompt_compose(instruction, turns, turn_idx, **kwargs), 
+            messages=self._messages_compose(instruction, turns, turn_idx, **kwargs),  
             engine=self.engine,
             **kwargs
         )
         
-            
-    def _prompt_compose(self, instruction, turns, turn_idx, **kwargs) -> str:
+
+    def _messages_compose(self, instruction, turns, turn_idx, **kwargs): 
         """
-        Returns:
-            str: Prepared and generated/constant prompt appended to turns properly to feed for completion llm call.
-        """        
-        def prepare_context(turns: List[tuple]):
-            # seed_turns = [x[0] for x in turns if x[-1]]
-            # non_seed_turns = [x[0] for x in turns if not x[-1]]
-            all_turns = [t[0] for t in turns]
-            _look_up = kwargs.get('look_up')
-            if not _look_up:
-                return '\n'.join(all_turns)
-            if _look_up > 0:
-                return '\n'.join(all_turns[:_look_up])
-            else:
-                return '\n'.join(all_turns[_look_up:])
-         
-        _few_shot_example = kwargs.get('few_shot_example')
+        messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
+        """
         
-        context = prepare_context(turns)
+        if kwargs.get('leaf_variable', False):
+            # TODO; add support for instruction before context; check gpt3 implementation
+            return [{
+                "role": "system", "content": "\n".join([t[0] for t in turns] +\
+                    [instruction]).strip()
+            }]
+        
+        # else; root variable
+        if kwargs.get('few_shot_example') == 'nvc':
+            few_shot_example = self.get_fewshot_example(turn_idx)
+            if few_shot_example != "":
+                instruction = f'{instruction}\n{few_shot_example}\n'
+        
+        seed_turns = [x[0] for x in turns if x[-1]]
+        non_seed_turns = [x[0] for x in turns if not x[-1]]
+                
+        messages = [
+            {"role": "system", "content": str(instruction)}, 
+        ]
+        
+        if seed_turns:
+            messages.append(
+                {"role": "user", "content": "\n".join(seed_turns).strip()}
+            )
 
-        if kwargs.get('leaf_variable', False):    
-            if kwargs.get('instruction_first', False):
-                return "\n".join([instruction, context])
-            else:
-                return "\n".join([context, instruction])
-        else: 
-            # root variable; instruction leading the conversation
-            if _few_shot_example == 'nvc':
-                few_shot_example = self.get_fewshot_example(turn_idx)
-                prompt = f'{instruction}\n\n{few_shot_example}\n\n' +\
-                    f'###\n\n{context}\n'
-            else:
-                prompt = f'{instruction}\n\n{context}\n'
-
-            return prompt + f'user {kwargs.get("persona_title")}:'
+        
+        
+        role = "assistant"
+        for t in non_seed_turns: 
+            messages.append({
+                "role": role, 
+                "content": t
+            })
             
+            role = "user" if role == "assistant" else "assistant"
+        
+        return messages
     
     @staticmethod
     def query_completion_api(
-            prompt, engine,
-            frequency_penalty=0, 
-            presence_penalty=0,
-            temperature=0.7,
-            n=1,
-            max_timeout_rounds = 5,
+            messages: List[Dict[str,str]], engine:str,
+            frequency_penalty=0, presence_penalty=0,
+            temperature=0.7, n=1,
             **kwargs
         ):
-        
-        for i in range(max_timeout_rounds):
-            # GPT-3 Generation
-            if i > 0:
-                log.critical(f'GPT timeout - retry #{i}')
-                
-            response = openai.Completion.create(
+        max_timeout_rounds = 5
+        for _ in range(max_timeout_rounds):        
+            response = openai.ChatCompletion.create(
                 model=engine,
-                prompt=prompt,
+                messages = messages, 
                 temperature=temperature,
                 max_tokens=1024,
                 top_p=1,
@@ -103,11 +102,12 @@ class GPT3(Endpoint):
                 stop=["user A:", "user B:", "user C:", "user D:"]
             )
             
+            response_text = response.choices[0]['message']['content'].strip() 
+
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
             # 0: safe, 1: sensitive, 2: unsafe
             # We want to make sure the generation is not unsafe
-            response_text = response.choices[0].text.strip()
             classification_response = openai.Completion.create(
                 model="content-filter-alpha",
                 prompt = "<|endoftext|>"+ response_text +"\n--\nLabel:",
@@ -165,3 +165,4 @@ class GPT3(Endpoint):
         # if timeout, then return something generic
         timeout_response = "I don't really know what to say about that."
         return timeout_response
+    

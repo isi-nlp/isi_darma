@@ -19,6 +19,8 @@ class GPTBot(BotAgent):
             default_endpoint='gpt3',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
+            num_threads=None,
+            allow_endpoint_override=True,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
@@ -28,6 +30,9 @@ class GPTBot(BotAgent):
         self.engine = engine 
         
         if engine:
+            # TODO remove completely .. still used only for backward compatibility..
+            # it would override the default engine across all valid endpoints!! (openai ones)
+            # preferably create complete new endpoints if necessary to use different engine
             os.environ['OPENAI_ENGINE'] = engine
         
         if api_key:
@@ -40,6 +45,8 @@ class GPTBot(BotAgent):
             persona_id,
             configs_relative_filepath=\
                 persona_configs_relative_filepath,
+            num_threads=num_threads,
+            allow_endpoint_override=allow_endpoint_override
         )
         
         self.turn_idx = 0
@@ -54,17 +61,19 @@ class GPTBot(BotAgent):
 
     def setup_endpoints(self):
         self.endpoints = endpoints.endpoints_dict        
-        endpoints_listing = "\n".join([
+        endpoints_listing = "\n\t".join([
             f"- {k}" for k in self.endpoints.keys()
         ])
         log.info(
-            f"Available endpoints:\n\t{endpoints_listing}\n"
+            f"\nAvailable endpoints:\n{endpoints_listing}\n"
             f"\twhile default is {self.default_endpoint}"
         )
 
     def load_persona(self, 
                      persona_id:str,
-                     configs_relative_filepath='persona_configs.json'):
+                     configs_relative_filepath='persona_configs.json',
+                     num_threads=None,
+                     allow_endpoint_override=False):
         
         configs_filepath =\
             os.path.join(
@@ -84,12 +93,18 @@ class GPTBot(BotAgent):
             elif len(matching_personas) > 1:
                 log.warning(f'Redundant personas with id "{persona_id}" exist!')
 
+
+            if allow_endpoint_override:
+                self.default_endpoint =\
+                    matching_personas[0].get('default_endpoint', self.default_endpoint)
+                
             return PromptGenerator(
                 matching_personas[0], 
                 self.endpoints,
-                self.engine,
+                # self.engine,
                 default_endpoint=self.default_endpoint,
-                few_shot_example=self.few_shot_example
+                few_shot_example=self.few_shot_example,
+                num_threads=num_threads
             )
 
     def context_append(self, user, text, is_seed=False):
