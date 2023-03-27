@@ -60,9 +60,9 @@ class GPT3(Endpoint):
 
         if kwargs.get('leaf_variable', False):    
             if kwargs.get('instruction_first', False):
-                return "\n".join([context, instruction])
-            else:
                 return "\n".join([instruction, context])
+            else:
+                return "\n".join([context, instruction])
         else: 
             # root variable; instruction leading the conversation
             if _few_shot_example == 'nvc':
