@@ -56,7 +56,7 @@ class GPTBot(BotAgent):
             f"Initialized GPT bot with {engine=}"
             f"{self.prompt_generator.id=}"
             f"{self.prompt_generator.title=}\n"
-            f"{self.prompt_generator.instruction.instruction_raw=}")
+            f"{self.prompt_generator.instruction._instruction_raw=}")
         
 
     def setup_endpoints(self):

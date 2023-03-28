@@ -60,7 +60,7 @@ class MixedBots:
         for id, title, instruction in self.personas:
             personas_table[0].append(id)
             personas_table[1].append(title)
-            instruction_table.append(textwrap.wrap(instruction, width=self.sub_width))
+            instruction_table.append(textwrap.wrap(str(instruction), width=self.sub_width))
         
         instruction_table = self.fill_table(instruction_table)
         personas_table = np.vstack([
@@ -233,7 +233,7 @@ def load_persona_confs(confs_filename='persona_configs.json'):
                 print(f'# Notes: {conf["notes"]}')
                 print(f'# Title: {conf["title"]}')
                 print('# Instruction:')
-                print_wrap_text(conf['instruction'])
+                print_wrap_text(str(conf['instruction']))
                 print("="*PRINT_WIDTH)
     except:
         raise Exception(f"{confs_filename} properly not a proper Json formatted file")

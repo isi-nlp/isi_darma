@@ -134,11 +134,19 @@ def generate_conversation(
     last_speaker = init_conv[-1]["speaker_id"]
 
     # replace <speaker_id> in moderated user's instruction with last_speaker text
-    moderated_user_bot.prompt_generator.instruction.instruction_raw = (
-        moderated_user_bot.prompt_generator.instruction.instruction_raw.replace(
-            "|speaker_id|", last_speaker
+    
+    for turn_idx in range(n_turns): 
+        # TODO probably there is a better way (less redundant way).. but I let it this way for clarification
+        curr_instruction_statement =\
+            moderated_user_bot.prompt_generator.instruction.get_curr_instruction_statement(turn_idx)
+        # if "|speaker_id|" not in curr_instruction_statement:
+        #     continue 
+        moderated_user_bot.prompt_generator.instruction._set_curr_instruction_statement(
+            curr_instruction_statement.replace(
+                "|speaker_id|", last_speaker
+            ),
+            turn_idx
         )
-    )
     moderated_user_bot.prompt_generator.title = last_speaker
 
     # continue chat for N turns
