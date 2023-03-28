@@ -1,6 +1,6 @@
 import os
 import openai
-import logging as log
+from boteval import log 
 from typing import Union, List, Dict
 from . import Endpoint
 
@@ -31,6 +31,8 @@ class ChatGPT(Endpoint):
               turn_idx: int,
               **kwargs):
 
+
+        
         return self.query_completion_api(
             messages=self._messages_compose(instruction, turns, turn_idx, **kwargs),  
             engine=self.engine,
@@ -43,12 +45,12 @@ class ChatGPT(Endpoint):
         messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
         """
         
-        if kwargs.get('leaf_variable', False):
-            # TODO; add support for instruction before context; check gpt3 implementation
-            return [{
-                "role": "system", "content": "\n".join([t[0] for t in turns] +\
-                    [instruction]).strip()
-            }]
+        # if kwargs.get('leaf_variable', False):
+        #     # TODO; add support for instruction after context; check gpt3 implementation            
+            
+        #     return [{
+        #         "role": "system", "content": "\n".join([instruction] + [t[0] for t in turns]).strip()
+        #     }]
         
         # else; root variable
         if kwargs.get('few_shot_example') == 'nvc':
@@ -63,11 +65,12 @@ class ChatGPT(Endpoint):
             {"role": "system", "content": str(instruction)}, 
         ]
         
+        
         if seed_turns:
             messages.append(
                 {"role": "user", "content": "\n".join(seed_turns).strip()}
             )
-
+        
         
         
         role = "assistant"
@@ -90,6 +93,10 @@ class ChatGPT(Endpoint):
         ):
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):        
+            
+            log.debug(f"Input messages: {messages}")
+            
+            
             response = openai.ChatCompletion.create(
                 model=engine,
                 messages = messages, 
@@ -103,6 +110,8 @@ class ChatGPT(Endpoint):
             )
             
             response_text = response.choices[0]['message']['content'].strip() 
+            
+            log.debug(f"Output response: {response_text}")
 
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
@@ -166,3 +175,13 @@ class ChatGPT(Endpoint):
         timeout_response = "I don't really know what to say about that."
         return timeout_response
     
+class GPT4(ChatGPT):
+    name = "gpt4"
+    
+    def __init__(self):
+        super().__init__()
+        self.default_engine = 'gpt-4'
+        self.engine = os.environ.get(
+            'OPENAI_ENGINE', 
+            self.default_engine
+        )

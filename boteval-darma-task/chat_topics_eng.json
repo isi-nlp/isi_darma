@@ -4,7 +4,7 @@
         "name": "chat 55 - controversy",
         "conversation": [
             {
-                "speaker_id": "c",
+                "speaker_id": "Topic",
                 "text": "The lack of respect and open-mindedness in political discussions may be due to affective polarization, the belief those with opposing views are immoral or unintelligent. Intellectual humility, the willingness to change beliefs when presented with evidence, was linked to lower affective polarization."
             },
             {
@@ -35,7 +35,7 @@
         "name": "chat 784 - controversy",
         "conversation": [
             {
-                "speaker_id": "c",
+                "speaker_id": "Topic",
                 "text": "States with the lowest levels of mask adherence were most likely to have high COVID-19 rates in the subsequent month, finds a new study of the 50 US states. Of the 8 states with at least 75% mask adherence, none reported a high COVID-19 rate. (PLOS One, 14 Apr 2021)"
             },
             {
@@ -66,7 +66,7 @@
         "name": "chat 1014 - controversy",
         "conversation": [
             {
-                "speaker_id": "b",
+                "speaker_id": "Topic",
                 "text": "A \"groundbreaking\" new study suggests the ancestors of both humans and Neanderthals were cooking lots of starchy foods at least 600,000 years ago.And they had already adapted to eating more starchy plants long before the invention of agriculture 10,000 years ago."
             },
             {
@@ -97,7 +97,7 @@
         "name": "chat 1068 - controversy",
         "conversation": [
             {
-                "speaker_id": "d",
+                "speaker_id": "Topic",
                 "text": "US is more politically divided than other Western democracies, suggests new study. Data from France, UK and US found that people in US were most likely to cut virtual ties over political differences, with 29.75% of those from US reporting they unfriended or unfollowed someone for political reasons."
             },
             {
@@ -132,7 +132,7 @@
         "name": "chat 332 - controversy",
         "conversation": [
             {
-                "speaker_id": "b",
+                "speaker_id": "Topic",
                 "text": "Engineers have developed the first wearable soft, stretchy skin patch device that monitors heart signals and multiple biochemical levels at the same time. It can be worn on the neck to continuously track blood pressure and heart rate, as well as levels of glucose, lactate, alcohol or caffeine."
             },
             {
@@ -167,7 +167,7 @@
         "name": "chat 476 - controversy",
         "conversation": [
             {
-                "speaker_id": "b",
+                "speaker_id": "Topic",
                 "text": "Easing mask mandates and reopening restaurants have led to a rise in Covid-19 cases and deaths, according to a new study by the CDC. Mask mandates implemented by local governments were able to slow the spread of the virus starting about 20 days after their implementation."
             },
             {
@@ -194,7 +194,7 @@
         "name": "chat 51 - controversy",
         "conversation": [
             {
-                "speaker_id": "f",
+                "speaker_id": "Topic",
                 "text": "The lack of respect and open-mindedness in political discussions may be due to affective polarization, the belief those with opposing views are immoral or unintelligent. Intellectual humility, the willingness to change beliefs when presented with evidence, was linked to lower affective polarization."
             },
             {
@@ -241,7 +241,7 @@
         "name": "chat 132 - controversy",
         "conversation": [
             {
-                "speaker_id": "d",
+                "speaker_id": "Topic",
                 "text": "Water fluoridation improves dental health, has no impact on cognitive ability, and improves labor incomes. The impact on labor incomes is foremost driven by individuals from a lower socioeconomic background."
             },
             {
@@ -284,7 +284,7 @@
         "name": "chat 254 - controversy",
         "conversation": [
             {
-                "speaker_id": "c",
+                "speaker_id": "Topic",
                 "text": "Tom Hanks' COVID-19 diagnosis likely shaped behaviors, thoughts toward virus. Hanks' disclosure inspired some people to seek more information and/or take stricter precautions. Public health advocates may want to use celebrity announcements to reach people who may be harder to reach."
             },
             {
@@ -307,7 +307,7 @@
         "name": "chat 365 - controversy",
         "conversation": [
             {
-                "speaker_id": "a",
+                "speaker_id": "Topic",
                 "text": "People with extremist views less able to do complex mental tasks, research suggests"
             },
             {
@@ -342,7 +342,7 @@
         "name": "chat 444 - controversy",
         "conversation": [
             {
-                "speaker_id": "d",
+                "speaker_id": "Topic",
                 "text": "Decades of research reveals very little difference between male and female brains - once brain size is accounted for, any differences that remained were small and rarely consistent from one study to the next, finds three decades of data from MRI scans and postmortem brain tissue studies."
             },
             {
@@ -421,7 +421,7 @@
         "name": "chat 572 - controversy",
         "conversation": [
             {
-                "speaker_id": "a",
+                "speaker_id": "Topic",
                 "text": "New article shows evidence that many US voters \"live virtually without exposure to the other party's voters in their residential environment\", and this can lead to political polarization and distrust."
             },
             {
@@ -472,7 +472,7 @@
         "name": "chat 696 - controversy",
         "conversation": [
             {
-                "speaker_id": "a",
+                "speaker_id": "Topic",
                 "text": "Vitamin D supplementation to prevent acute respiratory infections: a systematic review and meta-analysis of aggregate data from randomised controlled trials"
             },
             {
@@ -503,7 +503,7 @@
         "name": "chat 858 - controversy",
         "conversation": [
             {
-                "speaker_id": "d",
+                "speaker_id": "Topic",
                 "text": "Common antibiotic effective in healing coral disease lesions: New branch study shows 95% success rate with amoxicillin, a common antibiotic used to treat bacterial infections in humans, which is showing promise in treating disease-affected Montastraea cavernosa coral colonies in situ."
             },
             {
@@ -542,7 +542,7 @@
         "name": "chat 126 - controversy",
         "conversation": [
             {
-                "speaker_id": "c",
+                "speaker_id": "Topic",
                 "text": "Scientists announced the discovery of the most distant quasar ever observed, dating back to 670 million years after the Big Bang. The quasar was accompanied by the oldest supermassive black hole ever observed. They can't explain how it reached its extreme size."
             },
             {
@@ -594,7 +594,7 @@
         "name": "chat 1141 - controversy",
         "conversation": [
             {
-                "speaker_id": "b",
+                "speaker_id": "Topic",
                 "text": "The dangerous overprescription of antibiotic drugs could be partly due to doctors feeling pressure from patients who mention specific bacterial infections during their visits, a new video analysis of doctor's office interactions suggests."
             },
             {
@@ -629,7 +629,7 @@
         "name": "chat 1322 - controversy",
         "conversation": [
             {
-                "speaker_id": "d",
+                "speaker_id": "Topic",
                 "text": "After Mohammed Salah, a prominent Muslim football player, joined Liverpool F.C., hate crimes in the Liverpool area dropped by 16% (relative to comparable areas) and Liverpool F.C. fans halved their rates of posting anti-Muslim tweets relative to fans of other top-flight clubs."
             },
             {
@@ -672,7 +672,7 @@
         "name": "chat 1444 - controversy",
         "conversation": [
             {
-                "speaker_id": "c",
+                "speaker_id": "Topic",
                 "text": "Physically attractive individuals earn substantially more than otherwise similar unattractive individuals. The beauty wage gap is the largest among black women."
             },
             {

@@ -15,7 +15,7 @@ from pathlib import Path
 from loguru import logger
 import re
 
-logger.add("self_talk.log", rotation="10 MB", level="INFO")
+logger.add("self_talk.log", rotation="10 MB", level="DEBUG")
 
 api_key = os.environ.get("OPENAI_KEY", "")
 openai.api_key = api_key
@@ -209,6 +209,10 @@ def parse_args():
     parser.add_argument(
         "-p", "--persona_config_path", type=str, default="persona_configs.json"
     )
+
+    parser.add_argument(
+        "-m", "--moderator_persona_type", type=str, default=""
+    )
     parser.add_argument("--self_eval", action="store_true", default=False)
 
     args = vars(parser.parse_args())
@@ -231,33 +235,41 @@ def main():
     bot_ids = [x["id"] for x in persona_configs if x["id"] not in user_personas]
     
     
-    bot_ids = [
-        # just added these two
-        "dyn-2nd-chatgpt",
-        # "dyn-2nd-gpt3", 
+    if args["moderator_persona_type"] != "":
+        bot_ids = [args["moderator_persona_type"]]
+    else: 
+        bot_ids = [
+            # just added these two
+            # "dyn-2nd-chatgpt",
+            # "dyn-2nd-gpt3", 
 
-        "witty", 
-        "goto_interest_dynamic_strategy_simple", 
-        "goto_interest_simple",
-        "goto_interest_colloquial", 
-        "empathetic_colloquial",
-        "cognitive_reappraisal_paraphrase_suggestor", 
-        # "mirror_simple",
-        "stern",
-        "wisebeing",
-        "moderator",
-        "persuasive",
-        "sarcastic"
-    ]
+            # "goto_interest_dynamic_strategy_simple", 
+            "witty", 
+            # "goto_interest_simple",
+            # "goto_interest_colloquial", 
+            # "empathetic_colloquial",
+            # "cognitive_reappraisal_paraphrase_suggestor", 
+            # "mirror_simple",
+            # "stern",
+            # "wisebeing",
+            # "moderator",
+            # "persuasive",
+            # "sarcastic"
+        ]
 
     with open(args["seed_topic_path"], "r") as f:
         data = json.load(f)
+        
+    results_dir = "selftalk_results"
+    # create dir if it doesn't exist: 
+    if not os.path.exists(results_dir):
+        os.makedirs(results_dir, exist_ok=True)
 
     for bot_persona in bot_ids:
         for user_persona in user_personas:
             logger.info(f"Running {bot_persona} and {user_persona}")
             
-            fp = f"self-talk_endpoint={args['default_endpoint']}|{bot_persona=}|{user_persona=}.json"
+            fp = f"{results_dir}/self-talk_endpoint={args['default_endpoint']}__{bot_persona=}__{user_persona=}.json"
                     
             # if results file already exists, load the data from the path and append to it
             if os.path.exists(fp):

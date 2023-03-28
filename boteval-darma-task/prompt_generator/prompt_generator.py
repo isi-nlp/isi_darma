@@ -1,5 +1,5 @@
 import re
-import logging as log
+from boteval import log
 from multiprocessing import Lock, cpu_count
 from multiprocessing.pool import ThreadPool
 from typing import List
@@ -28,7 +28,7 @@ class PromptGenerator:
     
     """
     
-    def __init__(self, config_json: dict,
+    def __init__(self, config_dict: dict,
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
@@ -46,16 +46,16 @@ class PromptGenerator:
                 
         self.endpoints = endpoints
         self.default_endpoint = default_endpoint
-        self.id = config_json['id']
-        self.notes = config_json['notes']
-        self.title = config_json['title']    
-        self.instruction = Variable(config_json) # Similar structure to variables
+        self.id = config_dict['id']
+        self.notes = config_dict.get('notes', "")
+        self.title = config_dict.get('title', "Moderator")     
+        self.instruction = Variable(config_dict) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
         if not num_threads:
             num_threads = cpu_count()
         self.thread_pool = ThreadPool(processes=num_threads)
-        self.variables = config_json.get('preprocess_variables')
+        self.variables = config_dict.get('preprocess_variables')
         
         if self.variables:
             self.variables = {
@@ -102,6 +102,7 @@ class PromptGenerator:
                 presence_penalty=2,
                 temperature=1
             )
+        
         
         response = self._get_endpoint(self.instruction)(
             self.instruction, **kwargs

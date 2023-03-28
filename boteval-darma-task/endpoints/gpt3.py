@@ -1,6 +1,6 @@
 import os
 import openai
-import logging as log
+from boteval import log
 from typing import List
 from . import Endpoint
 
@@ -91,6 +91,8 @@ class GPT3(Endpoint):
             if i > 0:
                 log.critical(f'GPT timeout - retry #{i}')
                 
+            log.debug(f"Input prompt: {prompt}")
+                
             response = openai.Completion.create(
                 model=engine,
                 prompt=prompt,
@@ -108,6 +110,9 @@ class GPT3(Endpoint):
             # 0: safe, 1: sensitive, 2: unsafe
             # We want to make sure the generation is not unsafe
             response_text = response.choices[0].text.strip()
+            
+            log.debug(f"Output response: {response_text}")
+            
             classification_response = openai.Completion.create(
                 model="content-filter-alpha",
                 prompt = "<|endoftext|>"+ response_text +"\n--\nLabel:",
@@ -120,7 +125,6 @@ class GPT3(Endpoint):
             # This is the probability at which we evaluate that a "2" is likely real
             # vs. should be discarded as a false positive
             toxic_threshold = -0.355
-
 
             # If the filter returns 0 or 1, you should accept that as the filter's outcome. 
             # If the filter returns 2, you should accept this outcome only if its logprob is greater than -0.355.

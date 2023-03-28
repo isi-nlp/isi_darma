@@ -109,7 +109,7 @@ class GPTBot(BotAgent):
 
     def context_append(self, user, text, is_seed=False):
         if f"{user}: " not in text: 
-            log.warning(f"{user}: not found in {text}. prepnding '{user}:'")
+            log.warning(f"{user}: not found in {text}. prepending '{user}:'")
             turn = f'{user}: {text}'
         else: 
             turn = text
