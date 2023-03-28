@@ -46,10 +46,10 @@ class PromptGenerator:
                 
         self.endpoints = endpoints
         self.default_endpoint = default_endpoint
-        self.id = config_dict['id']
-        self.notes = config_dict.get('notes', "")
-        self.title = config_dict.get('title', "Moderator")     
-        self.instruction = Variable(config_dict) # Similar structure to variables
+        self.id: str = config_dict['id']
+        self.notes: str = config_dict.get('notes', "")
+        self.title: str = config_dict.get('title', "Moderator")     
+        self.instruction: Variable = Variable(config_dict) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
         if not num_threads:
@@ -103,7 +103,7 @@ class PromptGenerator:
                 temperature=1
             )
         
-        
+        self.instruction.update_turn(turn_idx) # TODO find a more appropriate way
         response = self._get_endpoint(self.instruction)(
             self.instruction, **kwargs
         )
@@ -215,7 +215,7 @@ class PromptGenerator:
     def backspace(self): 
         [v.backspace() for v in self.variables.values()]
             
-    def debug_prompt(self): return self.instruction.trace()
+    def debug_prompt(self): return self.instruction.trace(turn_idx=self.turn_idx)
 
     def debug_variables(self):
         from colorama import Fore, Style
