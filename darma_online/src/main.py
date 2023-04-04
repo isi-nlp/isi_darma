@@ -1,4 +1,4 @@
-from darma_online.utils import load_reddit_client
+from darma_online.utils import load_reddit_client, build_logger
 from darma_online.bots import BasicBot
 
 import time
@@ -19,7 +19,8 @@ def main():
     # Set the subreddit to be moderated
     sub = SUBREDDIT if args.subreddit is None else args.subreddit
 
-    moderation_bot = BasicBot(test=args.test, passive=args.passive, sub=sub, lang=args.lang)
+    reddit_client = load_reddit_client(logger)
+    logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
 
     reddit_client = load_reddit_client(moderation_bot.logger)
     moderation_bot.logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
