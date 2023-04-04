@@ -12,6 +12,7 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--test", "-t", action="store_true")
     parser.add_argument("--passive", "-p", action="store_true")
+    parser.add_argument("--mod_assist", "-m", action="store_true", default=False, required=True)
     parser.add_argument("--subreddit", "-s", default=SUBREDDIT, required=False)
     parser.add_argument("--lang", "-l", default="fr", required=True)
     args = parser.parse_args()
@@ -22,13 +23,20 @@ def main():
     reddit_client = load_reddit_client(logger)
     logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
 
-    reddit_client = load_reddit_client(moderation_bot.logger)
-    moderation_bot.logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
-
-    subreddit = reddit_client.subreddit(sub)
+    subreddit = reddit_client.subreddit(sub_name)
+    mods_list = [moderator.name for moderator in subreddit.moderator()]
     posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
     cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
-    moderation_bot.logger.info("Instantiated Subreddit stream for posts and comments")
+    logger.info(f"Instantiated Subreddit {sub_name} with {len(mods_list)=} moderators")
+
+    moderation_bot = BasicBot(reddit_client=reddit_client,
+                              test=args.test,
+                              passive=args.passive,
+                              sub_name=sub_name,
+                              sub_obj = subreddit,
+                              lang=args.lang,
+                              mod_assist=args.mod_assist,
+                              logger=logger)
 
     while True:
         try:

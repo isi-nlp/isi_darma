@@ -22,11 +22,22 @@ class ModerationBot(ABC):
 
 class BasicBot(ModerationBot):
 
-    def __init__(self, reddit_client=None, test=False, passive=False, sub='darma_test', lang='french') -> None:
+    def __init__(self,
+                 reddit_client=None,
+                 test=False,
+                 passive=False,
+                 sub_name='darma_test',
+                 sub_obj=None,
+                 lang='french',
+                 mod_assist=False,
+                 logger=None) -> None:
         super().__init__()
 
         self.test = test  # whether to actually post things to reddit
-        self.sub = sub
+        self.sub_name = sub_name
+        self.sub_obj = sub_obj if sub_obj else reddit_client.subreddit(sub_name)
+        self.moderators = None
+        self.mod_assist = mod_assist
 
         # Setup logger based on the 'test' flag
         if not self.test:
