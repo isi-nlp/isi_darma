@@ -39,11 +39,7 @@ class BasicBot(ModerationBot):
         self.moderators = None
         self.mod_assist = mod_assist
 
-        # Setup logger based on the 'test' flag
-        if not self.test:
-            self.logger = setup_logger(f'app_{sub}', f'logs/app_{sub}.log', test=self.test)
-        else:
-            self.logger = setup_logger(f'test_{sub}', f'logs/test_{sub}.log', test=self.test)
+        self.logger = logger if logger else setup_logger(f'bot_{sub_name}', f'logs/BasicBot_{sub_name}.log', test=test)
 
         self.CREDS = load_credentials(self.logger)
         self.CONFIG = load_config(self.logger)
