@@ -18,7 +18,8 @@ def main():
     args = parser.parse_args()
 
     # Set the subreddit to be moderated
-    sub = SUBREDDIT if args.subreddit is None else args.subreddit
+    sub_name = SUBREDDIT if args.subreddit is None else args.subreddit
+    logger = build_logger(sub_name, test=args.test)
 
     reddit_client = load_reddit_client(logger)
     logger.info(f"Instantiated Reddit Client with {args.passive=}, {args.test=}, {args.subreddit=}")
