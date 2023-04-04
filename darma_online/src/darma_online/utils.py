@@ -6,6 +6,8 @@ import json
 import praw
 from typing import Dict
 from praw.models import Redditor
+from darma_online.logging_setup import setup_logger
+
 
 CRED_FN = os.environ.get("CRED_FP", "/isi_darma/isi_darma/darma_online/src/darma_online/creds.yaml")
 CONFIG_FN = os.environ.get("CONF_FP", "/isi_darma/isi_darma/darma_online/src/darma_online/config.yaml")
@@ -49,6 +51,12 @@ def load_reddit_client(logger):
 
     return reddit
 
+def build_logger(sub_name: str, test=False) -> Logger:
+    # Setup logger based on the 'test' flag
+    if not test:
+        return setup_logger(f'app_{sub_name}', f'logs/app_{sub_name}.log', test=test)
+    else:
+        return setup_logger(f'test_{sub_name}', f'logs/test_{sub_name}.log', test=test)
 
 def check_for_opt_out(comment_str: str) -> bool:
     """
