@@ -140,6 +140,7 @@ class BasicBot(ModerationBot):
 
 
     def moderate(self, dialogue_str: str, obj_to_reply=None, type="comment") -> str:
+        #TODO: Break into smaller methods
         """
         Moderates a dialogue from comments or posts
         Optionally, a reddit object can be passed in to reply to.
