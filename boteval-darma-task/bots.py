@@ -8,6 +8,7 @@ import json
 import endpoints
 from prompt_generator import PromptGenerator
 from boteval import log, C, registry as R
+from boteval.model import ChatMessage
 from boteval.bots import BotAgent
 from typing import Dict, List, Union, Any
 
@@ -106,58 +107,48 @@ class GPTBot(BotAgent):
                 few_shot_example=self.few_shot_example,
                 num_threads=num_threads
             )
-
-    def context_append(self, user, text, is_seed=False):
-        if f"{user}: " not in text: 
-            log.warning(f"{user}: not found in {text}. prepending '{user}:'")
-            turn = f'{user}: {text}'
-        else: 
-            turn = text
-        n_toks = len(turn.strip().split())
-        self.context.append((turn, n_toks, is_seed))
     
-    
-    def _get_turns(self, context) -> str:
+    def _get_turns(self) -> str:
         # truncate to not exceed max input context length 
         seed_turns = []
         ctx_len = 0
         
-        for turn_text, turn_len, is_seed in reversed(context):
+        for idx, turn in enumerate(reversed(self.context)):
+            if 'text' not in turn:
+                log.error(f"Turn {idx} has no 'text': {turn}")
+                continue 
+            
+            turn_len = len(turn['text'].strip().split())
             ctx_len += turn_len
             if ctx_len >= self.max_ctx_len:
                 break
-            seed_turns = [(turn_text, turn_len, is_seed)] + seed_turns
+            seed_turns = [turn] + seed_turns
+            
         return seed_turns      
 
     def talk(self, timeout=None):
         
-        turns = self._get_turns(self.context)
+        turns = self._get_turns()
         
-        final_message_text = self.prompt_generator.run(
+        new_message_text = self.prompt_generator.run(
             turns,
             self.turn_idx
         )
-        final_message_text = final_message_text.strip()
+        new_message_text = new_message_text.strip()
+        
+        new_message = {
+            "user_id": self.prompt_generator.title, 
+            "text": new_message_text, 
+            "is_seed": False, 
+            "episode_done": False
+        }
 
-        self.context_append(self.prompt_generator.title, final_message_text, is_seed=False)
-        act_out = {}
-        act_out['text'] = final_message_text
-        act_out['user_id'] = self.prompt_generator.title
+        self.context.append(new_message)
         self.turn_idx += 1
-        return {**act_out, 'episode_done': False}
+        return new_message 
 
-    def hear(self, msg: Dict, is_seed=False):
-        user_id = msg.get('user_id')
-        if msg.get('data') and msg['data'].get('speaker_id'):
-            user_id = msg['data']['speaker_id']
-        if not user_id and msg.get('speaker_id'):
-            user_id = msg['speaker_id']
-        self.context_append(user_id, msg['text'], is_seed)
-
-    def feed(self, text):
-        # force feed instead of adding conversation
-        n_toks = len(text.strip().split())
-        self.context.append((text, n_toks))
+    def hear(self, msg: Dict):
+        self.context.append(msg)
         
     def backspace(self) -> list:
         """
@@ -181,8 +172,10 @@ class GPTBot(BotAgent):
         final_message_text = resp
         final_message_text = final_message_text.strip()
         
-        self.feed(final_message_text)
-        act_out = {}
-        act_out['text'] = final_message_text
-        act_out['user_id'] = "Forced Completion"
-        return {**act_out, 'episode_done': False}
+        final_message = {
+            'text': final_message_text,
+            'user_id': "Forced Completion",
+            'episode_done': False
+        }
+        self.context.append(final_message)
+        return final_message

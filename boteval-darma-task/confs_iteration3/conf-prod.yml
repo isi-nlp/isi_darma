@@ -27,7 +27,7 @@ chatbot:
 
 limits:
   max_threads_per_user: 50
-  max_threads_per_topic: &max_assignments 5
+  max_threads_per_topic: &max_assignments 8
   max_turns_per_thread: 4
   reward: &reward '1.5' # dollars
 
@@ -68,32 +68,31 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator persona (Ver. E) (Adult Content)'
+    Title: 'Evaluate a moderator (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot persona after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    Description: Evaluate a moderator chatbot after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
     QualificationRequirements:
-      -  QualificationTypeId: "00000000000000000071"  # locale qualification
-         Comparator: In
-         LocaleValues:
-            - Country: US
-            - Country: CA
-            - Country: GB
-            - Country: AU
-         ActionsGuarded: DiscoverPreviewAndAccept
-      -  QualificationTypeId: "00000000000000000040"  # 5k hits
+      # -  QualificationTypeId: "00000000000000000071"  # locale qualification
+      #    Comparator: In
+      #    LocaleValues:
+      #       - Country: US
+      #       - Country: CA
+      #       - Country: GB
+      #       - Country: AU
+      -  QualificationTypeId: "00000000000000000040"  # number of hits 
          Comparator: GreaterThan
-         IntegerValues: [10000]
-         ActionsGuarded: DiscoverPreviewAndAccept
+         IntegerValues: [2400]
       -  QualificationTypeId: "00000000000000000060"  # adult content
          Comparator: EqualTo
          IntegerValues: [1]
-         ActionsGuarded: DiscoverPreviewAndAccept
       -  QualificationTypeId: "000000000000000000L0"  # percentage approved
          Comparator: GreaterThan
-         IntegerValues: [99]
-         ActionsGuarded: DiscoverPreviewAndAccept
+         IntegerValues: [95]
       -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
          Comparator: DoesNotExist
+         ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+         Comparator: Exists
          ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
