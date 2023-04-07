@@ -218,9 +218,12 @@ class BasicBot(ModerationBot):
         if (not self.test and not self.passive) and final_response and obj_to_reply:
 
             try:
-                obj_to_reply.reply(final_response)
-                self.databases.add_to_moderated(post_id, author_username, dialogue_str)
-                self.logger.info(f'Response sent to toxic user: {author_username}\n')
+                if not self.mod_assist:
+                    obj_to_reply.reply(final_response)
+                else:
+                    self.msg_mods(toxic_user, tox_score, behav_type, parent_username, best_response, dialogue_str, obj_to_reply.url)
+                self.databases.add_to_moderated(post_id, toxic_user, dialogue_str)
+                self.logger.info(f'Response sent to toxic user: {toxic_user}\n')
 
             except Forbidden:
                 self.logger.info(f"Cannot send response to toxic user on r/{self.sub_name} - Forbidden")
@@ -232,3 +235,21 @@ class BasicBot(ModerationBot):
             self.logger.debug(f'Final response: {final_response if final_response else "<empty>"}')
 
         return final_response
+
+    def msg_mods(self, toxic_user, tox_score, behav_type, parent_username, best_response, dialogue_str, url):
+        """
+        Sends a message to moderators with details of the toxic comment
+        """
+
+        message_body = f"##### {self.bot_responses['init_mod_msg']} \n" \
+           f"- **Toxic user:** {toxic_user} \n" \
+           f"- **Toxicity score:** {tox_score} \n" \
+           f"- **Behavior type:** {behav_type} \n" \
+           f"- **Victim username:** {parent_username} \n" \
+           f"- **Toxic comment:** {dialogue_str} \n" \
+           f"- **Link to comment:** {url} \n" \
+           f"- **Possible response:** {best_response} \n\n"\
+           f"{self.bot_responses['mod_action_request']}{toxic_user}".format(**locals())
+
+        self.logger.info(f"Sending following message to moderators with details about toxic comment: \n{message_body}")
+        self.sub_obj.message(message = message_body, subject = "Toxic comment detected | DARMA Bot")
