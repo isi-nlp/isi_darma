@@ -187,7 +187,7 @@ class BasicBot(ModerationBot):
 
                 # Combine initial and best response for FINAL response
                 final_response = initial_response + '\n' + best_response
-                self.logger.info(f"Generated (and translated) response.\n\n")
+                self.logger.info("Generated (and translated) response.\n\n")
                 if self.test: self.logger.debug(f"Final response: \n{final_response}\n")
 
             # Dialogue requires no moderation
