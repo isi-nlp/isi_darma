@@ -12,9 +12,9 @@ def main():
     parser = ArgumentParser()
     parser.add_argument("--test", "-t", action="store_true")
     parser.add_argument("--passive", "-p", action="store_true")
-    parser.add_argument("--mod_assist", "-m", action="store_true", default=False, required=True)
-    parser.add_argument("--subreddit", "-s", default=SUBREDDIT, required=False)
-    parser.add_argument("--lang", "-l", default="fr", required=True)
+    parser.add_argument("--mod_assist", "-m", default=True, required=True)
+    parser.add_argument("--subreddit", "-s", default=SUBREDDIT)
+    parser.add_argument("--lang", "-l", default="english", required=True)
     args = parser.parse_args()
 
     # Set the subreddit to be moderated
@@ -28,7 +28,7 @@ def main():
     mods_list = [moderator.name for moderator in subreddit.moderator()]
     posts = subreddit.stream.submissions(pause_after=-1, skip_existing=True)
     cmts = subreddit.stream.comments(pause_after=-1, skip_existing=True)
-    logger.info(f"Instantiated Subreddit {sub_name} with {len(mods_list)=} moderators")
+    logger.info(f"Instantiated Subreddit {sub_name} with {len(mods_list)} moderators -> {mods_list}")
 
     moderation_bot = BasicBot(reddit_client=reddit_client,
                               test=args.test,
