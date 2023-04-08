@@ -264,7 +264,7 @@ class BasicBot(ModerationBot):
            f"- **Toxic comment:** {dialogue_str} \n" \
            f"- **Link to comment:** {url} \n" \
            f"- **Possible response:** {best_response} \n\n"\
-           f"{self.bot_responses['mod_action_request']}{toxic_user}".format(**locals())
+           f"{self.bot_responses['mod_action_request']}**{toxic_user}**".format(**locals())
 
         self.logger.info(f"Sending following message to moderators with details about toxic comment: \n{message_body}")
         self.sub_obj.message(message = message_body, subject = "Toxic comment detected | DARMA Bot")
