@@ -134,9 +134,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.error(f"Exception occurred while getting moderator response: {e}")
             return 0
 
-    def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type):
-        perspec_tox_score = max(perspec_score['toxicity'], perspec_score['severe_toxicity'])
-        behav_scores = perspec_score["behav_types"]
+    def intersect_moderation(self, comment, moderator_score, perspec_tox_score, behav_scores, behav_type):
         data_row = [comment, moderator_score, perspec_tox_score, behav_type, behav_scores["namecalling"], behav_scores["ad-hominem_attacking"], behav_scores["obscene/vulgar"], behav_scores["dehumanizing"]]
 
         if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
