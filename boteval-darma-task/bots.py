@@ -4,6 +4,7 @@ This work is done by Taiwei Shi during his internship at USC ISI (Summer 2022).
 
 import os
 import json
+import random 
 
 import endpoints
 from prompt_generator import PromptGenerator
@@ -126,26 +127,44 @@ class GPTBot(BotAgent):
             
         return seed_turns      
 
-    def talk(self, timeout=None):
+    def should_bot_respond(self, turns) -> bool:
+        
+        # sample from a random distribution
+        # should_respond = random.random() < 0.33
+        should_respond = True 
+        log.debug(f"Determined whether bot should respond: {should_respond}")
+
+        return should_respond
+
+    def talk(self, n_users=None, timeout=None):
         
         turns = self._get_turns()
         
-        new_message_text = self.prompt_generator.run(
-            turns,
-            self.turn_idx
-        )
-        new_message_text = new_message_text.strip()
-        
-        new_message = {
-            "user_id": self.prompt_generator.title, 
-            "text": new_message_text, 
-            "is_seed": False, 
-            "episode_done": False
-        }
+        if n_users is None or n_users < 2: 
+            should_respond = True 
+        else: 
+            should_respond = self.should_bot_respond(turns)
+            
+        if should_respond: 
+            
+            new_message_text = self.prompt_generator.run(
+                turns,
+                self.turn_idx
+            )
+            new_message_text = new_message_text.strip()
+            
+            new_message = {
+                "user_id": self.prompt_generator.title, 
+                "text": new_message_text, 
+                "is_seed": False, 
+                "episode_done": False
+            }
 
-        self.context.append(new_message)
-        self.turn_idx += 1
-        return new_message 
+            self.context.append(new_message)
+            self.turn_idx += 1
+            return new_message
+        else:
+            return {} 
 
     def hear(self, msg: Dict):
         self.context.append(msg)
