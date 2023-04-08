@@ -8,8 +8,6 @@ import os
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
-# TODO: Experiment with toxic-bert and use transformer-interpret for check which tokens are toxic
-
 class ModerationClassifier(ABC):
 
     @abstractmethod
