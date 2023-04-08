@@ -71,15 +71,15 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         try:
             perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
-            perspec_decision, perspec_score, behav_type = self.map_behavtypes(perspec_response)
+            perspec_decision, perspec_score_mapping, perspec_tox_score, perspec_behav_score, behav_type = self.map_behavtypes(perspec_response)
 
             if self.use_moderator:
                 moderator_score = self.get_moderator_response(comment)
             else:
                 moderator_score = 1
 
-            final_decision = self.intersect_moderation(comment, moderator_score, perspec_score, behav_type)
-            return final_decision, perspec_score, behav_type
+            final_decision = self.intersect_moderation(comment, moderator_score, perspec_tox_score, perspec_score_mapping['behav_types'], behav_type)
+            return final_decision, perspec_tox_score, perspec_behav_score, behav_type
 
         except Exception as e:
             if e.status_code == 429:
@@ -107,8 +107,10 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
         behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
-        score = mapping["behav_types"][behav_type]
-        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with behav score = {score} and toxicity score = {max(mapping['toxicity'], mapping['severe_toxicity'])}")
+        tox_score = max(mapping['toxicity'], mapping['severe_toxicity'])
+        behav_score = mapping["behav_types"][behav_type]
+
+        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with behav score = {behav_score} and toxicity score = {tox_score}")
 
         if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe_toxicity"]):
             needs_mod = True
@@ -116,7 +118,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe_toxicity"]} is below threshold {self.toxicity_threshold}.')
             needs_mod = False
 
-        return needs_mod, mapping, behav_type
+        return needs_mod, mapping, tox_score, behav_score, behav_type
 
     def get_moderator_response(self, comment):
         request_data = { "0": { "comment" : comment } }

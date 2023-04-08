@@ -150,7 +150,7 @@ class BasicBot(ModerationBot):
         Optionally, a reddit object can be passed in to reply to.
         """
 
-        needs_mod, tox_score, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
+        needs_mod, tox_score, behav_score, behav_type = self.moderation_classifier.measure_toxicity(dialogue_str)
         self.logger.debug(f'Toxicity score for "{dialogue_str}" = {tox_score} with behavior type = {behav_type}')
         moderation_strategy = self.determine_moderation_strategy(dialogue_str)
         toxic_user = get_username(obj_to_reply) if obj_to_reply else "test_author"
