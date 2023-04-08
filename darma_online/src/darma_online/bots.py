@@ -165,7 +165,11 @@ class BasicBot(ModerationBot):
         # Extract post id from object and check if already in database
         if type == 'post': post_id = get_post_id(obj_to_reply)
         else: post_id = get_post_id(obj_to_reply.submission)
-        already_moderated = self.databases.search_moderated(post_id)
+
+        if self.mod_assist:
+            already_moderated, opt_out, no_mod_user = False, False, False
+        else:
+            already_moderated = self.databases.search_moderated(post_id)
 
         # Check if user has opted out of moderation now or earlier
         if not already_moderated and not opt_out and not no_mod_user:
