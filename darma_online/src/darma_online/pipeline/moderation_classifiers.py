@@ -128,8 +128,9 @@ class PerspectiveAPIModerator(ModerationClassifier):
         behav_scores = perspec_score["behav_types"]
         data_row = [comment, moderator_score, perspec_tox_score, behav_type, behav_scores["namecalling"], behav_scores["ad-hominem_attacking"], behav_scores["obscene/vulgar"], behav_scores["dehumanizing"]]
 
-        if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
-            self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
+        # if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
+        if self.needs_moderation(perspec_tox_score): # Temporary fix for moderator not working
+            self.logger.info("Moderator and Perspective API both agree that comment needs moderation.")
             # TODO: Also save hashid of comment
             self.mod_agree_df = self.dump_data(self.mod_agree_df, data_row, self.mod_agree_csv)
             return True
