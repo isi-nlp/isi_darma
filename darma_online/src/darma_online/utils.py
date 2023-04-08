@@ -83,7 +83,7 @@ def get_replied_to(comment) -> str:
     this_comment = comment
 
     if isinstance(this_comment.parent(), type(comment)) or isinstance(this_comment.parent(), type(comment.submission)):
-        return " envers " + this_comment.parent().author.name
+        return this_comment.parent().author.name
     else:
         return ""
 
