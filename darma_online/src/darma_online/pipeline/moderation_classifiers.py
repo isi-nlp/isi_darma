@@ -27,11 +27,15 @@ class PerspectiveAPIModerator(ModerationClassifier):
             static_discovery=False,
         )
 
-        self.toxicity_threshold = config["toxicity_threshold"]
         self.logger = logger
-        self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
-        self.csv_path = config["intersection_scores_path"]
 
+        self.toxicity_threshold = config["toxicity_threshold"]
+        self.use_moderator = config["use_moderator"]
+        self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
+        if not self.use_moderator:
+            self.logger.info("Not using moderator. Moderator score will be set to 1 for all comments!")
+
+        self.csv_path = config["intersection_scores_path"]
         COLUMNS = ['comment', 'moderator_score', 'perspec_tox_score', 'det_behav_type', 'namecalling' ,'ad_hominem_attacking', 'obscene_vulgar','dehumanizing']
         self.intersect_csv = "intersection_scores"
         self.mod_agree_csv = "mod_agree"
@@ -68,7 +72,12 @@ class PerspectiveAPIModerator(ModerationClassifier):
         try:
             perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
             perspec_decision, perspec_score, behav_type = self.map_behavtypes(perspec_response)
-            moderator_score = self.get_moderator_response(comment)
+
+            if self.use_moderator:
+                moderator_score = self.get_moderator_response(comment)
+            else:
+                moderator_score = 1
+
             final_decision = self.intersect_moderation(comment, moderator_score, perspec_score, behav_type)
             return final_decision, perspec_score, behav_type
 
@@ -128,8 +137,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
         behav_scores = perspec_score["behav_types"]
         data_row = [comment, moderator_score, perspec_tox_score, behav_type, behav_scores["namecalling"], behav_scores["ad-hominem_attacking"], behav_scores["obscene/vulgar"], behav_scores["dehumanizing"]]
 
-        # if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
-        if self.needs_moderation(perspec_tox_score): # Temporary fix for moderator not working
+        if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
             self.logger.info("Moderator and Perspective API both agree that comment needs moderation.")
             # TODO: Also save hashid of comment
             self.mod_agree_df = self.dump_data(self.mod_agree_df, data_row, self.mod_agree_csv)
