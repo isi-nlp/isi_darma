@@ -165,6 +165,10 @@ class GPTBot(BotAgent):
             return new_message
         else:
             return {} 
+    
+    def reset(self): 
+        self.context = [] 
+        self.turn_idx = 0 
 
     def hear(self, msg: Dict):
         self.context.append(msg)
