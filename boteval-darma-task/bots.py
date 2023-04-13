@@ -12,6 +12,7 @@ from boteval import log, C, registry as R
 from boteval.model import ChatMessage
 from boteval.bots import BotAgent
 from typing import Dict, List, Union, Any
+import re
 
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
@@ -139,6 +140,7 @@ class GPTBot(BotAgent):
     def talk(self, n_users=None, timeout=None):
         
         turns = self._get_turns()
+        speaker_id = self.prompt_generator.title
         
         if n_users is None or n_users < 2: 
             should_respond = True 
@@ -153,11 +155,12 @@ class GPTBot(BotAgent):
             )
             new_message_text = new_message_text.strip()
             
+            if re.match(rf"^{speaker_id}: ", new_message_text):
+                new_message_text = re.sub(rf"^{speaker_id}: ", "", new_message_text)
+            
             new_message = {
-                "user_id": self.prompt_generator.title, 
+                "speaker_id": self.prompt_generator.title, 
                 "text": new_message_text, 
-                "is_seed": False, 
-                "episode_done": False
             }
 
             self.context.append(new_message)

@@ -42,10 +42,18 @@ class ChatGPT(Endpoint):
         
 
     def format_turn_text(self, turn): 
+        
+        try: 
+            speaker_id = turn['data']['speaker_id']
+        except Exception as e: 
+            log.error(e)
+            log.error(f"Did not find ['data']['speaker_id'] field in turn: {turn}")
+            return turn['text']
+            
         # if text doesn't start with turn['user_id'], append: 
-        if not re.match(rf"^{turn['user_id']}: ", turn['text']): 
-            log.debug(f"`{turn['user_id']}` not in the beginning of turn text: `{turn['text']}`. Prepending it.")
-            turn_text = f"{turn['user_id']}: {turn['text']}"
+        if not re.match(rf"^{speaker_id}: ", turn['text']): 
+            log.debug(f"`{speaker_id}` not in the beginning of turn text: `{turn['text']}`. Prepending it.")
+            turn_text = f"{speaker_id}: {turn['text']}"
         else: 
             turn_text = turn['text']
         return turn_text

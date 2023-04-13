@@ -27,10 +27,18 @@ class GPT3(Endpoint):
     def format_turns(self, turns: List[Dict]):
         formatted_turns = [] 
         for turn in turns: 
-            if f"{turn['user_id']}: " not in turn: 
-                turn_text = f"{turn['user_id']}: {turn['text']}"
+            try: 
+                speaker_id = turn['data']['speaker_id']
+            except Exception as e: 
+                log.error(e)
+                log.error(f"Did not find ['data']['speaker_id'] field in turn: {turn}")
+                turn_text = turn['text']
+            
+            if f"{speaker_id}: " not in turn: 
+                turn_text = f"{speaker_id}: {turn['text']}"
             else: 
                 turn_text = turn['text']
+                
             formatted_turns.append([
                 turn_text, 
                 len(turn_text.strip().split()), 
