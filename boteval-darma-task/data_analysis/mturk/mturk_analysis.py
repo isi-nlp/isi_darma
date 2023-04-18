@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Dict, List, Any
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.stats as st
 from tabulate import tabulate
 from loguru import logger
 from argparse import ArgumentParser
@@ -28,11 +29,12 @@ ITERATION1_NVC_chats = [1444, 1322, 1141, 570, 126, 858, 785, 696, 572, 444]
 ITERATION_DATES = {
     1: [20230107, 20230108, 20230109],
     2: [20230201, 20230202, 20230203, 20230204, 20230205, 20230206, 20230207, 20230208],
+    3: [20230413, 20230414, 20230415, 20230416, 20230417]
 }
 
 PLOT_WIDTH=12
 PLOT_HEIGHT=8
-MIN_TASK_COUNT = 3
+MIN_TASK_COUNT = 10
 
 def extract_bot_type(endpoint: str) -> str:
     persona_configs = json.load(
@@ -45,24 +47,27 @@ def extract_bot_type(endpoint: str) -> str:
             return name
     return None
 
-def normalize_scores_by_user(df): 
-    import pdb; pdb.set_trace() 
-    # drop users with less than 2 datapoints
+def filter_users(df): 
+    # drop users if they have less than MIN_TASK_COUNT tasks
     counts_per_worker = df.groupby("worker_id").agg("count")["coherency"]
     workers_to_drop = counts_per_worker[counts_per_worker < MIN_TASK_COUNT].index.tolist()
     df = df[~df["worker_id"].isin(workers_to_drop)]
+    return df 
+
+def normalize_scores_by_user(df):     
+    metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
     
     # get mean & std per dimension per worker id 
-    stats_per_worker = df.groupby("worker_id").agg(["mean", "std"])
+    stats_per_worker = df[metrics_to_normalize + ['worker_id']].groupby("worker_id").agg(["mean", "std"])
     
     # adjust scores based on the mean and std 
-    metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
     for idx, row in df.iterrows(): 
         worker_id = row["worker_id"]
         for metric in metrics_to_normalize: 
             stats = stats_per_worker.loc[worker_id][metric]
-            df.at[idx, metric] = (row[metric] - stats['mean']) / stats['std']
-    import pdb; pdb.set_trace()
+            # df.at[idx, metric] = st.norm.cdf((row[metric] - stats['mean']) / (stats['std']+1e-6))
+            df.at[idx, metric] = (row[metric] - stats['mean']) / (stats['std']+1e-6)
+            # df.at[idx, metric] = 1 
     
     return df 
 
@@ -77,7 +82,7 @@ def get_annotated_data_for_dates(dates: List[str]) -> List[str]:
     return data_files
 
 
-def extract_data_of_interest(mturk_fn: str, iteration_idx=None) -> Dict[str, Any]:
+def extract_data_of_interest(mturk_fn: str, iteration_idx=None) -> List[Dict[str, Any]]:
     """extract only the data that is relevant for analysis
 
     Args:
@@ -92,39 +97,69 @@ def extract_data_of_interest(mturk_fn: str, iteration_idx=None) -> Dict[str, Any
 
     # chat number
     chat_num = mturk_fn.name.split("chat")[-1].split("_")[0]
+    
+    # get conversation
+    messages = data["messages"]
+    
+    # extract speaker order
+    speaker_order = []
+    for m in messages: 
+        if m["user_id"] == "context":
+            continue 
+        elif m["user_id"] not in speaker_order: 
+            speaker_order.append(m["user_id"])
 
-    # get ratings
-    ratings = data["data"]["ratings"]
-    ratings = {
-        SURVEY_QUESTIONS[k.lower()]: int(v)
-        for k, v in ratings.items()
-        if k != "optional_feedback"
-    }
-
-    # get user
+    # ignore sandbox results for analysis (in case any got mixed in here)
     if "mturk_sandbox" in data["data"]:
         return None
 
-    worker_id = data["data"]["mturk"]["worker_id"]
-
+    # getting bot type (legacy code for older iterations that didn't store this information)
     if iteration_idx == 1:
         bot_type = "moderator" if int(chat_num) in ITERATION1_MOD_CHATS else "wisebeing"
         if bot_type == "wisebeing":
             assert int(chat_num) in ITERATION1_NVC_chats, chat_num
-    else:
-        # hacky way to do it for second iteration TODO: store bot type into collected data
+    elif iteration_idx == 2:
+        # hacky way to do it for second iteration 
         bot_type = extract_bot_type(data["users"][0]["data"]["next"])
+    else: 
+        bot_type = data["meta"]["persona_id"]
 
-    # get conversation
-    messages = data["messages"]
 
-    return {
-        "topic_id": chat_num,
-        "bot_type": bot_type,
-        "worker_id": worker_id,
-        "messages": messages,
-        **ratings,
-    }
+    data_of_interest = [] 
+    # get ratings
+    ratings = data["data"]["ratings"]
+    
+    def format_results(user_ratings): 
+        
+        filtered_ratings = {
+            SURVEY_QUESTIONS[k.lower()]: int(v)
+            for k, v in user_ratings.items()
+            if k != "optional_feedback"
+        }
+        
+        if len(filtered_ratings) != len(SURVEY_QUESTIONS): 
+            import pdb; pdb.set_trace() 
+        
+        formatted_ratings = {
+            "topic_id": chat_num,
+            "bot_type": bot_type,
+            "worker_id": user_id,
+            "messages": messages,
+            "speaker_order": speaker_order.index(user_id), 
+            **filtered_ratings, 
+        }
+        formatted_ratings["human_words"], formatted_ratings["bot_words"] = get_human_bot_number_words(messages)
+        
+        return formatted_ratings
+            
+    if isinstance(list(ratings.values())[0], dict): 
+        for user_id, user_ratings in ratings.items(): 
+            data_of_interest.append(format_results(user_ratings))
+    else: 
+        # legacy code for older iterations that didn't store multi-user info
+        data_of_interest.append(format_results(ratings))
+
+    return data_of_interest
 
 
 def get_human_bot_number_words(messages):
@@ -133,7 +168,8 @@ def get_human_bot_number_words(messages):
     for msg in messages:
         if msg["user_id"] == "context":
             continue
-        if msg["user_id"] == "bot01":
+        if msg["user_id"] == "bot01" or msg["user_id"] == "Moderator":
+        # if msg["user_id"] == "bot01": 
             bot += len(msg["text"].split())
         else:
             human += len(msg["text"].split())
@@ -141,12 +177,21 @@ def get_human_bot_number_words(messages):
     return human, bot
 
 
-def create_word_count_plots(df, iteration_idx=None): 
+def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:bool=False): 
+    if normalize: 
+        df = normalize_scores_by_user(df)
 
     categories_of_interest = ["human_words", "bot_words"]
+    cols_to_drop = ["worker_id", "messages"] 
+    df = df.drop(cols_to_drop, axis=1)
     agg_by_bots = df.groupby("bot_type").agg(["mean", "median", "std", "count"])[
         categories_of_interest
     ]
+    
+    print(
+        df.groupby("bot_type").agg(["mean", "count"])[categories_of_interest]
+    )
+    
     means_by_bot_type = {}
     for row in agg_by_bots.iterrows():
         means_by_bot_type[row[0]] = [round(row[1][l]["mean"], 2) for l in categories_of_interest]
@@ -159,7 +204,12 @@ def create_word_count_plots(df, iteration_idx=None):
     start_width = x - width * number_of_bots / 4
     for idx, (bot_type, means) in enumerate(means_by_bot_type.items()):
         bot_count = int(agg_by_bots.loc[bot_type][categories_of_interest[0]]['count'])
+        
         rects1 = ax.bar(start_width, means, width / 2, label=f"{bot_type} [{bot_count}]")
+        
+        stds = [agg_by_bots.loc[bot_type][cat]['std'] for cat in categories_of_interest]
+        ax.errorbar(start_width, means, stds, markeredgecolor="black", ecolor="black",  fmt='o')
+        
         start_width += width / 2
         ax.bar_label(rects1, padding=3)
 
@@ -172,23 +222,24 @@ def create_word_count_plots(df, iteration_idx=None):
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
     fig.savefig(f"it{iteration_idx}_words_mean_results.png", dpi=100)
 
-def create_bot_mean_plots(df, iteration_idx=None): 
+def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:bool=False): 
+    if normalize:
+        df = normalize_scores_by_user(df)
     
     eval_categories = sorted(list(SURVEY_QUESTIONS.values()))
 
-    print(
-        tabulate(df.groupby("bot_type").agg(["mean", "count"])[eval_categories])
-    )
-    
     num_unique_workers = len(df.groupby("worker_id").agg(["count"]))
     logger.info(f"Number of unique workers in this iteration: {num_unique_workers}")
 
-    import pdb ; pdb.set_trace()
+    cols_to_drop = ["worker_id", "messages"] 
+    df = df.drop(cols_to_drop, axis=1)
+
+    print(
+        df.groupby("bot_type").agg(["mean", "count"])[eval_categories]
+    )
 
     agg_by_bots = df.groupby("bot_type").agg(["mean", "median", "std", "count"])[eval_categories]
-    
-    import pdb; pdb.set_trace()
-    
+        
     means_by_bot_type = {}
     for row in agg_by_bots.iterrows():
         means_by_bot_type[row[0]] = [round(row[1][l]["mean"], 2) for l in eval_categories]
@@ -196,15 +247,15 @@ def create_bot_mean_plots(df, iteration_idx=None):
     x = np.arange(len(eval_categories))  # the label locations
     fig, ax = plt.subplots()
     number_of_bots = len(means_by_bot_type)
-    width = 1 / number_of_bots * 1.5
+    width = 1 / number_of_bots * 1.7
     start_width = x - width * number_of_bots / 4
     
     for idx, (bot_type, means) in enumerate(means_by_bot_type.items()):
         bot_count = int(agg_by_bots.loc[bot_type][eval_categories[0]]['count'])
-        stds = [agg_by_bots.loc[bot_type][cat]['std'] for cat in eval_categories]
         rects1 = ax.bar(start_width, means, width / 2, label=f"{bot_type} [{bot_count}]")
         
-        ax.errorbar(start_width, means, stds, linestyle='None', markeredgecolor="black", ecolor="black",  fmt='-o')
+        stds = [agg_by_bots.loc[bot_type][cat]['std'] for cat in eval_categories]
+        ax.errorbar(start_width, means, stds, markeredgecolor="black", ecolor="black",  fmt='o')
 
         start_width += width / 2
         ax.bar_label(rects1, padding=3)
@@ -244,8 +295,12 @@ def create_task_per_worker_plot(df, iteration_idx=None):
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
-        "--iteration_idx", "-idx", type=int, default=2, help="iteration index: [1,2]"
+        "--iteration_idx", "-idx", type=int, default=3, help="iteration index: [1,2]"
     )
+    parser.add_argument(
+        "--normalize", "-n", action="store_true", help="normalize scores by user"
+    )
+    
     args = parser.parse_args()
 
     dates_of_interest = ITERATION_DATES.get(args.iteration_idx, [])
@@ -261,16 +316,11 @@ if __name__ == "__main__":
         try:
             mturk_result = extract_data_of_interest(fn, args.iteration_idx)
             if mturk_result:
-                all_mturk_results.append(mturk_result)
+                all_mturk_results += mturk_result
         except Exception as e:
+            logger.exception(e)
             print(e)
             print(fn)
-
-    # add information about the number of words for human / bot actors
-    for list_item in all_mturk_results:
-        human, bot = get_human_bot_number_words(list_item["messages"])
-        list_item["human_words"] = human
-        list_item["bot_words"] = bot
 
     df = pd.DataFrame(all_mturk_results)
     
@@ -280,9 +330,10 @@ if __name__ == "__main__":
         df = df[~df['bot_type'].isin(bots_to_ignore)]
     
     # normalize scores by user 
-    df = normalize_scores_by_user(df)
+    df = filter_users(df)
     
-    create_bot_mean_plots(df, iteration_idx=args.iteration_idx)
-    create_word_count_plots(df, iteration_idx=args.iteration_idx)
+    create_bot_mean_plots(df, iteration_idx=args.iteration_idx, normalize = args.normalize)
+    # create_word_count_plots(df, iteration_idx=args.iteration_idx, normalize = args.normalize)
+    create_word_count_plots(df, iteration_idx=args.iteration_idx, normalize = False)
     create_task_per_worker_plot(df, iteration_idx=args.iteration_idx)
     
