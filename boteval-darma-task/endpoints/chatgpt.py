@@ -3,6 +3,7 @@ import openai
 from boteval import log 
 from typing import Union, List, Dict
 from . import Endpoint
+import re 
 
 class ChatGPT(Endpoint):
 
@@ -27,20 +28,37 @@ class ChatGPT(Endpoint):
         
     def query(self, 
               instruction: str, 
-              turns:List[tuple],
+              turns:List[Dict],
               turn_idx: int,
               **kwargs):
-
-
+        
+        formatted_messages = self._messages_compose(instruction, turns, turn_idx, **kwargs)
         
         return self.query_completion_api(
-            messages=self._messages_compose(instruction, turns, turn_idx, **kwargs),  
+            messages= formatted_messages,  
             engine=self.engine,
             **kwargs
         )
         
 
-    def _messages_compose(self, instruction, turns, turn_idx, **kwargs): 
+    def format_turn_text(self, turn): 
+        
+        try: 
+            speaker_id = turn['data']['speaker_id']
+        except Exception as e: 
+            log.error(e)
+            log.error(f"Did not find ['data']['speaker_id'] field in turn: {turn}")
+            return turn['text']
+            
+        # if text doesn't start with turn['user_id'], append: 
+        if not re.match(rf"^{speaker_id}: ", turn['text']): 
+            log.debug(f"`{speaker_id}` not in the beginning of turn text: `{turn['text']}`. Prepending it.")
+            turn_text = f"{speaker_id}: {turn['text']}"
+        else: 
+            turn_text = turn['text']
+        return turn_text
+
+    def _messages_compose(self, instruction:str, turns: List[Dict], turn_idx:int, **kwargs): 
         """
         messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
         """
@@ -53,13 +71,14 @@ class ChatGPT(Endpoint):
         #     }]
         
         # else; root variable
+        
         if kwargs.get('few_shot_example') == 'nvc':
             few_shot_example = self.get_fewshot_example(turn_idx)
             if few_shot_example != "":
                 instruction = f'{instruction}\n{few_shot_example}\n'
         
-        seed_turns = [x[0] for x in turns if x[-1]]
-        non_seed_turns = [x[0] for x in turns if not x[-1]]
+        seed_turns =[turn for turn in turns if turn['is_seed']]
+        non_seed_turns = [turn for turn in turns if not turn['is_seed']]
                 
         messages = [
             {"role": "system", "content": str(instruction)}, 
@@ -67,21 +86,22 @@ class ChatGPT(Endpoint):
         
         
         if seed_turns:
+            seed_turn_texts = [self.format_turn_text(turn) for turn in seed_turns]
+            
             messages.append(
-                {"role": "user", "content": "\n".join(seed_turns).strip()}
+                {"role": "user", "content": "\n".join(seed_turn_texts).strip()}
             )
         
-        
-        
-        role = "assistant"
         for t in non_seed_turns: 
+            if t['user_id'] != "Moderator": 
+                role = "user"
+            else: 
+                role = "assistant"
             messages.append({
                 "role": role, 
-                "content": t
+                "content": self.format_turn_text(t)
             })
-            
-            role = "user" if role == "assistant" else "assistant"
-        
+                    
         return messages
     
     @staticmethod
@@ -112,6 +132,7 @@ class ChatGPT(Endpoint):
             response_text = response.choices[0]['message']['content'].strip() 
             
             log.debug(f"Output response: {response_text}")
+                        
 
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
