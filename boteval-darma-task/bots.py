@@ -166,7 +166,7 @@ class GPTBot(BotAgent):
             list(str): list of popped context strings
         """
         self.turn_idx -= 1
-        self.prompt_generator.backspace()
+        self.prompt_generator.backspace(self.turn_idx)
         return [self.context.pop() for _ in range(2)]
     
     def force_completion(self):
@@ -175,8 +175,11 @@ class GPTBot(BotAgent):
         Returns:
             dict: similar output to talk
         """
-
-        resp = self.endpoints[self.default_endpoint](messages=self.context, engine=self.engine)
+        
+        # TODO
+        resp = self.endpoints[self.default_endpoint].query_completion_api(
+            prompt=self.context, engine=self.engine
+        )
 
         final_message_text = resp
         final_message_text = final_message_text.strip()

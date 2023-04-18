@@ -215,12 +215,14 @@ class Variable:
                 f'{key}({self.get("id")}) = {value}'
             )
         
-    def backspace(self): 
+    def backspace(self, turn_idx): 
         """
         Goes back in time one step
         """
-        if self._assignments.get(self._assign_cnt):
-            self._assignments.__delitem__(self._assign_cnt)
-        self._assign_cnt -= 1
+        ass_ptrs = list(self._assignments.keys())
+        if len(ass_ptrs) and max(ass_ptrs) > turn_idx:
+            if self._assignments.get(self._assign_cnt):
+                self._assignments.__delitem__(self._assign_cnt)
+            self._assign_cnt -= 1
         
     def is_constant(self): return not self._variables and len(self._instruction_raw) <= 1

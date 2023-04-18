@@ -37,6 +37,7 @@ class MixedBots:
                 persona_id=persona_id,
                 # few_shot_example=existing_conv,
                 max_ctx_len=max_ctx_len,
+                # num_threads=1,
             )
             for persona_id, _, _ in self.personas
         ]
@@ -128,7 +129,7 @@ class MixedBots:
     def view_seed(self):
         def get_seed(b):
             return {
-                'text': b.get_seed_turns()
+                'text': b._get_turns(b.context)
             }
         print('Seeds')
         seeds = self._iterate(get_seed)
@@ -232,6 +233,7 @@ def load_persona_confs(confs_filename='persona_configs.json'):
                 print(f'# {i+1} :: id({conf["id"]})')
                 print(f'# Notes: {conf["notes"]}')
                 print(f'# Title: {conf["title"]}')
+                print(f'# default_endpoint:', {conf.get('default_endpoint', 'default')})
                 print('# Instruction:')
                 print_wrap_text(str(conf['instruction']))
                 print("="*PRINT_WIDTH)
@@ -310,10 +312,14 @@ def interactive_session(
             print(bots.backspace())
 
         def retry():
+            print('Removing last iteration.. & Giving another response..')
             bots.backspace()
             bots.talk()
             
         def respond_with_mturk_history():
+            if not mturk_chats:
+                print_wrap_text('Mturk Chats are not available for this conversation, please try another option.')
+                return
             choice_idx = np.random.choice(np.arange(len(mturk_chats)))
             line = mturk_chats[choice_idx][bots.get_turn_idx()]['text']
             print_wrap_text(f'[User {final_user}]: {line}')

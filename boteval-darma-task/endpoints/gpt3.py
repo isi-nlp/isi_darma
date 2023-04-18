@@ -30,8 +30,15 @@ class GPT3(Endpoint):
               turn_idx: int,
               **kwargs):
         
+        constructed_prompt = self._prompt_compose(instruction, turns, turn_idx, **kwargs)
+        # breakpoint()
+        log.debug(
+            '# GPT3 DEBUG Processing:\n'
+            f'Instruction: \n"""\n {instruction}\n"""\n'
+            f'Input to GPT3 API:\n """\n {constructed_prompt}\n """"'
+        )
         return self.query_completion_api(
-            self._prompt_compose(instruction, turns, turn_idx, **kwargs), 
+            constructed_prompt, 
             engine=self.engine,
             **kwargs
         )
@@ -45,7 +52,9 @@ class GPT3(Endpoint):
         def prepare_context(turns: List[tuple]):
             # seed_turns = [x[0] for x in turns if x[-1]]
             # non_seed_turns = [x[0] for x in turns if not x[-1]]
-            all_turns = [t[0] for t in turns]
+            topic = turns[0][0] # NOT USED
+            all_turns = [f'user {t[0]}' for t in turns[1:]]
+            # all_turns = [topic] + all_turns
             _look_up = kwargs.get('look_up')
             if not _look_up:
                 return '\n'.join(all_turns)
