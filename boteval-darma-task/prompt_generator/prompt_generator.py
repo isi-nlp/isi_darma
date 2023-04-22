@@ -32,7 +32,8 @@ class PromptGenerator:
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
-                 num_threads:int=None):
+                #  num_threads:int=None
+                ):
         """
 
         Args:
@@ -54,7 +55,7 @@ class PromptGenerator:
         
         # if not num_threads:
         #     num_threads = cpu_count()
-        self.thread_pool = ThreadPool(processes=num_threads)
+        self.thread_pool = ThreadPool()
         self.variables = config_dict.get('preprocess_variables')
         
         if self.variables:
@@ -122,7 +123,6 @@ class PromptGenerator:
         )
         
         
-        
     def _decode_tokens(self, variable: Variable) -> Variable:
         
         def _decode_token(token: str):
@@ -145,7 +145,8 @@ class PromptGenerator:
                     log.debug(
                         f'From {variable.get("id", "init")} '
                         f'Executing call for assignment #{leaf_variable._assign_cnt + 1} '
-                        f'to obtain variable {leaf_variable["id"]}'
+                        f'to obtain variable {leaf_variable["id"]} '
+                        f'using Endpoint {leaf_variable.get("endpoint", self.default_endpoint)}'
                     )
                     
                     sub_instruction = str(self._decode_tokens(leaf_variable,))   

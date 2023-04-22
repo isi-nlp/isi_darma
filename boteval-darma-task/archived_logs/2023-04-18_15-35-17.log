@@ -1,0 +1,9 @@
+2023-04-18 15:35:18.901 | INFO     | bots:setup_endpoints:70 - 
+Available endpoints:
+- chatgpt
+	- gpt4
+	- gpt3
+	while default is gpt3
+2023-04-18 15:35:18.916 | INFO     | prompt_generator.prompt_generator:__init__:70 - Init PromptGenerator using 8
+2023-04-18 15:35:18.917 | INFO     | bots:__init__:58 - Initialized GPT bot with engine='text-davinci-003'self.prompt_generator.id='moderator'self.prompt_generator.title='Moderator'
+self.prompt_generator.instruction._instruction_raw=[("You are a moderator that seeks to build a more civil online environment. Moderate the following conversation and format your response as 'Moderator: {response}'", 0)]

@@ -8,7 +8,8 @@ A script meant for interactive analysis and automated processes for fast experim
 
 import os, argparse
 import re, json, textwrap
-import logging as log
+from boteval import log
+from logging import CRITICAL
 import numpy as np
 from bots import GPTBot
 from tabulate import tabulate
@@ -46,7 +47,6 @@ class MixedBots:
             int((self.print_width-1)/len(self.personas))
         
         self.threadPool = ThreadPool()
-
         
     def __len__(self) -> int:
         return len(self.bots)
@@ -83,8 +83,14 @@ class MixedBots:
     def _iterate(self, func):
         return self.threadPool.map(func, self.bots)
             
-    def hear(self, msg, is_seed=False):     
-        self._iterate(lambda x: x.hear(msg, is_seed=is_seed))       
+    def hear(self, msg, is_seed=False):  
+        self._iterate(lambda x: x.hear(dict(
+            text=msg['text'],
+            is_seed = is_seed, 
+            user_id=msg['speaker_id'],
+            thread_id=-1,
+            data={"speaker_id": msg['speaker_id']}
+        )))       
     
     def feed(self, txt):     
         self._iterate(lambda x: x.feed(txt))     
@@ -446,11 +452,15 @@ if __name__ == "__main__":
     PRINT_WIDTH = args.print_width
     
     if args.suppress_log:
-            log.getLogger().setLevel(log.CRITICAL)
+        import sys
+        log.critical('Suppress logs below CRITICAL')
+        log.remove()
+        log.add(sys.stderr, level="CRITICAL") 
+
     # log.getLogger().setLevel(log.DEBUG)
 
     if args.inter:
-        mturk_data_dir = '/mnt/c/Users/basem/Projects/ISI/isi_darma/boteval-darma-task/data/data'
+        mturk_data_dir = './data/data'
         
         # interactive_session()
         # TODO inject mturk responses into conversation

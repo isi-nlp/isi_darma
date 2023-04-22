@@ -1,0 +1,10 @@
+2023-04-20 14:31:09.865 | INFO     | bots:setup_endpoints:70 - 
+Available endpoints:
+- chatgpt
+	- gpt4
+	- gpt3
+	while default is gpt3
+2023-04-20 14:31:09.886 | INFO     | prompt_generator.prompt_generator:__init__:70 - Init PromptGenerator using 8
+2023-04-20 14:31:09.888 | INFO     | bots:__init__:58 - Initialized GPT bot with engine='text-davinci-003'self.prompt_generator.id='dyn-2nd-chatgpt'self.prompt_generator.title='Moderator'
+self.prompt_generator.instruction._instruction_raw=[('You are an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy> You should refer to <to_be_moderated_users> by name in the conversation. Your identity is secret and should not be revealed to conversers. You should not reveal its plan to users in this conversation.', 0)]
+2023-04-20 14:31:11.754 | DEBUG    | prompt_generator.prompt_generator:_decode_token:145 - From dyn-2nd-chatgpt Executing call for assignment #1 to obtain variable to_be_moderated_users

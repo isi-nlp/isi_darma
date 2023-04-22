@@ -120,124 +120,6 @@
         "instruction": "<moderator_strategy> Casually and colloquially respond to the last speaker of the conversation. Moderate the following conversation and format your response as 'Moderator: {response}'"
     },
     {
-        "default_endpoint": "chatgpt",
-        "id": "dyn-2nd-chatgpt",
-        "notes": "attempt to enforce constraints over dyn-b",
-        "title": "Moderator",
-        "instruction": "You are an intelligent moderator agent. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_emotions>. <moderator_strategy> You should refer to <to_be_moderated_users> by name in the conversation. Your identity is secret and should not be revealed to conversers. You should not reveal its plan to users in this conversation.",
-        "endpoint_kwargs": {
-            "n": 10
-        },
-        "preprocess_variables": [
-            {
-                "id": "to_be_moderated_users",
-                "instruction": "Classify using Yes or No whether each user need moderation based on their responses in the conversation:",
-                "post_regex": "(User \\w+): Yes",
-                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
-                "post_func": "lambda x: ' and '.join(x)",
-                "frequency": 1
-            },
-            {
-                "id": "moderation_reasoning",
-                "instruction": "Reason why does <to_be_moderated_users> require moderation:",
-                "frequency": 2
-            },
-            {
-                "id": "users_emotions",
-                "instruction": "For each user, pick the top 1 emotion category based on the responses in this conversation out of the following categories: [admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral]",
-                "post_regex": "(User \\w+): (\\w+)",
-                "regex_validation": "https://regex101.com/r/sV4IQw/1",
-                "post_func": [
-                    "lambda x: {u[0]: u[1] for u in x}",
-                    "lambda x: [x[name] for name in <to_be_moderated_users-list>]",
-                    "lambda x: ', '.join(x)"
-                ]
-            },
-            {
-                "id": "to_be_moderated_with_their_emotions",
-                "instruction": "For each user, pick the top 1 emotion category based on the responses in this conversation out of the following categories: [admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral]",
-                "post_regex": "(User \\w+): (\\w+)",
-                "regex_validation": "https://regex101.com/r/sV4IQw/1",
-                "post_func": [
-                    "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
-                    "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
-                    "lambda x: ' and '.join(x) "
-                ],
-                "frequency": 3
-            },
-            { 
-                "id": "moderator_strategy",
-                "instruction": "Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and that <to_be_moderated_users> emotions classified as <users_emotions> respectively in the converation. Explain using second-person pronouns how one can convince <to_be_moderated_users> to adapt nonviolent communication rules:",
-                "frequency": 1
-            }
-        ]
-    },
-    {
-        "default_endpoint": "gpt3",
-        "id": "dyn-2nd-gpt3",
-        "notes": "attempt to enforce constraints over dyn-b",
-        "title": "Moderator",
-        "instruction": "Moderator is an intelligent moderation agent. Moderator identity is secret and should not be revealed to conversers. Moderator should not reveal its plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <coherency_of_to_be_moderated_response>. <to_be_moderated_with_their_recent_emotions>. <moderator_strategy> Moderator should address and refer to <to_be_moderated_users> by name in response.",
-        "endpoint": "gpt3",
-        "endpoint_kwargs": {
-            "n": 10,
-            "temperature": 0.5
-        },
-        "preprocess_variables": [
-            {
-                "id": "list_users",
-                "instruction": "list users involved in this conversation except Moderator seperated with commas:",
-                "post_func": "lambda x: ' and '.join(x.split(','))"
-            },
-            {
-                "id": "to_be_moderated_users",
-                "instruction": "Classify using Yes or No whether ecah user of <list_users> need moderation based on their responses in the conversation:",
-                "post_regex": "(User \\w+): Yes",
-                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
-                "post_func": "lambda x: ' and '.join(x)",
-                "frequency": 1,
-                "endpoint_kwargs": {
-                    "n": 10
-                }
-            },
-            {
-                "id": "moderation_reasoning",
-                "instruction": "Reason why does <to_be_moderated_users> require moderation:",
-                "frequency": 3
-            },
-            {
-                "id": "to_be_moderated_with_their_recent_emotions",
-                "instruction": "Pick top 1 emotion category of <list_users> based on their most recent responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
-                "post_regex": "(User \\w+): (\\w+)",
-                "regex_validation": "https://regex101.com/r/sV4IQw/1",
-                "post_func": [
-                    "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
-                    "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
-                    "lambda x: ' and '.join(x) "
-                ],
-                "frequency": 1,
-                "temperature": 0.5,
-                "endpoint_kwargs": {
-                    "n": 5
-                }
-            },
-            { 
-                "id": "moderator_strategy",
-                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions in the conversation are as follows: <to_be_moderated_with_their_recent_emotions>. Explain how would a moderator through negotiation only convince and encourage <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotion:",
-                "frequency": 1
-            },
-            {
-                "id": "coherency_of_to_be_moderated_response",
-                "instruction": "Q: Are <to_be_moderated_users> recent responses consistent with the context of the converation? answer by yes or no:",
-                "post_func": "lambda x: '<to_be_moderated_users> responses are consistent with context of the conversation' if 'yes' in x.lower() else '<to_be_moderated_users> responses are not coherent with the context of the conversation'",
-                "frequency": 2,
-                "endpoint_kwargs": {
-                    "look_up": -5
-                }
-            }
-        ]
-    },
-    {
         "id": "th1",
         "notes": "therapist somewhat promising manual trial",
         "title": "Moderator",
@@ -278,5 +160,137 @@
         "notes": "baseline",
         "title": "wisebeing",
         "instruction": "The following is a conversation with a wise and loving being who has an understanding of how nonviolent communication work. This being is dedicated to building a more civil online environment."
+    },
+    {
+        "default_endpoint": "gpt3",
+        "id": "dyn-2nd-gpt3",
+        "notes": "attempt to enforce constraints over dyn-b",
+        "title": "Moderator",
+        "author": "Basem",
+        "instruction": "Moderator is an intelligent moderation agent. Moderator identity is secret and should not be revealed to conversers. Moderator should not reveal its plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <coherency_of_to_be_moderated_response>. <to_be_moderated_with_their_recent_emotions>. <moderator_strategy> Moderator should address and refer to <to_be_moderated_users> by name in response.",
+        "endpoint": "gpt3",
+        "endpoint_kwargs": {
+            "n": 10,
+            "temperature": 0.5
+        },
+        "preprocess_variables": [
+            {
+                "id": "list_users",
+                "instruction": "list users involved in this conversation except Moderator seperated with commas:",
+                "post_func": "lambda x: ' and '.join(x.split(','))"
+            },
+            {
+                "id": "to_be_moderated_users",
+                "instruction": "Classify using Yes or No whether ecah user of <list_users> need moderation based on their responses in the conversation:",
+                "post_regex": "(User \\w+): Yes",
+                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
+                "post_func": "lambda x: ' and '.join(x)",
+                "frequency": 1,
+                "endpoint_kwargs": {
+                    "n": 10
+                }
+            },
+            {
+                "id": "moderation_reasoning",
+                "instruction": "Reason why does <to_be_moderated_users> require moderation:",
+                "frequency": 3
+            },
+            {
+                "id": "to_be_moderated_with_their_recent_emotions",
+                "instruction": "Pick top 1 most recent emotion category of <list_users> based on their most recent responses in this conversation out of the following categories (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral):",
+                "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
+                "post_func": [
+                    "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
+                    "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
+                    "lambda x: ' and '.join(x) "
+                ],
+                "frequency": 1,
+                "temperature": 0.5,
+                "endpoint_kwargs": {
+                    "n": 5
+                },
+                "endpoint" : "gpt3"
+            },
+            { 
+                "id": "moderator_strategy",
+                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions in the conversation are as follows: <to_be_moderated_with_their_recent_emotions>. Explain how would a moderator through negotiation only convince and encourage <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotion:",
+                "frequency": 1
+            },
+            {
+                "id": "coherency_of_to_be_moderated_response",
+                "instruction": "Q: Are <to_be_moderated_users> recent responses consistent with the context of the converation? answer by yes or no:",
+                "post_func": "lambda x: '<to_be_moderated_users> responses are consistent with context of the conversation' if 'yes' in x.lower() else '<to_be_moderated_users> responses are not coherent with the context of the conversation'",
+                "frequency": 2,
+                "endpoint_kwargs": {
+                    "look_up": -5
+                }
+            }
+        ]
+    },
+    {
+        "default_endpoint": "chatgpt",
+        "id": "dyn-2nd-chatgpt",
+        "notes": "gpt3 to chatgpt adaption of promsing dyn bot",
+        "title": "Moderator",
+        "author": "Basem",
+        "instruction": "You are an intelligent moderator agent. Your identity is secret and should not be revealed to conversers. You should not reveal your plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_recent_emotions>.  Moderator strategy could be as follows: <moderator_strategy>. Finally Moderator should address and refer to <to_be_moderated_users> by name in response. Format your response as 'Moderator: {response}'",
+        "endpoint_kwargs": {
+            "n": 10
+        },
+        "preprocess_variables": [
+            {
+                "id": "list_users",
+                "instruction": "Given the above conversation, List the users involved excluding the Moderator seperated with commas:",
+                "post_func": "lambda x: ' and '.join(x.split(','))",
+                "role": "system"
+            },
+            {
+                "id": "to_be_moderated_users",
+                "instruction": "For each user, classify using Yes or No if the user need moderation based on their responses in the conversation: (Format your response as 'User user_name: no/yes' per each user_name)",
+                "post_regex": "(User \\w+): Yes",
+                "regex_validation": "https://regex101.com/r/Gn1dyY/1",
+                "post_func": "lambda x: ' and '.join(x)",
+                "frequency": 1,
+                "role": "system"
+            },
+            {
+                "id": "moderation_reasoning",
+                "instruction": "Given the conversation above, Reason why user <to_be_moderated_users> require moderation: (Format your response as: User user_name should be moderated because {response}}",
+                "frequency": 2,
+                "role": "system"
+            },
+            {
+                "id": "to_be_moderated_with_their_recent_emotions",
+                "instruction": "Given the responses in the conversation above, classify each user most recent emotion category in the following categories: (admiration, amusement, anger, annoyance, approval, caring, confusion, curiosity, desire, disappointment, disapproval, disgust, embarrassment, excitement, fear, gratitude, grief, joy, love, nervousness, optimism, pride, realization, relief, remorse, sadness, surprise, neutral): (Format your response as according to this regex: (User \\w+): (\\w+)",
+                "endpoint": "gpt3",
+                "post_regex": "(User \\w+): (\\w+)",
+                "regex_validation": "https://regex101.com/r/sV4IQw/1",
+                "post_func": [
+                    "lambda x: [u for u in x if u[0] in <to_be_moderated_users-list>]",
+                    "lambda x: [f'{u[0]} emotion is {u[1]}' for u in x]",
+                    "lambda x: ' and '.join(x) "
+                ],
+                "frequency": 1,
+                "temperature": 0.5,
+                "endpoint_kwargs": {
+                    "n": 5,
+                    "exclude_topic": true
+                },
+                "role": "system"
+            },
+            { 
+                "id": "moderator_strategy",
+                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions in the conversation are as follows: <to_be_moderated_with_their_recent_emotions>. Explain how would a moderator through negotiation only convince and encourage <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotion:",
+                "frequency": 3,
+                "role": "system"
+            },
+            {
+                "id": "modification_strategy",
+                "instruction": "Given the recent the most recent user response and the moderator response, should the moderator use more or fewer words:",
+                "frequency": 3,
+                "role": "system"
+            }
+        ]
     }
 ]

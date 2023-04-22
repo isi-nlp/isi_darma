@@ -1,5 +1,5 @@
 import re
-import logging as log
+from boteval import log
 
 ROOT_TOKEN_REGEX = '([\w]+)'
 TOKEN_REGEX = '<([\w-]+)>'

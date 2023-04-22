@@ -1,0 +1,2 @@
+2023-04-20 15:00:59.464 | CRITICAL | __main__:<module>:455 - Suppress logs below CRITICAL
+2023-04-20 15:00:59.465 | INFO     | __main__:<module>:457 - it is not working

@@ -54,7 +54,7 @@ class GPT3(Endpoint):
               **kwargs):
         
         # make transformations to turns as necessary
-        formatted_turns = self.format_turns(turns) # TODO check what is this doing with JUSTIN
+        formatted_turns = self.format_turns(turns)
         constructed_prompt = self._prompt_compose(instruction, formatted_turns, turn_idx, **kwargs)
         
         # breakpoint()
