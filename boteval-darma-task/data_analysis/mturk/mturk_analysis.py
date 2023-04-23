@@ -34,7 +34,7 @@ ITERATION_DATES = {
 
 PLOT_WIDTH=12
 PLOT_HEIGHT=8
-MIN_TASK_COUNT = 10
+MIN_TASK_COUNT = 3
 
 def extract_bot_type(endpoint: str) -> str:
     persona_configs = json.load(
@@ -71,7 +71,7 @@ def normalize_scores_by_user(df):
     
     return df 
 
-def get_annotated_data_for_dates(dates: List[str]) -> List[str]:
+def get_annotated_datafiles_for_dates(dates: List[str]) -> List[str]:
     data_folders = [p for p in Path(BASE_DATA_DIR).glob("*") if int(p.name) in dates]
     data_files = []
     for folder in data_folders:
@@ -214,13 +214,18 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
         ax.bar_label(rects1, padding=3)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel("Word count")
+    plt.title("Word Count Results")
+    
+    if normalize: 
+        ax.set_ylabel(f"Normalized word count")
+    else: 
+        ax.set_ylabel("Word count")
     ax.set_xticks(x, categories_of_interest)
     ax.legend()
 
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
-    fig.savefig(f"it{iteration_idx}_words_mean_results.png", dpi=100)
+    fig.savefig(f"it{iteration_idx}_{normalize=}__words_mean_results.png", dpi=100)
 
 def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:bool=False): 
     if normalize:
@@ -261,7 +266,11 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
         ax.bar_label(rects1, padding=3)
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
-    ax.set_ylabel("Normalized Scores")
+    if normalize: 
+        ax.set_ylabel("Normalized Scores")
+    else: 
+        ax.set_ylabel("Scores")
+        
     # ax.set_ylim([1, 5])
     ax.set_xticks(x, eval_categories)
     ax.set_xlabel("Evaluation categories")
@@ -271,7 +280,7 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
 
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
-    plt.savefig(f"it{iteration_idx}_bot_mean_results.png")
+    plt.savefig(f"it{iteration_idx}_{normalize=}_bot_mean_results.png")
 
 
 def create_task_per_worker_plot(df, iteration_idx=None): 
@@ -309,7 +318,7 @@ if __name__ == "__main__":
         logger.warning(
             f"There were no dates identified for the given iteration index. Make sure that you have identified dates for iteration #{args.iteration_idx} and that they exist in {BASE_DATA_DIR}"
         )
-    data_files = get_annotated_data_for_dates(dates_of_interest)
+    data_files = get_annotated_datafiles_for_dates(dates_of_interest)
 
     all_mturk_results = []
     for fn in data_files:
@@ -333,7 +342,6 @@ if __name__ == "__main__":
     df = filter_users(df)
     
     create_bot_mean_plots(df, iteration_idx=args.iteration_idx, normalize = args.normalize)
-    # create_word_count_plots(df, iteration_idx=args.iteration_idx, normalize = args.normalize)
-    create_word_count_plots(df, iteration_idx=args.iteration_idx, normalize = False)
+    create_word_count_plots(df, iteration_idx=args.iteration_idx, normalize = args.normalize)
     create_task_per_worker_plot(df, iteration_idx=args.iteration_idx)
     
