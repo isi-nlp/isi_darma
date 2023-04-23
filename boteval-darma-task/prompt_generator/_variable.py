@@ -61,6 +61,7 @@ class Variable:
                 'Error parsing instruction, please ensure correct format'
                 f'of variable with id: ({self._parameters["id"]})'
             )
+            
         return sorted(instruction_raw, key = lambda x: x[1])
     
     def get_curr_instruction_statement(self, turn_idx:int) -> str:
@@ -92,7 +93,7 @@ class Variable:
         self._recent_turn = turn_idx
         for i, (statement, offset) in enumerate(reversed(self._instruction_raw)):
             if turn_idx >= offset:
-                self._instruction_raw[-i] = updated_statement
+                self._instruction_raw[-i] = (updated_statement, offset)
                 return
             
         log.critical(
@@ -146,6 +147,7 @@ class Variable:
         """
         if turn_idx:
             self._recent_turn = turn_idx
+            
         statement: str = self.get_curr_instruction_statement(self._recent_turn)
         decoding_placeholder =\
             "[\033[95m{cnt}\033[00m : \033[96m{decoding}\033[00m]"

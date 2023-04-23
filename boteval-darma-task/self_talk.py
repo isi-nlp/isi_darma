@@ -128,8 +128,15 @@ def generate_conversation(
     # init chat for each bot
     reformatted_init_conv = []
     for turn in init_conv:
-        moderator_bot.hear(turn, is_seed=True)
-        moderated_user_bot.hear(turn, is_seed=True)
+        formatted_turn = dict(
+            text=turn['text'],
+            is_seed = True, 
+            user_id=turn['speaker_id'],
+            thread_id=-1, # DUMMY
+            data={"speaker_id": turn['speaker_id']}
+        )
+        moderator_bot.hear(formatted_turn)
+        moderated_user_bot.hear(formatted_turn)
         reformatted_init_conv.append(f"{turn['speaker_id']}: {turn['text']}")
     last_speaker = init_conv[-1]["speaker_id"]
 
@@ -168,7 +175,9 @@ def generate_conversation(
                 "text"
             ] = f"{moderator_bot.prompt_generator.title}: {mod_response['text']}"
 
-        moderated_user_bot.hear(mod_response, is_seed=is_seed_for_user_bot)
+        formatted_mod_response = mod_response # ALREADY FORMATTED
+        moderated_user_bot.hear(formatted_mod_response)
+        
         continued_conv.append(f"{mod_response['text']}")
         logger.info(continued_conv[-1])
 
@@ -248,8 +257,8 @@ def main():
     else: 
         bot_ids = [
             # just added these two
-            # "dyn-2nd-chatgpt",
-            # "dyn-2nd-gpt3", 
+            "dyn-2nd-chatgpt",
+            # "dyn-2nd-gpt3",  # TODO DEFAULT ENDPOINT SET BY DEFAULT
 
             # "goto_interest_dynamic_strategy_simple", 
             "witty", 
@@ -259,7 +268,7 @@ def main():
             # "cognitive_reappraisal_paraphrase_suggestor", 
             # "mirror_simple",
             # "stern",
-            # "wisebeing",
+            "wisebeing",
             # "moderator",
             # "persuasive",
             # "sarcastic"

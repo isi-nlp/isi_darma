@@ -231,19 +231,22 @@
     {
         "default_endpoint": "chatgpt",
         "id": "dyn-2nd-chatgpt",
-        "notes": "gpt3 to chatgpt adaption of promsing dyn bot",
+        "notes": "gpt3 to chatgpt adaption of promising dyn bot",
         "title": "Moderator",
         "author": "Basem",
-        "instruction": "You are an intelligent moderator agent. Your identity is secret and should not be revealed to conversers. You should not reveal your plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <to_be_moderated_with_their_recent_emotions>.  Moderator strategy could be as follows: <moderator_strategy>. Finally Moderator should address and refer to <to_be_moderated_users> by name in response. Format your response as 'Moderator: {response}'",
+        "instruction": "You are an intelligent moderator agent. Your identity is secret and should not be revealed to conversers. You should not reveal your plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, As <moderation_reasoning>. <to_be_moderated_with_their_recent_emotions>.  Moderator strategy could be as follows: <moderator_strategy>. While <modification_strategy>. As moderator in multi-speaker conversation, you should mention the user addressing clearly in the response. Format your response as 'Moderator: {response}'",
         "endpoint_kwargs": {
-            "n": 10
+            "n": 10,
+            "temperature": 0.1
         },
         "preprocess_variables": [
             {
                 "id": "list_users",
                 "instruction": "Given the above conversation, List the users involved excluding the Moderator seperated with commas:",
                 "post_func": "lambda x: ' and '.join(x.split(','))",
-                "role": "system"
+                "endpoint_kwargs": {
+                    "role": "system"
+                }
             },
             {
                 "id": "to_be_moderated_users",
@@ -252,13 +255,18 @@
                 "regex_validation": "https://regex101.com/r/Gn1dyY/1",
                 "post_func": "lambda x: ' and '.join(x)",
                 "frequency": 1,
-                "role": "system"
+                "endpoint_kwargs": {
+                    "role": "system"
+                }
             },
             {
                 "id": "moderation_reasoning",
                 "instruction": "Given the conversation above, Reason why user <to_be_moderated_users> require moderation: (Format your response as: User user_name should be moderated because {response}}",
                 "frequency": 2,
-                "role": "system"
+                "endpoint_kwargs": {
+                    "role": "system"
+                }
+
             },
             {
                 "id": "to_be_moderated_with_their_recent_emotions",
@@ -272,24 +280,30 @@
                     "lambda x: ' and '.join(x) "
                 ],
                 "frequency": 1,
-                "temperature": 0.5,
                 "endpoint_kwargs": {
                     "n": 5,
-                    "exclude_topic": true
-                },
-                "role": "system"
+                    "exclude_topic": true,
+                    "role": "system",
+                    "temperature": 0.2
+                }
             },
             { 
                 "id": "moderator_strategy",
-                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions in the conversation are as follows: <to_be_moderated_with_their_recent_emotions>. Explain how would a moderator through negotiation only convince and encourage <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotion:",
+                "instruction": "Given this conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>, and their emotions as follows: <to_be_moderated_with_their_recent_emotions>. Give step by step instructions on how would a moderator through negotiation only convince and encourage and address <to_be_moderated_users> to adapt non violent communication rules while considering their feelings and emotion:",
                 "frequency": 3,
-                "role": "system"
+                "endpoint_kwargs": {
+                    "role": "system",
+                    "temperature": 0.3
+                }
             },
             {
                 "id": "modification_strategy",
                 "instruction": "Given the recent the most recent user response and the moderator response, should the moderator use more or fewer words:",
-                "frequency": 3,
-                "role": "system"
+                "frequency": 1,
+                "endpoint_kwargs": {
+                    "temperature": 0.1,
+                    "role": "system"
+                }
             }
         ]
     }
