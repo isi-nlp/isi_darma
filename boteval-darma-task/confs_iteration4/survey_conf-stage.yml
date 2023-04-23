@@ -1,4 +1,4 @@
-chat_dir: data
+chat_dir: survey-data
 
 chatbot:
   display_name: 'Moderator'

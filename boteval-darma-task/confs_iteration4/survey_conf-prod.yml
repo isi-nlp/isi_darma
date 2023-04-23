@@ -1,4 +1,4 @@
-chat_dir: data
+chat_dir: survey-data-prod
 
 chatbot:
   display_name: 'Moderator'
@@ -20,7 +20,7 @@ limits:
   reward: &reward '0.3' # dollars
   
 onboarding:
-  agreement_file: user-agreement.html
+  agreement_file: survey-user-agreement.html
   instructions_file: survey_instructions.html
   simple_instructions_file: survey_simple_instructions.html
   checkboxes:
@@ -37,16 +37,16 @@ ratings:
       - Very
   - question: If you were the user, how likely are you to continue chatting with the moderator?
     choices: *choices
-  - question: To what degree did the moderator understand the user's point of view?
+  - question: How well did it seem like the moderator understand the user's point of view?
     choices: *choices
-  - question:  To what degree was the moderator successful in convincing to change the user's behavior?
+  - question:  How successful was the moderator in convincing to change the user's behavior?
     choices: *choices
 
 # rename _mturk -> mturk to enable crowd backend
-mturk: 
+mturk:
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
-    sandbox: true  # sandbox: false to go live
+    sandbox: false  # sandbox: false to go live
   seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
@@ -56,30 +56,38 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot [DEV]'
+    Title: 'Evaluate a moderator (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after reading a conversation that it has completed.  
-    QualificationRequirements: 
-      -  QualificationTypeId: "00000000000000000071"  # locale qualification
-         Comparator: In
-         LocaleValues:
-            - Country: US
-            - Country: CA
-            - Country: FR
-            - Country: GB
-            - Country: AU
-            - Country: BE
-            - Country: HT
-            - Country: CH
-            - Country: CD
+    Description: Evaluate a moderator after reading a conversation that it has completed with a user.  
+    QualificationRequirements:
+      # -  QualificationTypeId: "00000000000000000071"  # locale qualification
+      #    Comparator: In
+      #    LocaleValues:
+      #       - Country: US
+      #       - Country: CA
+      #       - Country: GB
+      #       - Country: AU
+      -  QualificationTypeId: "00000000000000000040"  # number of hits 
+         Comparator: GreaterThan
+         IntegerValues: [2400]
+      -  QualificationTypeId: "00000000000000000060"  # adult content
+         Comparator: EqualTo
+         IntegerValues: [1]
+      -  QualificationTypeId: "000000000000000000L0"  # percentage approved
+         Comparator: GreaterThan
+         IntegerValues: [95]
+      -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
+         Comparator: DoesNotExist
          ActionsGuarded: DiscoverPreviewAndAccept
-
+      -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+         Comparator: Exists
+         ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'survey_dev.db'   # this will be placed in task dir
-  SQLALCHEMY_TRACK_MODIFICATIONS: false
+  # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it4-survey-prod.db'   # this will be placed in task dir
+  SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
-  
