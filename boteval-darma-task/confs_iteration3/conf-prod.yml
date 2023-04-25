@@ -9,8 +9,10 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: gpt-3.5-turbo
-    persona_id: em1
+    engines: 
+      - chatgpt 
+      - gpt4
+      - gpt3
 
 #  transforms:
 #    human:

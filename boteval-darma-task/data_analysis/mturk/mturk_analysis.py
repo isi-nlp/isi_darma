@@ -240,7 +240,17 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
     fig.savefig(f"it{iteration_idx}_{normalize=}__words_mean_results.png", dpi=100)
 
-def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:bool=False): 
+def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:bool=False, title:str=""): 
+    """creates a bar plot of the mean scores for each bot type 
+    
+    input:
+        df:pd.DataFrame: dataframe of survey results
+        iteration_idx:int: iteration number
+        normalize:bool: whether to normalize the scores by user
+        title:str: title of the plot
+    
+    returns: None 
+    """
     if normalize:
         df = normalize_scores_by_user(df)
     
@@ -290,12 +300,16 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     ax.set_xticks(x, eval_categories)
     ax.set_xlabel("Evaluation categories")
     ax.legend()
-
-    plt.title("Bot Evaluation Mean Results")
-
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
-    plt.savefig(f"it{iteration_idx}_{normalize=}_bot_mean_results.png")
+
+    if title:
+        plt.title(title)
+        plt.savefig(f"it{iteration_idx}_{normalize=}_{title=}.png")
+        
+    else:
+        plt.title("Bot Evaluation Mean Results")
+        plt.savefig(f"it{iteration_idx}_{normalize=}_bot_mean_results.png")
 
 
 def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize: bool = False):
