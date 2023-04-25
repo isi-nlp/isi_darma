@@ -32,7 +32,8 @@ class PromptGenerator:
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
-                 num_threads:int=None):
+                #  num_threads:int=None
+                ):
         """
 
         Args:
@@ -52,9 +53,9 @@ class PromptGenerator:
         self.instruction: Variable = Variable(config_dict) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
-        if not num_threads:
-            num_threads = cpu_count()
-        self.thread_pool = ThreadPool(processes=num_threads)
+        # if not num_threads:
+        #     num_threads = cpu_count()
+        self.thread_pool = ThreadPool()
         self.variables = config_dict.get('preprocess_variables')
         
         if self.variables:
@@ -100,7 +101,7 @@ class PromptGenerator:
             kwargs.update(
                 frequency_penalty=2, 
                 presence_penalty=2,
-                temperature=1
+                temperature=1 # Exploration vs. Exploitation on some level
             )
         
         self.instruction.update_turn(turn_idx) # TODO find a more appropriate way
@@ -122,7 +123,6 @@ class PromptGenerator:
         )
         
         
-        
     def _decode_tokens(self, variable: Variable) -> Variable:
         
         def _decode_token(token: str):
@@ -130,41 +130,38 @@ class PromptGenerator:
             token_root = token_split[0]
             with self.variables_master_lock:
                 variable_lock = self.variables_locks[token_root]
-                
+            
             with variable_lock:
                 leaf_variable = self.variables.get(token_root)
+                
                 if not leaf_variable:
                     raise Exception(
                         f'{token_root} not defined in preprocess variables.'
                     )
-                    
+                
                 if leaf_variable.is_assignable(self.turn_idx):  
                     # Need to be queried      
 
                     log.debug(
                         f'From {variable.get("id", "init")} '
-                        f'Executig call #{leaf_variable._assign_cnt + 1} '
-                        f'to obtain variable {leaf_variable["id"]}'
+                        f'Executing call for assignment #{leaf_variable._assign_cnt + 1} '
+                        f'to obtain variable {leaf_variable["id"]} '
+                        f'using Endpoint {leaf_variable.get("endpoint", self.default_endpoint)}'
                     )
-                    # print(
-                    #     f'From {variable.get("id", "init")} '
-                    #     f'Executig call #{leaf_variable._assign_cnt + 1} '
-                    #     f'to obtain variable {leaf_variable["id"]}'
-                    # )
                     
                     sub_instruction = str(self._decode_tokens(leaf_variable,))   
-                
                     leaf_variable['response'] = self._get_endpoint(leaf_variable)(
                         sub_instruction,
                         **leaf_variable.endpoint_kwargs
                     )
-                    
+                                    
                     value = self.reduce(leaf_variable)
                     if value is None:
                         log.error(
                             'Multiple calls in the same turn might arise as'
                             'None reduction is observed'
                         )
+                        
                     leaf_variable.assign(
                         value,
                         turn_idx=self.turn_idx
@@ -177,8 +174,8 @@ class PromptGenerator:
         tokens = variable.get_tokens()
         for token, decoding_var__format in zip(
             tokens, 
-            self.thread_pool.map(_decode_token, tokens
-        )):
+            self.thread_pool.map(_decode_token, tokens, chunksize=cpu_count())
+        ):
             variable.replace(token, decoding_var__format)
 
         return variable
@@ -212,8 +209,8 @@ class PromptGenerator:
     def is_dynamic_prompt(self): 
         return not self.instruction.is_constant()
     
-    def backspace(self): 
-        [v.backspace() for v in self.variables.values()]
+    def backspace(self, turn_idx): 
+        [v.backspace(turn_idx) for v in self.variables.values()]
             
     def debug_prompt(self): return self.instruction.trace(turn_idx=self.turn_idx)
 

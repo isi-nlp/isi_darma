@@ -22,7 +22,7 @@ class GPTBot(BotAgent):
             default_endpoint='gpt3',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
-            num_threads=None,
+            num_threads=None, # NOT USED NOW
             allow_endpoint_override=True,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
@@ -107,7 +107,7 @@ class GPTBot(BotAgent):
                 # self.engine,
                 default_endpoint=self.default_endpoint,
                 few_shot_example=self.few_shot_example,
-                num_threads=num_threads
+                # num_threads=num_threads
             )
     
     def _get_turns(self) -> str:
@@ -125,7 +125,7 @@ class GPTBot(BotAgent):
             if ctx_len >= self.max_ctx_len:
                 break
             seed_turns = [turn] + seed_turns
-            
+        
         return seed_turns      
 
     def should_bot_respond(self, turns) -> bool:
@@ -148,7 +148,7 @@ class GPTBot(BotAgent):
             should_respond = self.should_bot_respond(turns)
             
         if should_respond: 
-            
+            # breakpoint()
             new_message_text = self.prompt_generator.run(
                 turns,
                 self.turn_idx
@@ -159,8 +159,10 @@ class GPTBot(BotAgent):
                 new_message_text = re.sub(rf"^{speaker_id}: ", "", new_message_text)
             
             new_message = {
-                "speaker_id": self.prompt_generator.title, 
+                "user_id": self.prompt_generator.title, 
                 "text": new_message_text, 
+                "data": {"speaker_id": self.prompt_generator.title},
+                "is_seed": False
             }
 
             self.context.append(new_message)
@@ -183,7 +185,7 @@ class GPTBot(BotAgent):
             list(str): list of popped context strings
         """
         self.turn_idx -= 1
-        self.prompt_generator.backspace()
+        self.prompt_generator.backspace(self.turn_idx)
         return [self.context.pop() for _ in range(2)]
     
     def force_completion(self):
@@ -192,8 +194,11 @@ class GPTBot(BotAgent):
         Returns:
             dict: similar output to talk
         """
-
-        resp = self.endpoints[self.default_endpoint](messages=self.context, engine=self.engine)
+        
+        # TODO
+        resp = self.endpoints[self.default_endpoint].query_completion_api(
+            prompt=self.context, engine=self.engine
+        )
 
         final_message_text = resp
         final_message_text = final_message_text.strip()
