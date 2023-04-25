@@ -8,8 +8,7 @@ A script meant for interactive analysis and automated processes for fast experim
 
 import os, argparse
 import re, json, textwrap
-from boteval import log
-from logging import CRITICAL
+import logging as log
 import numpy as np
 from bots import GPTBot
 from tabulate import tabulate
@@ -38,7 +37,6 @@ class MixedBots:
                 persona_id=persona_id,
                 # few_shot_example=existing_conv,
                 max_ctx_len=max_ctx_len,
-                # num_threads=1,
             )
             for persona_id, _, _ in self.personas
         ]
@@ -47,6 +45,7 @@ class MixedBots:
             int((self.print_width-1)/len(self.personas))
         
         self.threadPool = ThreadPool()
+
         
     def __len__(self) -> int:
         return len(self.bots)
@@ -83,14 +82,8 @@ class MixedBots:
     def _iterate(self, func):
         return self.threadPool.map(func, self.bots)
             
-    def hear(self, msg, is_seed=False):  
-        self._iterate(lambda x: x.hear(dict(
-            text=msg['text'],
-            is_seed = is_seed, 
-            user_id=msg['speaker_id'],
-            thread_id=-1,
-            data={"speaker_id": msg['speaker_id']}
-        )))       
+    def hear(self, msg, is_seed=False):     
+        self._iterate(lambda x: x.hear(msg, is_seed=is_seed))       
     
     def feed(self, txt):     
         self._iterate(lambda x: x.feed(txt))     
@@ -135,7 +128,7 @@ class MixedBots:
     def view_seed(self):
         def get_seed(b):
             return {
-                'text': b._get_turns(b.context)
+                'text': b.get_seed_turns()
             }
         print('Seeds')
         seeds = self._iterate(get_seed)
@@ -239,7 +232,6 @@ def load_persona_confs(confs_filename='persona_configs.json'):
                 print(f'# {i+1} :: id({conf["id"]})')
                 print(f'# Notes: {conf["notes"]}')
                 print(f'# Title: {conf["title"]}')
-                print(f'# default_endpoint:', {conf.get('default_endpoint', 'default')})
                 print('# Instruction:')
                 print_wrap_text(str(conf['instruction']))
                 print("="*PRINT_WIDTH)
@@ -318,14 +310,10 @@ def interactive_session(
             print(bots.backspace())
 
         def retry():
-            print('Removing last iteration.. & Giving another response..')
             bots.backspace()
             bots.talk()
             
         def respond_with_mturk_history():
-            if not mturk_chats:
-                print_wrap_text('Mturk Chats are not available for this conversation, please try another option.')
-                return
             choice_idx = np.random.choice(np.arange(len(mturk_chats)))
             line = mturk_chats[choice_idx][bots.get_turn_idx()]['text']
             print_wrap_text(f'[User {final_user}]: {line}')
@@ -452,15 +440,11 @@ if __name__ == "__main__":
     PRINT_WIDTH = args.print_width
     
     if args.suppress_log:
-        import sys
-        log.critical('Suppress logs below CRITICAL')
-        log.remove()
-        log.add(sys.stderr, level="CRITICAL") 
-
+            log.getLogger().setLevel(log.CRITICAL)
     # log.getLogger().setLevel(log.DEBUG)
 
     if args.inter:
-        mturk_data_dir = './data/data'
+        mturk_data_dir = '/mnt/c/Users/basem/Projects/ISI/isi_darma/boteval-darma-task/data/data'
         
         # interactive_session()
         # TODO inject mturk responses into conversation

@@ -1,5 +1,5 @@
 import re
-from boteval import log
+import logging as log
 
 ROOT_TOKEN_REGEX = '([\w]+)'
 TOKEN_REGEX = '<([\w-]+)>'
@@ -61,7 +61,6 @@ class Variable:
                 'Error parsing instruction, please ensure correct format'
                 f'of variable with id: ({self._parameters["id"]})'
             )
-            
         return sorted(instruction_raw, key = lambda x: x[1])
     
     def get_curr_instruction_statement(self, turn_idx:int) -> str:
@@ -93,7 +92,7 @@ class Variable:
         self._recent_turn = turn_idx
         for i, (statement, offset) in enumerate(reversed(self._instruction_raw)):
             if turn_idx >= offset:
-                self._instruction_raw[-i] = (updated_statement, offset)
+                self._instruction_raw[-i] = updated_statement
                 return
             
         log.critical(
@@ -147,7 +146,6 @@ class Variable:
         """
         if turn_idx:
             self._recent_turn = turn_idx
-            
         statement: str = self.get_curr_instruction_statement(self._recent_turn)
         decoding_placeholder =\
             "[\033[95m{cnt}\033[00m : \033[96m{decoding}\033[00m]"
@@ -217,14 +215,12 @@ class Variable:
                 f'{key}({self.get("id")}) = {value}'
             )
         
-    def backspace(self, turn_idx): 
+    def backspace(self): 
         """
         Goes back in time one step
         """
-        ass_ptrs = list(self._assignments.keys())
-        if len(ass_ptrs) and max(ass_ptrs) > turn_idx:
-            if self._assignments.get(self._assign_cnt):
-                self._assignments.__delitem__(self._assign_cnt)
-            self._assign_cnt -= 1
+        if self._assignments.get(self._assign_cnt):
+            self._assignments.__delitem__(self._assign_cnt)
+        self._assign_cnt -= 1
         
     def is_constant(self): return not self._variables and len(self._instruction_raw) <= 1
