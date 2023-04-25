@@ -30,7 +30,6 @@ class GPTBot(BotAgent):
         self.max_ctx_len = max_ctx_len
         self.few_shot_example = few_shot_example # e.g. nvc
         self.default_endpoint = default_endpoint
-        self.engine = engine 
         
         if engine:
             # TODO remove completely .. still used only for backward compatibility..
@@ -56,8 +55,8 @@ class GPTBot(BotAgent):
         self.context = []
         
         log.info(
-            f"Initialized GPT bot with {engine=}"
-            f"{self.prompt_generator.id=}"
+            f"Initialized GPT bot with {default_endpoint=}\n"
+            f"{self.prompt_generator.id=}\n"
             f"{self.prompt_generator.title=}\n"
             f"{self.prompt_generator.instruction._instruction_raw=}")
         
