@@ -42,7 +42,6 @@ class ChatGPT(Endpoint):
         
 
     def format_turn_text(self, turn): 
-        
         try: 
             speaker_id = turn['data']['speaker_id']
         except Exception as e: 
@@ -80,10 +79,13 @@ class ChatGPT(Endpoint):
         seed_turns =[turn for turn in turns if turn['is_seed']]
         non_seed_turns = [turn for turn in turns if not turn['is_seed']]
                 
-        messages = [
-            {"role": "system", "content": str(instruction)}, 
-        ]
         
+        if kwargs.get("exclude_topic"):
+            messages = []
+        else:
+            messages = [
+                {"role": "system", "content": str(instruction)}, 
+            ]
         
         if seed_turns:
             seed_turn_texts = [self.format_turn_text(turn) for turn in seed_turns]
@@ -93,10 +95,16 @@ class ChatGPT(Endpoint):
             )
         
         for t in non_seed_turns: 
+            # TODO hardcoded values.. need to be changed
             if t['user_id'] != "Moderator": 
                 role = "user"
             else: 
                 role = "assistant"
+                
+            role_override = kwargs.get('role')
+            if role_override is not None:
+                role = role_override
+                
             messages.append({
                 "role": role, 
                 "content": self.format_turn_text(t)
