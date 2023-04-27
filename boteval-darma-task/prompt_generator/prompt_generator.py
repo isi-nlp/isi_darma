@@ -32,7 +32,7 @@ class PromptGenerator:
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
-                #  num_threads:int=None
+                 num_threads:int=None
                 ):
         """
 
@@ -53,9 +53,9 @@ class PromptGenerator:
         self.instruction: Variable = Variable(config_dict) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
-        # if not num_threads:
-        #     num_threads = cpu_count()
-        self.thread_pool = ThreadPool()
+        if not num_threads:
+            num_threads = cpu_count()
+        self.thread_pool = ThreadPool(processes=num_threads)
         self.variables = config_dict.get('preprocess_variables')
         
         if self.variables:
