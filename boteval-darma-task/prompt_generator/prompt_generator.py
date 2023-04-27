@@ -174,7 +174,7 @@ class PromptGenerator:
         tokens = variable.get_tokens()
         for token, decoding_var__format in zip(
             tokens, 
-            self.thread_pool.map(_decode_token, tokens, chunksize=cpu_count())
+            self.thread_pool.map(_decode_token, tokens)
         ):
             variable.replace(token, decoding_var__format)
 
