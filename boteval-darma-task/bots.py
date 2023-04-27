@@ -136,6 +136,18 @@ class GPTBot(BotAgent):
 
         return should_respond
 
+    def format_response(self, text:str): 
+        return text 
+    
+    def init_chat_context(self, init_messages:List[Dict[str, Any]]): 
+        
+        self.reset()  # important to reset context, otherwise conversations will get mixed up 
+        for msg in init_messages:
+            self.bot_agent.hear(msg)
+            
+        assert len(init_messages) == len(self.bot_agent.context)
+
+
     def talk(self, n_users=None, timeout=None):
         
         turns = self._get_turns()

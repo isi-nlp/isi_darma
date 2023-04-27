@@ -55,6 +55,10 @@ ratings:
     choices: *choices
   - question:  To what degree did the moderator convince you to change your behavior?
     choices: *choices
+  - question: Let us know if you have any other thoughts about the chatbot (e.g. how would it have been more effective?) or feedback about the task itself.
+    freetext: 
+      default: none 
+      required: False
 
 # rename _mturk -> mturk to enable crowd backend
 mturk: 
