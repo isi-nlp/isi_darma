@@ -143,9 +143,9 @@ class GPTBot(BotAgent):
         
         self.reset()  # important to reset context, otherwise conversations will get mixed up 
         for msg in init_messages:
-            self.bot_agent.hear(msg)
+            self.hear(msg)
             
-        assert len(init_messages) == len(self.bot_agent.context)
+        assert len(init_messages) == len(self.context)
 
 
     def talk(self, n_users=None, timeout=None):
