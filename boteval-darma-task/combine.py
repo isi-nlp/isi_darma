@@ -15,7 +15,9 @@ def combine(dir_path):
     combined_json = []
     for json_file in json_files:
         with open(os.path.join(dir_path, json_file)) as f:
-            combined_json.append(json.load(f))
+            data = json.load(f)
+            data['id'] = data['name']
+            combined_json.append(data)
 
     # write combined json to file 
     with open(os.path.join(dir_path, "combined.json"), "w") as f:
