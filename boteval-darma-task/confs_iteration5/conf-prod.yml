@@ -102,7 +102,7 @@ flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-it3-prod.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it5-prod.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
