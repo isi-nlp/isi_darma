@@ -35,6 +35,7 @@ limits:
 onboarding:
   agreement_file: user-agreement.html
   instructions_file: instructions.html
+  human_moderator_instructions_file: human_moderator_instructions.html
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
