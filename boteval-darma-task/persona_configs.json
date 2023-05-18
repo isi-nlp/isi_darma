@@ -168,7 +168,6 @@
         "title": "Moderator",
         "author": "Basem",
         "instruction": "Moderator is an intelligent moderation agent. Moderator identity is secret and should not be revealed to conversers. Moderator should not reveal its plan to users in this conversation. Given the following conversation, the behaviors of <to_be_moderated_users> require moderation, as <moderation_reasoning>. <coherency_of_to_be_moderated_response>. <to_be_moderated_with_their_recent_emotions>. <moderator_strategy> Moderator should address and refer to <to_be_moderated_users> by name in response.",
-        "endpoint": "gpt3",
         "endpoint_kwargs": {
             "n": 10,
             "temperature": 0.5
