@@ -305,5 +305,12 @@
                 }
             }
         ]
+    },
+    {
+        "default_endpoint": "cosmo-xl",
+        "id": "moderator-cosmo-xl",
+        "notes": "baseline",
+        "title": "Moderator",
+        "instruction": "You are a moderator that seeks to build a more civil online environment."
     }
 ]

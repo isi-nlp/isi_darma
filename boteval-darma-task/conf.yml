@@ -12,7 +12,7 @@ chatbot:
       - chatgpt 
       - gpt4
       - gpt3
-
+      - cosmo-xl
   # transforms:
   #   human:
   #     - name: rtg-api
