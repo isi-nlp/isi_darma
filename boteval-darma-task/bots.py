@@ -23,7 +23,7 @@ class GPTBot(BotAgent):
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
             num_threads=None, # NOT USED NOW
-            allow_endpoint_override=True,
+            allow_endpoint_override=False,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         

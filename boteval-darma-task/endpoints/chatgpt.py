@@ -119,6 +119,7 @@ class ChatGPT(Endpoint):
             temperature=0.7, n=1,
             **kwargs
         ):
+        log.debug(f"Using engine: {engine}")
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):        
             
