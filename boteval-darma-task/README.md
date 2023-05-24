@@ -24,8 +24,8 @@ The `darmaeval.nginx.conf` has following URL mappings:
 | `/boteval`   |  http://127.0.0.1:7070/boteval |
 | `/boteval-dev1`   |  http://127.0.0.1:7071/boteval-dev1 |
 | `/boteval-dev2`   |  http://127.0.0.1:7072/boteval-dev2 |
-| `/boteval-stage`   |  http://127.0.0.1:7074/boteval-stage |
-| `/boteval-prod`   |  http://127.0.0.1:7075/boteval-prod |
+| `/boteval-stage`   |  http://127.0.0.1:7073/boteval-stage |
+| `/boteval-prod`   |  http://127.0.0.1:7074/boteval-prod |
 
 By respecting these mappings help avoid any potential conflicts/collisions. This way, we can use same remote node with single SSL/nginx for development and production. 
 For all these URL mappings, the `flask_config.SERVER_NAME` is same which is `darmaeval.cutelab.name`. We need to explicitely inform the app about its url prefix `/boteval` via CLI, as described in the following sections. 
@@ -47,18 +47,18 @@ uwsgi --http 127.0.0.1:7072 --module boteval.app:app --pyargv "darma-task -d -b 
 ### Staging
 
 ```bash
-python  -m boteval darma-task -p 7074 -b /boteval-stage
+python  -m boteval darma-task -p 7073 -b /boteval-stage
 # or with uwsgi (recommended)
-uwsgi --http 127.0.0.1:7074 --module boteval.app:app\
+uwsgi --http 127.0.0.1:7073 --module boteval.app:app\
    --pyargv "darma-task -b /boteval-stage"
 ```
 
 ### Production
 
 ```bash
-python  -m boteval darma-task -p 7075 -b /boteval-prod
+python  -m boteval darma-task -p 7074 -b /boteval-prod
 # or with uwsgi (recommended)
-uwsgi --http 127.0.0.1:7075 --module boteval.app:app \
+uwsgi --http 127.0.0.1:7074 --module boteval.app:app \
     --pyargv "darma-task -b /boteval-prod"
 ```
 

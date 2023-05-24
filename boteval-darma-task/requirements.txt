@@ -1,2 +1,4 @@
 openai>=0.23
 requests
+textwrap
+loguru

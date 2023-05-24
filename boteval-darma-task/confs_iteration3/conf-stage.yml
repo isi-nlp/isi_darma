@@ -9,8 +9,8 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-002
-    persona_id: wisebeing
+    engine: gpt-3.5-turbo
+    persona_id: em1
 
 #  transforms:
 #    human:
@@ -23,13 +23,14 @@ chatbot:
 #          api_url: http://localhost:6062/nllb/translate
 #          src_lang: eng_Latn
 #          tgt_lang: fra_Latn
+#
 
 limits:
-  max_threads_per_user: 10
-  max_threads_per_topic: &max_assignments 10
-  max_turns_per_thread: 6
-  reward: &reward '0.5' # dollars
-  
+  max_threads_per_user: 50
+  max_threads_per_topic: &max_assignments 5
+  max_turns_per_thread: 4
+  reward: &reward '1.5' # dollars
+
 onboarding:
   agreement_file: user-agreement.html
   instructions_file: instructions.html
@@ -54,7 +55,7 @@ ratings:
     choices: *choices
 
 # rename _mturk -> mturk to enable crowd backend
-mturk: 
+mturk:
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
     sandbox: true  # sandbox: false to go live
@@ -67,10 +68,10 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot (Adult Content)'
+    Title: 'Evaluate a moderator persona (Ver. E) (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
-    QualificationRequirements: 
+    Description: Evaluate a moderator chatbot persona after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    QualificationRequirements:
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
          LocaleValues:
@@ -78,10 +79,10 @@ mturk:
             - Country: CA
             - Country: GB
             - Country: AU
-      #    ActionsGuarded: DiscoverPreviewAndAccept
+         ActionsGuarded: DiscoverPreviewAndAccept
       # -  QualificationTypeId: "00000000000000000040"  # 5k hits
       #    Comparator: GreaterThan
-      #    IntegerValues: [5000]
+      #    IntegerValues: [10000]
       #    ActionsGuarded: DiscoverPreviewAndAccept
       # -  QualificationTypeId: "00000000000000000060"  # adult content
       #    Comparator: EqualTo
@@ -89,21 +90,17 @@ mturk:
       #    ActionsGuarded: DiscoverPreviewAndAccept
       # -  QualificationTypeId: "000000000000000000L0"  # percentage approved
       #    Comparator: GreaterThan
-      #    IntegerValues: [95]
+      #    IntegerValues: [99]
       #    ActionsGuarded: DiscoverPreviewAndAccept
       # -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
       #    Comparator: DoesNotExist
-      #    ActionsGuarded: DiscoverPreviewAndAccept
-      # -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
-      #    Comparator: Exists
       #    ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-stage-eng-nvc-01.db'   # this will be placed in task dir
-  SQLALCHEMY_TRACK_MODIFICATIONS: false
+  DATABASE_FILE_NAME: 'sqlite-database-it3-stage.db'   # this will be placed in task dir
+  SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
-  

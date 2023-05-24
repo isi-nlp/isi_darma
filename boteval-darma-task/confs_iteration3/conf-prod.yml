@@ -9,8 +9,8 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-003
-    persona_id: th1
+    engine: gpt-3.5-turbo
+    persona_id: em1
 
 #  transforms:
 #    human:
@@ -26,10 +26,10 @@ chatbot:
 #
 
 limits:
-  max_threads_per_user: 10
-  max_threads_per_topic: &max_assignments 20
-  max_turns_per_thread: 6
-  reward: &reward '0.5' # dollars
+  max_threads_per_user: 50
+  max_threads_per_topic: &max_assignments 5
+  max_turns_per_thread: 4
+  reward: &reward '1.5' # dollars
 
 onboarding:
   agreement_file: user-agreement.html
@@ -58,7 +58,7 @@ ratings:
 mturk:
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
-    sandbox: true  # sandbox: false to go live
+    sandbox: false  # sandbox: false to go live
   seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
@@ -100,7 +100,7 @@ flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-gpt-persona-th1-01.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it3-prod.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
-  # SERVER_NAME: darmaeval.cutelab.name
-  # PREFERRED_URL_SCHEME: https
+  SERVER_NAME: darmaeval.cutelab.name
+  PREFERRED_URL_SCHEME: https
