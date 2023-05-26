@@ -1,6 +1,6 @@
 sudo apt-get update
-sudo apt install gcc
-sudo apt install g++
+sudo apt --assume-yes install gcc
+sudo apt --assume-yes install g++
 cd prosocial-dialog
 conda env create -f environment.yml
 eval "$(conda shell.bash hook)"
