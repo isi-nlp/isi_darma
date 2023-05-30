@@ -70,16 +70,15 @@ class PromptGenerator:
         
         log.info(f'Init PromptGenerator using {self.thread_pool._processes}')
 
-    def run(self, turns: List[str], turn_idx: int) -> str:
+    def run(self, turns: List[dict], turn_idx: int) -> str:
         """
 
         Args:
-            turns (str): concatentation of all past turns of the conversation
-            turn_idx (int): turn number in the conversation used to set args of
-            language model calls
+            turns (dict): list of dicts corresponding to all past turns of the conversation including the topic.
+            turn_idx (int): turn number in the conversation used to set args of language model calls.
 
         Returns:
-            str: bot response given the generated/constant prompt using the default lm
+            str: bot response given the generated/constant prompt using the default lm.
         """
         
         

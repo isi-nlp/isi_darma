@@ -107,7 +107,7 @@ In this particular sample variable there are few other supported optional argume
 
 ## Further Notes:
 
-- Note that `endpoint_kwargs` is not limited to the defined arguments by the endpoint (i.e emotion classifier, or gpt3-lm, etc.) call used, but can be extended seamlessly based on the definition of your created endpoint modules [a relative link](../endpoints/README.md) in your project structure.
+- Note that `endpoint_kwargs` is not limited to the defined arguments by the endpoint (i.e emotion classifier, or gpt3-lm, etc.) call used, but can be extended seamlessly based on the definition of your created [endpoint modules](../endpoints/README.md) in your project structure.
 
 Examples from defined `GPT3` endpoint:
 1. `"look_up"`: `-5`
