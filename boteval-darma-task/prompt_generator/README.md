@@ -122,3 +122,4 @@ Examples from defined `GPT3` endpoint:
 > If set to `true`, the constructed prompt would be in this order:
 > `<instruction>` \n `<context>` instead of `<context>` `<instruction>`
 > It is set to `false` by default for any `variable` in `preprocess_variables` for GPT3 endpoint defined in this project.
+> This argument is *not* supported in ChatGPT, and by default the behavior is the opposite: instruction first.
