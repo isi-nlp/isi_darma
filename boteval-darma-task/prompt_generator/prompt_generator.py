@@ -1,8 +1,11 @@
 import re
-from boteval import log
-from multiprocessing import Lock, cpu_count
-from multiprocessing.pool import ThreadPool
+from time import sleep
+from random import random
 from typing import List
+from multiprocessing import cpu_count
+from threading import Lock, Semaphore
+from multiprocessing.pool import ThreadPool
+from boteval import log
 from ._variable import Variable, ROOT_TOKEN_REGEX
 
 class PromptGenerator:
@@ -32,7 +35,8 @@ class PromptGenerator:
                  endpoints: dict,
                  few_shot_example=None,
                  default_endpoint:str='query_lm',
-                 num_threads:int=None
+                 max_num_active_threads:int=None,
+                #  num_threads:int=None
                 ):
         """
 
@@ -53,9 +57,8 @@ class PromptGenerator:
         self.instruction: Variable = Variable(config_dict) # Similar structure to variables
         self.few_shot_example = few_shot_example     
         
-        if not num_threads:
-            num_threads = cpu_count()
-        self.thread_pool = ThreadPool(processes=num_threads)
+        if not max_num_active_threads:
+            max_num_active_threads = max(cpu_count() - 1, 1)
         self.variables = config_dict.get('preprocess_variables')
         
         if self.variables:
@@ -63,12 +66,12 @@ class PromptGenerator:
                 x['id'] : Variable(x, leaf_variable=True) 
                 for x in self.variables
             }
-            self.variables_master_lock = Lock()
+            self.variables_master_lock = Semaphore(max_num_active_threads)
             self.variables_locks = {
                 k: Lock() for k in self.variables
             }
         
-        log.info(f'Init PromptGenerator using {self.thread_pool._processes}')
+        log.debug(f'Init PromptGenerator using {max_num_active_threads} max active threads')
 
     def run(self, turns: List[dict], turn_idx: int) -> str:
         """
@@ -121,59 +124,83 @@ class PromptGenerator:
             **{'persona_title': self.title, **kwargs}
         )
         
-        
+
     def _decode_tokens(self, variable: Variable) -> Variable:
         
         def _decode_token(token: str):
             token_split = re.findall(ROOT_TOKEN_REGEX, token)
             token_root = token_split[0]
-            with self.variables_master_lock:
-                variable_lock = self.variables_locks[token_root]
-            
-            with variable_lock:
-                leaf_variable = self.variables.get(token_root)
-                
-                if not leaf_variable:
-                    raise Exception(
-                        f'{token_root} not defined in preprocess variables.'
-                    )
-                
-                if leaf_variable.is_assignable(self.turn_idx):  
-                    # Need to be queried      
-
-                    log.debug(
-                        f'From {variable.get("id", "init")} '
-                        f'Executing call for assignment #{leaf_variable._assign_cnt + 1} '
-                        f'to obtain variable {leaf_variable["id"]} '
-                        f'using Endpoint {leaf_variable.get("endpoint", self.default_endpoint)}'
-                    )
-                    
-                    sub_instruction = str(self._decode_tokens(leaf_variable,))   
-                    leaf_variable['response'] = self._get_endpoint(leaf_variable)(
-                        sub_instruction,
-                        **leaf_variable.endpoint_kwargs
-                    )
-                                    
-                    value = self.reduce(leaf_variable)
-                    if value is None:
-                        log.error(
-                            'Multiple calls in the same turn might arise as'
-                            'None reduction is observed'
-                        )
+            wait_interval = random() *0.02
+            attempts = 0
+            while True:
+                attempts += 1
+                is_variable_master_locked = self.variables_master_lock.acquire(blocking=False)
+                ################  start critical section 1 (1.1, 1.2) ###############
+                if is_variable_master_locked:
+                    variable_lock = self.variables_locks[token_root]
+                    if variable_lock.acquire(blocking=False):
+                        # breakpoint()
+                        # log.critical(f"acquired variable ({token_root}) lock")
+                        ################  start critical section 2 ###############
+                        leaf_variable = self.variables.get(token_root)
                         
-                    leaf_variable.assign(
-                        value,
-                        turn_idx=self.turn_idx
-                    )
+                        if not leaf_variable:
+                            raise Exception(
+                                f'{token_root} not defined in preprocess variables.'
+                            )
+                        
+                        if leaf_variable.is_assignable(self.turn_idx):  
+                            # Need to be queried      
+
+                            log.debug(
+                                f'From {variable.get("id", "init")} '
+                                f'Executing call for assignment #{leaf_variable._assign_cnt + 1} '
+                                f'to obtain variable {leaf_variable["id"]} '
+                                f'using Endpoint {leaf_variable.get("endpoint", self.default_endpoint)}'
+                            )
+                            
+                            sub_instruction = str(self._decode_tokens(leaf_variable,))   
+                            leaf_variable['response'] = self._get_endpoint(leaf_variable)(
+                                sub_instruction,
+                                **leaf_variable.endpoint_kwargs
+                            )
+                                            
+                            value = self.reduce(leaf_variable)
+                            if value is None:
+                                log.error(
+                                    'Multiple calls in the same turn might arise as'
+                                    'None reduction is observed'
+                                )
+                                
+                            leaf_variable.assign(
+                                value,
+                                turn_idx=self.turn_idx
+                            )
+                        ################### end critical section 2 ##################
+                        variable_lock.release()    
+                        ################### end critical section 1.1 ##################
+                        self.variables_master_lock.release()
+                        break
+                else:
+                    ################### end critical section 1.2 ##################
+                    self.variables_master_lock.release()
+                
+                wait = attempts**2.0 * wait_interval
+                # log.critical(f"Busy variable ({token_root}) lock.. gonna wait for {wait} seconds")
+                sleep(wait)
             
+            # log.critical(f"evaluated variable ({token_root})")
             # Support other value formats such as 'value-list'
             token_format = '-'.join(token_split[1:])
             return leaf_variable, token_format
         
         tokens = variable.get_tokens()
+        # log.critical(f"evaluate {variable._parameters['id']}...\n but first to decode tokens: ({tokens})")
+
+        
         for token, decoding_var__format in zip(
             tokens, 
-            self.thread_pool.map(_decode_token, tokens)
+            ThreadPool().map(_decode_token, tokens)
         ):
             variable.replace(token, decoding_var__format)
 

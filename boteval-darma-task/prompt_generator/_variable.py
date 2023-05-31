@@ -13,7 +13,7 @@ class Variable:
     """
     def __init__(self, parameters, leaf_variable=False):
         if not isinstance(parameters, dict):
-            parameters = {'id': '_root', 'instruction': parameters}
+            parameters = {'id': '_generated', 'instruction': parameters}
         self._parameters = parameters
         self._instruction_raw = self._process_raw_instructions(
             self._parameters.get('instruction')
