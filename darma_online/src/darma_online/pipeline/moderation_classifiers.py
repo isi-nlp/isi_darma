@@ -8,8 +8,6 @@ import os
 
 API_KEY = 'AIzaSyC30WbnABE2zjzK4Be58ytkatxgOC3yg9I'
 
-# TODO: Experiment with toxic-bert and use transformer-interpret for check which tokens are toxic
-
 class ModerationClassifier(ABC):
 
     @abstractmethod
@@ -29,11 +27,15 @@ class PerspectiveAPIModerator(ModerationClassifier):
             static_discovery=False,
         )
 
-        self.toxicity_threshold = config["toxicity_threshold"]
         self.logger = logger
-        self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
-        self.csv_path = config["intersection_scores_path"]
 
+        self.toxicity_threshold = config["toxicity_threshold"]
+        self.use_moderator = config["use_moderator"]
+        self.moderator_endpoint = "http://128.9.37.116:5050/moderation-prediction-classifier"
+        if not self.use_moderator:
+            self.logger.info("Not using moderator. Moderator score will be set to 1 for all comments!")
+
+        self.csv_path = config["intersection_scores_path"]
         COLUMNS = ['comment', 'moderator_score', 'perspec_tox_score', 'det_behav_type', 'namecalling' ,'ad_hominem_attacking', 'obscene_vulgar','dehumanizing']
         self.intersect_csv = "intersection_scores"
         self.mod_agree_csv = "mod_agree"
@@ -69,10 +71,15 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         try:
             perspec_response = self.perspec_client.comments().analyze(body=analyze_request).execute()
-            perspec_decision, perspec_score, behav_type = self.map_behavtypes(perspec_response)
-            moderator_score = self.get_moderator_response(comment)
-            final_decision = self.intersect_moderation(comment, moderator_score, perspec_score, behav_type)
-            return final_decision, perspec_score, behav_type
+            perspec_decision, perspec_score_mapping, perspec_tox_score, perspec_behav_score, behav_type = self.map_behavtypes(perspec_response)
+
+            if self.use_moderator:
+                moderator_score = self.get_moderator_response(comment)
+            else:
+                moderator_score = 1
+
+            final_decision = self.intersect_moderation(comment, moderator_score, perspec_tox_score, perspec_score_mapping['behav_types'], behav_type)
+            return final_decision, perspec_tox_score, perspec_behav_score, behav_type
 
         except Exception as e:
             if e.status_code == 429:
@@ -100,8 +107,10 @@ class PerspectiveAPIModerator(ModerationClassifier):
 
         self.logger.info(f"Perspective Toxicity scores after mapping: {mapping}")
         behav_type = max(mapping["behav_types"].items(), key=operator.itemgetter(1))[0]
-        score = mapping["behav_types"][behav_type]
-        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with behav score = {score} and toxicity score = {max(mapping['toxicity'], mapping['severe_toxicity'])}")
+        tox_score = max(mapping['toxicity'], mapping['severe_toxicity'])
+        behav_score = mapping["behav_types"][behav_type]
+
+        self.logger.info(f"Current max Toxicity Behaviour type is '{behav_type}' with behav score = {behav_score} and toxicity score = {tox_score}")
 
         if self.needs_moderation(mapping["toxicity"]) or self.needs_moderation(mapping["severe_toxicity"]):
             needs_mod = True
@@ -109,7 +118,7 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.info(f'Perspective Toxicity score: {mapping["toxicity"]} or Severe Toxicity score: {mapping["severe_toxicity"]} is below threshold {self.toxicity_threshold}.')
             needs_mod = False
 
-        return needs_mod, mapping, behav_type
+        return needs_mod, mapping, tox_score, behav_score, behav_type
 
     def get_moderator_response(self, comment):
         request_data = { "0": { "comment" : comment } }
@@ -125,13 +134,11 @@ class PerspectiveAPIModerator(ModerationClassifier):
             self.logger.error(f"Exception occurred while getting moderator response: {e}")
             return 0
 
-    def intersect_moderation(self, comment, moderator_score, perspec_score, behav_type):
-        perspec_tox_score = max(perspec_score['toxicity'], perspec_score['severe_toxicity'])
-        behav_scores = perspec_score["behav_types"]
+    def intersect_moderation(self, comment, moderator_score, perspec_tox_score, behav_scores, behav_type):
         data_row = [comment, moderator_score, perspec_tox_score, behav_type, behav_scores["namecalling"], behav_scores["ad-hominem_attacking"], behav_scores["obscene/vulgar"], behav_scores["dehumanizing"]]
 
         if self.needs_moderation(perspec_tox_score) and self.needs_moderation(moderator_score):
-            self.logger.info(f"Moderator and Perspective API both agree that comment needs moderation.")
+            self.logger.info("Moderator and Perspective API both agree that comment needs moderation.")
             # TODO: Also save hashid of comment
             self.mod_agree_df = self.dump_data(self.mod_agree_df, data_row, self.mod_agree_csv)
             return True

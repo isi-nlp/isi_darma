@@ -3,7 +3,7 @@ chat_dir: data
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: chat_topics_eng.json
+  topics_file: new_chat_topics.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
@@ -13,19 +13,6 @@ chatbot:
       - chatgpt 
       - gpt4
       - gpt3
-
-#  transforms:
-#    human:
-#      - name: rtg-api
-#        args:
-#          api_url: http://localhost:6060/many-eng/v1/translate
-#    bot:
-#      - name: nllb-api
-#        args:
-#          api_url: http://localhost:6062/nllb/translate
-#          src_lang: eng_Latn
-#          tgt_lang: fra_Latn
-#
 
 limits:
   max_threads_per_user: 50
@@ -44,20 +31,28 @@ onboarding:
     #know_french: I can read and write fluently in French and I agree to write in French in this task.
 
 ratings:
-  - question: How Coherent was the conversation?
+  - question: Did the moderator make specific suggestions for the given conversation to facilitate cooperation? 
     choices: &choices
       - Not at all
       - Mostly not
       - So-so
       - Somewhat
       - Very
-  - question: How likely are you to continue chatting with the moderator?
+  - question: Was the moderator impartial? 
     choices: *choices
-  - question: To what degree did the moderator understand your point of view?
+  - question: Did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive) 
     choices: *choices
-  - question:  To what degree did the moderator convince you to change your behavior?
+  - question:  Did you (the user) become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm) 
     choices: *choices
-  - question: Let us know if you have any other thoughts about the chatbot (e.g. how would it have been more effective?) or feedback about the task itself.
+  - question: How much did you agree with the arguments/viewpoints of the user that you were acting as?
+    choices: *choices
+  - question: How much did you like the person that you were acting as?
+    choices: *choices
+  - question: How could the moderator have been more effective? (e.g. reduce repetition, less generic suggestions, more examples, etc.) 
+    freetext: 
+      default: none 
+      required: False
+  - question: How can we improve the task design or survey questions? 
     freetext: 
       default: none 
       required: False
@@ -78,7 +73,7 @@ mturk:
     Reward: *reward
     Title: 'Evaluate a moderator persona (Ver. E) (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot persona after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    Description: Evaluate a moderator after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
     QualificationRequirements:
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
@@ -108,7 +103,7 @@ flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-it3-stage.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it5-stage.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https

@@ -257,21 +257,22 @@ def main():
     else: 
         bot_ids = [
             # just added these two
-            "dyn-2nd-chatgpt",
+            # "dyn-2nd-chatgpt",
             # "dyn-2nd-gpt3",  # TODO DEFAULT ENDPOINT SET BY DEFAULT
 
             # "goto_interest_dynamic_strategy_simple", 
-            "witty", 
+            # "witty", 
             # "goto_interest_simple",
             # "goto_interest_colloquial", 
             # "empathetic_colloquial",
             # "cognitive_reappraisal_paraphrase_suggestor", 
             # "mirror_simple",
             # "stern",
-            "wisebeing",
+            # "wisebeing",
             # "moderator",
             # "persuasive",
-            # "sarcastic"
+            # "sarcastic",
+            "socratic"
         ]
 
     with open(args["seed_topic_path"], "r") as f:

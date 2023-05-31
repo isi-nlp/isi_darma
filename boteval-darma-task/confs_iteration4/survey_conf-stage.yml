@@ -1,8 +1,8 @@
-chat_dir: data
+chat_dir: survey-data
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: chat_topics_eng.json
+  topics_file: mturk_chat_seed_it3.json
   #bot_name: hf-transformers
   #bot_args:
   #  model_name: facebook/blenderbot_small-90M
@@ -12,53 +12,35 @@ chatbot:
       - chatgpt 
       - gpt4
       - gpt3
-      - cosmo-xl
-  # transforms:
-  #   human:
-  #     - name: rtg-api
-  #       args:
-  #         api_url: http://localhost:6060/many-eng/v1/translate
-  #   bot:
-  #     - name: nllb-api
-  #       args:
-  #         api_url: http://localhost:6062/nllb/translate
-  #         src_lang: eng_Latn
-  #         tgt_lang: deu_Latn
-  #         # tgt_lang: fra_Latn
   
 limits:
-  max_threads_per_user: 10
-  max_threads_per_topic: &max_assignments 10
-  max_turns_per_thread: 1
-  reward: &reward '0.01' # dollars
+  max_threads_per_user: 100
+  max_threads_per_topic: &max_assignments 4
+  max_turns_per_thread: 0
+  reward: &reward '0.3' # dollars
   
 onboarding:
-  agreement_file: user-agreement.html
-  instructions_file: instructions.html
-  simple_instructions_file: simple_instructions.html
+  agreement_file: survey-user-agreement.html
+  instructions_file: survey_instructions.html
+  simple_instructions_file: survey_simple_instructions.html
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
-    # know_french: I can read and write fluently in German and I agree to write in German in this task.
 
 ratings:
-  - question: How Coherent was the conversation?
+  - question: How coherent was the conversation?
     choices: &choices
       - Not at all
       - Mostly not
       - So-so
       - Somewhat
       - Very
-  - question: How likely are you to continue chatting with the moderator?
+  - question: If you were the user, how likely are you to continue chatting with the moderator?
     choices: *choices
-  - question: To what degree did the moderator understand your point of view?
+  - question: How well did it seem like the moderator understand the user's point of view?
     choices: *choices
-  - question:  To what degree did the moderator convince you to change your behavior?
+  - question:  How successful was the moderator in convincing to change the user's behavior?
     choices: *choices
-  - question: Let us know if you have any other thoughts about the chatbot (e.g. how would it have been more effective?) or feedback about the task itself.
-    freetext: 
-      default: none 
-      required: False
 
 # rename _mturk -> mturk to enable crowd backend
 mturk: 
@@ -74,9 +56,9 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator chatbot [DEV]'
+    Title: 'Evaluate a moderator [Stage]'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator chatbot after conversing with it. 
+    Description: Evaluate a moderator after reading a conversation that it has completed with a user.  
     QualificationRequirements: 
       -  QualificationTypeId: "00000000000000000071"  # locale qualification
          Comparator: In
@@ -96,7 +78,7 @@ mturk:
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'dev.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it4-survey-stage.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https

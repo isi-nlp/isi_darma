@@ -23,14 +23,13 @@ class GPTBot(BotAgent):
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
             num_threads=None, # NOT USED NOW
-            allow_endpoint_override=True,
+            allow_endpoint_override=False,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
         self.max_ctx_len = max_ctx_len
         self.few_shot_example = few_shot_example # e.g. nvc
         self.default_endpoint = default_endpoint
-        self.engine = engine 
         
         if engine:
             # TODO remove completely .. still used only for backward compatibility..
@@ -56,8 +55,8 @@ class GPTBot(BotAgent):
         self.context = []
         
         log.info(
-            f"Initialized GPT bot with {engine=}"
-            f"{self.prompt_generator.id=}"
+            f"Initialized GPT bot with {default_endpoint=}\n"
+            f"{self.prompt_generator.id=}\n"
             f"{self.prompt_generator.title=}\n"
             f"{self.prompt_generator.instruction._instruction_raw=}")
         
@@ -136,6 +135,18 @@ class GPTBot(BotAgent):
         log.debug(f"Determined whether bot should respond: {should_respond}")
 
         return should_respond
+
+    def format_response(self, text:str): 
+        return text 
+    
+    def init_chat_context(self, init_messages:List[Dict[str, Any]]): 
+        
+        self.reset()  # important to reset context, otherwise conversations will get mixed up 
+        for msg in init_messages:
+            self.hear(msg)
+            
+        assert len(init_messages) == len(self.context)
+
 
     def talk(self, n_users=None, timeout=None):
         

@@ -122,9 +122,12 @@ class ChatGPT(Endpoint):
             max_timeout_rounds = 10,
             **kwargs
         ):
+        log.debug(f"Using engine: {engine}")
+
         for i in range(max_timeout_rounds):        
             if i > 0:
                 log.critical(f'GPT timeout - retry #{i}')
+            
             log.debug(f"Input messages: {messages}")
             
             try:

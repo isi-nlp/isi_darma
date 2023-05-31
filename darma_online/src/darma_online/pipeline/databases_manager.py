@@ -21,6 +21,13 @@ class DatabaseManager:
                 self.logger.error(f"Error reading database from {path}", exc_info=True)
                 self.logger.debug(f"Returning empty database")
                 return {}
+            except FileNotFoundError:
+                self.logger.error(f"Database file not found at {path}", exc_info=True)
+                # Create the file if not found
+                with open(path, 'w') as new_file:
+                    new_file.write("{}")
+                self.logger.debug(f"Created new database file at {path}. Retrying read.")
+                return self.read_db(path)
 
     def add_optout_user(self, username: str, dialogue_str: str):
         self.optout_db[username] = { "dialogue": dialogue_str }
