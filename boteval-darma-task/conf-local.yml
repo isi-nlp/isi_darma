@@ -12,7 +12,8 @@ chatbot:
       - chatgpt 
       - gpt4
       - gpt3
-
+      - cosmo-xl
+      - prosocial
   # transforms:
   #   human:
   #     - name: rtg-api
