@@ -1,7 +1,7 @@
 import os
 import openai
 from boteval import log
-from typing import List
+from typing import List, Dict
 from . import Endpoint
 
 class GPT3(Endpoint):
@@ -23,15 +23,49 @@ class GPT3(Endpoint):
                             " Please 'export OPENAI_KEY=<key>' and rerun."
                             " You may obtain key from https://beta.openai.com/account/api-keys")            
         openai.api_key = api_key
+  
+    def format_turns(self, turns: List[Dict]):
+        formatted_turns = [] 
+        for turn in turns: 
+            try: 
+                speaker_id = turn['data']['speaker_id']
+            except Exception as e: 
+                log.error(e)
+                log.error(f"Did not find ['data']['speaker_id'] field in turn: {turn}")
+                turn_text = turn['text']
+            
+            if f"{speaker_id}: " not in turn: 
+                turn_text = f"{speaker_id}: {turn['text']}"
+            else: 
+                turn_text = turn['text']
+                
+            formatted_turns.append([
+                turn_text, 
+                len(turn_text.strip().split()), 
+                turn['is_seed']
+            ])
+            
+        return formatted_turns
     
     def query(self, 
               instruction: str, 
-              turns:List[tuple],
+              turns:List[Dict],
               turn_idx: int,
               **kwargs):
         
+        # make transformations to turns as necessary
+        formatted_turns = self.format_turns(turns)
+        constructed_prompt = self._prompt_compose(instruction, formatted_turns, turn_idx, **kwargs)
+        
+        # breakpoint()
+        log.debug(
+            '# GPT3 DEBUG Processing:\n'
+            f'Instruction: \n"""\n {instruction}\n"""\n'
+            f'Input to GPT3 API:\n """\n {constructed_prompt}\n """"'
+        )
+        
         return self.query_completion_api(
-            self._prompt_compose(instruction, turns, turn_idx, **kwargs), 
+            constructed_prompt, 
             engine=self.engine,
             **kwargs
         )
@@ -42,10 +76,12 @@ class GPT3(Endpoint):
         Returns:
             str: Prepared and generated/constant prompt appended to turns properly to feed for completion llm call.
         """        
-        def prepare_context(turns: List[tuple]):
+        def prepare_context(turns: List[Dict]):
             # seed_turns = [x[0] for x in turns if x[-1]]
             # non_seed_turns = [x[0] for x in turns if not x[-1]]
-            all_turns = [t[0] for t in turns]
+            topic = turns[0][0] # NOT USED
+            all_turns = [f'user {t[0]}' for t in turns[1:]]
+            # all_turns = [topic] + all_turns
             _look_up = kwargs.get('look_up')
             if not _look_up:
                 return '\n'.join(all_turns)

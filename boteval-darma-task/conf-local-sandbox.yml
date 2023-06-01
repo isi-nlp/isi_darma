@@ -8,10 +8,12 @@ chatbot:
   #  model_name: facebook/blenderbot_small-90M
   bot_name: gpt
   bot_args:
-    engine: text-davinci-003
-    persona_id: wisebeing 
-    # 
-
+    engines: 
+      - chatgpt 
+      - gpt4
+      - gpt3
+      - cosmo-xl
+      - prosocial
   # transforms:
   #   human:
   #     - name: rtg-api

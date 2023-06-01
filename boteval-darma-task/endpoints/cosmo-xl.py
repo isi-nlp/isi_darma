@@ -1,29 +1,18 @@
 import os
+import re
 import openai
+import requests
 from boteval import log 
 from typing import Union, List, Dict
 from . import Endpoint
-import re 
 
-class ChatGPT(Endpoint):
 
-    name = 'chatgpt'
+class Cosmo_xl(Endpoint):
+
+    name = 'cosmo-xl'
     
     def __init__(self):
-        self.default_engine = 'gpt-3.5-turbo'
-        
-        # Override option for backward compatability
-        self.engine  = os.environ.get(
-            'OPENAI_ENGINE', 
-            self.default_engine
-        )  
-             
-        api_key = os.environ.get('OPENAI_KEY', '')
-        if not api_key:
-            raise Exception("OpenAI API key is not set."
-                            " Please 'export OPENAI_KEY=<key>' and rerun."
-                            " You may obtain key from https://beta.openai.com/account/api-keys")            
-        openai.api_key = api_key
+        self.aws_ec2_dns = "http://ec2-44-199-199-221.compute-1.amazonaws.com:7860/generate"
         
         
     def query(self, 
@@ -32,11 +21,10 @@ class ChatGPT(Endpoint):
               turn_idx: int,
               **kwargs):
         
-        formatted_messages = self._messages_compose(instruction, turns, turn_idx, **kwargs)
+        formatted_input = self._input_compose(instruction, turns, turn_idx, **kwargs)
         
         return self.query_completion_api(
-            messages= formatted_messages,  
-            engine=self.engine,
+            input_dict=formatted_input,
             **kwargs
         )
         
@@ -49,96 +37,64 @@ class ChatGPT(Endpoint):
             log.error(f"Did not find ['data']['speaker_id'] field in turn: {turn}")
             return turn['text']
             
-        # if text doesn't start with turn['user_id'], append: 
-        if not re.match(rf"^{speaker_id}: ", turn['text']): 
-            log.debug(f"`{speaker_id}` not in the beginning of turn text: `{turn['text']}`. Prepending it.")
-            turn_text = f"{speaker_id}: {turn['text']}"
+        # if text starts with turn['speaker_id'], remove.
+        if re.match(rf"^{speaker_id}: ", turn['text']): 
+            log.debug(f"`{speaker_id}` in the beginning of turn text: `{turn['text']}`. Removing it.")
+            turn_text = re.sub(rf"^{speaker_id}: ", '', turn['text'])
         else: 
             turn_text = turn['text']
         return turn_text
 
-    def _messages_compose(self, instruction:str, turns: List[Dict], turn_idx:int, **kwargs): 
+
+    def _input_compose(self, instruction:str, turns: List[Dict], turn_idx:int, **kwargs): 
         """
-        messages format for chatgpt endpoint (gpt-3.5-turbo). this can be easily parsed back to regular text for other plaintext endpoints
+        input format for cosmo-xl endpoint. this can be easily parsed back to regular text for other plaintext endpoints
         """
-        
-        # if kwargs.get('leaf_variable', False):
-        #     # TODO; add support for instruction after context; check gpt3 implementation            
-            
-        #     return [{
-        #         "role": "system", "content": "\n".join([instruction] + [t[0] for t in turns]).strip()
-        #     }]
-        
-        # else; root variable
         
         if kwargs.get('few_shot_example') == 'nvc':
-            few_shot_example = self.get_fewshot_example(turn_idx)
-            if few_shot_example != "":
-                instruction = f'{instruction}\n{few_shot_example}\n'
+            log.debug("cosmo-xl does not support few-shot example.")
         
         seed_turns =[turn for turn in turns if turn['is_seed']]
         non_seed_turns = [turn for turn in turns if not turn['is_seed']]
-                
-        
-        if kwargs.get("exclude_topic"):
-            messages = []
-        else:
-            messages = [
-                {"role": "system", "content": str(instruction)}, 
-            ]
-        
+
+        conversation_history = []
         if seed_turns:
-            seed_turn_texts = [self.format_turn_text(turn) for turn in seed_turns]
-            
-            messages.append(
-                {"role": "user", "content": "\n".join(seed_turn_texts).strip()}
-            )
+            conversation_history = [self.format_turn_text(turn) for turn in seed_turns]
         
         for t in non_seed_turns: 
-            # TODO hardcoded values.. need to be changed
-            if t['user_id'] != "Moderator": 
-                role = "user"
-            else: 
-                role = "assistant"
-                
-            role_override = kwargs.get('role')
-            if role_override is not None:
-                role = role_override
-                
-            messages.append({
-                "role": role, 
-                "content": self.format_turn_text(t)
-            })
-                    
-        return messages
+            conversation_history.append(self.format_turn_text(t))       
+
+        input_dict = {
+            "situation": "",
+            "instruction": "" if kwargs.get("exclude_topic") else str(instruction),
+            "conversation": conversation_history,
+        }
+
+        return input_dict
+
     
-    @staticmethod
+    # @staticmethod
     def query_completion_api(
-            messages: List[Dict[str,str]], engine:str,
-            frequency_penalty=0, presence_penalty=0,
-            temperature=0.7, n=1,
-            **kwargs
+            self,
+            input_dict: List[Dict[str,str]],
+            top_p=1,
+            temperature=0.7, 
+            n=1,
+            **kwargs,
         ):
-        log.debug(f"Using engine: {engine}")
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):        
             
-            log.debug(f"Input messages: {messages}")
+            log.debug(f"Input dictionary: {input_dict}")
             
+            input_dict["temperature"] = temperature
+            input_dict["top_p"] = top_p
+            input_dict["num_return_sequences"] = n
+
+            log.debug(f"Input dict: {input_dict}")
+            res = requests.get(self.aws_ec2_dns, json=input_dict)
             
-            response = openai.ChatCompletion.create(
-                model=engine,
-                messages = messages, 
-                temperature=temperature,
-                max_tokens=1024,
-                top_p=1,
-                n=n,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty,
-                stop=["user A:", "user B:", "user C:", "user D:"]
-            )
-            
-            response_text = response.choices[0]['message']['content'].strip() 
+            response_text = res.json()['responses'][0].strip() 
             
             log.debug(f"Output response: {response_text}")
                         
@@ -204,14 +160,3 @@ class ChatGPT(Endpoint):
         # if timeout, then return something generic
         timeout_response = "I don't really know what to say about that."
         return timeout_response
-    
-class GPT4(ChatGPT):
-    name = "gpt4"
-    
-    def __init__(self):
-        super().__init__()
-        self.default_engine = 'gpt-4'
-        self.engine = os.environ.get(
-            'OPENAI_ENGINE', 
-            self.default_engine
-        )
