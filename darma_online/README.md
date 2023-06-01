@@ -61,7 +61,7 @@ The `main.py` script takes the path to the configuration file as an arguments:
 Since the agent is deployed as a docker, the arguments to the `main.py` script can be modified in the `Dockerfile`. The next section discusses details about installing requirements and building the docker.
 
 ## Installation
-- (optional)The required packages are listed in `requirements.txt`. The requirements can be installed using `pip install -r requirements.txt`. This step is optional since the docker will be built with the required packages.
+- (optional) The required packages are listed in `requirements.txt`. The requirements can be installed using `pip install -r requirements.txt`. This step is optional since the docker will be built with the required packages.
 - The docker building and running process can be exceuted using shell scripts. To make the shell scripts executable use `chmod +x <script_name>`.
 - Then, the docker can be build using the shell script `build.sh`.
 
