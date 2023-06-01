@@ -2,7 +2,7 @@
 
 ---
 
-## v1.0.0 - Initial release
+## v1.0.0 - First major release
 
 - [Feature]: Continuous streaming of posts and comments on subreddit using praw
 - [Feature]: Integration with RTG 500-to-1 for MT from 500 languages to English
