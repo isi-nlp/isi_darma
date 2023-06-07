@@ -1,9 +1,11 @@
 import os
+import re 
 import openai
+from time import sleep
+from openai.error import RateLimitError
 from boteval import log 
 from typing import Union, List, Dict
 from . import Endpoint
-import re 
 
 class ChatGPT(Endpoint):
 
@@ -117,27 +119,36 @@ class ChatGPT(Endpoint):
             messages: List[Dict[str,str]], engine:str,
             frequency_penalty=0, presence_penalty=0,
             temperature=0.7, n=1,
+            max_timeout_rounds = 10,
             **kwargs
         ):
         log.debug(f"Using engine: {engine}")
-        max_timeout_rounds = 5
-        for _ in range(max_timeout_rounds):        
+
+        for i in range(max_timeout_rounds):        
+            if i > 0:
+                log.critical(f'GPT timeout - retry #{i}')
             
             log.debug(f"Input messages: {messages}")
             
-            
-            response = openai.ChatCompletion.create(
-                model=engine,
-                messages = messages, 
-                temperature=temperature,
-                max_tokens=1024,
-                top_p=1,
-                n=n,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty,
-                stop=["user A:", "user B:", "user C:", "user D:"]
-            )
-            
+            try:
+                response = openai.ChatCompletion.create(
+                    model=engine,
+                    messages = messages, 
+                    temperature=temperature,
+                    max_tokens=1024,
+                    top_p=1,
+                    n=n,
+                    frequency_penalty=frequency_penalty,
+                    presence_penalty=presence_penalty,
+                    stop=["user A:", "user B:", "user C:", "user D:"]
+                )
+            except RateLimitError:
+                time_to_sleep = 0.15
+                log.critical(f'OpenAI RateLimitError - sleeping for {time_to_sleep} then retrying..')
+                sleep(time_to_sleep)
+                continue
+                
+                
             response_text = response.choices[0]['message']['content'].strip() 
             
             log.debug(f"Output response: {response_text}")

@@ -5,7 +5,20 @@ class Endpoint(metaclass=abc.ABCMeta):
     
     name = None
     
-    def query(self, _instruction: str, turns:List[tuple], turn_idx:int, **kwargs) -> str:
+    def query(self, _instruction: str, turns:List[Dict], turn_idx:int, **kwargs) -> str:
+        """
+
+        Args:
+            _instruction (str): a statement treated typically as an instruction to the endpoint (i.e. instruction part of a prompt of large language model), could be set None and not used if not needed (e.g. in the case of specialized non-lm classifier).
+            turns (List[dict]): list of dicts corresponding to all past turns of the conversation including the topic. 
+            turn_idx (int): turn number in the conversation so that it can be used (if needed) to set args possibly of actual endpoint calls.
+
+        Raises:
+            NotImplementedError: this function has to be overloaded in new endpoints.
+
+        Returns:
+            str: outcome of the endpoint call process
+        """
         raise NotImplementedError
     
     @classmethod

@@ -1,5 +1,7 @@
 import os
 import openai
+from time import sleep
+from openai.error import RateLimitError
 from boteval import log
 from typing import List, Dict
 from . import Endpoint
@@ -118,7 +120,7 @@ class GPT3(Endpoint):
             presence_penalty=0,
             temperature=0.7,
             n=1,
-            max_timeout_rounds = 5,
+            max_timeout_rounds=10,
             **kwargs
         ):
         
@@ -128,19 +130,25 @@ class GPT3(Endpoint):
                 log.critical(f'GPT timeout - retry #{i}')
                 
             log.debug(f"Input prompt: {prompt}")
-                
-            response = openai.Completion.create(
-                model=engine,
-                prompt=prompt,
-                temperature=temperature,
-                max_tokens=1024,
-                top_p=1,
-                n=n,
-                frequency_penalty=frequency_penalty,
-                presence_penalty=presence_penalty,
-                stop=["user A:", "user B:", "user C:", "user D:"]
-            )
             
+            try:
+                response = openai.Completion.create(
+                    model=engine,
+                    prompt=prompt,
+                    temperature=temperature,
+                    max_tokens=1024,
+                    top_p=1,
+                    n=n,
+                    frequency_penalty=frequency_penalty,
+                    presence_penalty=presence_penalty,
+                    stop=["user A:", "user B:", "user C:", "user D:"]
+                )
+            except RateLimitError:
+                time_to_sleep = 0.15
+                log.critical(f'OpenAI RateLimitError - sleeping for {time_to_sleep} then retrying..')
+                sleep(time_to_sleep)
+                continue
+
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
             # 0: safe, 1: sensitive, 2: unsafe
