@@ -8,6 +8,7 @@ from scipy import stats
 from collections import defaultdict, Counter
 
 eval_categories = sorted(list(set(SURVEY_QUESTIONS.values())))
+eval_categories = ["coherency", "engaging", "understanding", "convincing"]
 
 # load iteration 3 data 
 it3_dates = ITERATION_DATES[3]
@@ -68,10 +69,10 @@ users = df.groupby("worker_id").agg("count")
 print(users['topic_id'])
 
 # df = df[(np.abs(stats.zscore(df[eval_categories])) < 4).all(axis=1)]
-create_bot_mean_plots(df, iteration_idx=4, normalize=False)
-# create_bot_mean_plots(df.copy(), iteration_idx=4, normalize=True)
+# create_bot_mean_plots(df, iteration_idx=4, normalize=False)
+create_bot_mean_plots(df.copy(), iteration_idx=4, normalize=True)
 # create_bot_mean_plots(it3_df.copy(), iteration_idx=3, normalize=True)
-create_bot_mean_plots(it3_df.copy(), iteration_idx=3, normalize=False)
+# create_bot_mean_plots(it3_df.copy(), iteration_idx=3, normalize=False)
 # create_bot_mean_plots(it4_df.copy(), iteration_idx=4, normalize=True)
 
 # check for inconsistency in the same user

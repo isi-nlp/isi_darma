@@ -1,6 +1,7 @@
 data/*
 boteval-darma-task/data-prod/
-boteval-darma-task/data.bak/	
+boteval-darma-task/data.bak/
+*.csv
 *.db
 .env
 .history*

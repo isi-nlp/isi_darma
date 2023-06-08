@@ -9,6 +9,7 @@ import pandas as pd
 from pathlib import Path
 from typing import Dict, List, Any
 import matplotlib.pyplot as plt
+plt.rcParams.update({'font.size': 16})
 from matplotlib.patches import Patch
 import seaborn as sns
 
@@ -29,6 +30,14 @@ SURVEY_QUESTIONS = {
     "how successful was the moderator in convincing to change the user's behavior?": "convincing",
     "how well did it seem like the moderator understand the user's point of view?": "understanding",
     "how coherent was the conversation?": "coherency",
+    'did the moderator make specific suggestions for the given conversation to facilitate cooperation?': "specific",
+    'was the moderator impartial?': "fair", 
+    'did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "engaging", 
+    'did you (the user) become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm)': "respectful",
+    'how much did you agree with the arguments/viewpoints of the user that you were acting as?': 'agreement',
+    'how much did you like the person that you were acting as?': 'likeability',
+    'how could the moderator have been more effective? (e.g. reduce repetition, less generic suggestions, more examples, etc.)': 'moderator_feedback',
+    'how can we improve the task design or survey questions?': 'task_feedback'
 }
 
 ITERATION1_MOD_CHATS = [55, 784, 1014, 1068, 332, 410, 476, 51, 68, 132]
@@ -37,7 +46,8 @@ ITERATION_DATES = {
     1: [20230107, 20230108, 20230109],
     2: [20230201, 20230202, 20230203, 20230204, 20230205, 20230206, 20230207, 20230208],
     3: [20230413, 20230414, 20230415, 20230416, 20230417],
-    4: [20230423, 20230424]
+    4: [20230423, 20230424],
+    5: [20230502, 20230503, 20230504, 20230505, 20230506, 20230507, 20230516]
 }
 
 PLOT_WIDTH=12
@@ -57,13 +67,12 @@ def extract_bot_type(endpoint: str) -> str:
 
 def filter_users(df): 
     # drop users if they have less than MIN_TASK_COUNT tasks
-    counts_per_worker = df.groupby("worker_id").agg("count")["coherency"]
+    counts_per_worker = df.groupby("worker_id").agg("count")["engaging"]
     workers_to_drop = counts_per_worker[counts_per_worker < MIN_TASK_COUNT].index.tolist()
     df = df[~df["worker_id"].isin(workers_to_drop)]
     return df 
 
-def normalize_scores_by_user(df):     
-    metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+def normalize_scores_by_user(df, metrics_to_normalize:List[str]):     
     
     # get mean & std per dimension per worker id 
     stats_per_worker = df[metrics_to_normalize + ['worker_id']].groupby("worker_id").agg(["mean", "std"])
@@ -142,12 +151,18 @@ def extract_data_of_interest(mturk_fn: str, iteration_idx=None, is_survey=False)
         
         filtered_ratings = {
             SURVEY_QUESTIONS[k.lower().strip()]: int(v)
+            if k.lower().strip() not in [
+                "optional_feedback", 
+                'how could the moderator have been more effective? (e.g. reduce repetition, less generic suggestions, more examples, etc.)', 
+                'how can we improve the task design or survey questions?'
+            ]
+            else v
             for k, v in user_ratings.items()
-            if k != "optional_feedback"
+            if k.lower().strip() not in ["optional_feedback"]
         }
         
-        if len(filtered_ratings) != 4: 
-            import pdb; pdb.set_trace() 
+        # if len(filtered_ratings) != 4: 
+        #     import pdb; pdb.set_trace() 
         
         order = speaker_order.index(user_id) if user_id in speaker_order else -1
         
@@ -191,14 +206,22 @@ def get_human_bot_number_words(messages):
 
 def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:bool=False): 
     if normalize: 
-        df = normalize_scores_by_user(df)
+        if iteration_idx < 5: 
+            metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+        else: 
+            metrics_to_normalize = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+        df = normalize_scores_by_user(df, metrics_to_normalize)
 
     categories_of_interest = ["human_words", "bot_words"]
     cols_to_drop = ["worker_id", "messages"] 
     df = df.drop(cols_to_drop, axis=1)
+    df = df[~df['bot_type'].isin(['witty'])]
+
     agg_by_bots = df.groupby("bot_type").agg(["mean", "median", "std", "count"])[
         categories_of_interest
     ]
+    
+    agg_by_bots.to_csv(f"it{iteration_idx}_{normalize=}_word_count_results.csv")
     
     print(
         df.groupby("bot_type").agg(["mean", "count"])[categories_of_interest]
@@ -221,7 +244,7 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
         rects1 = ax.bar(start_width, means, width / 2, label=f"{bot_type} [{bot_count}]", color=palette[idx])
         
         stds = [agg_by_bots.loc[bot_type][cat]['std'] for cat in categories_of_interest]
-        ax.errorbar(start_width, means, stds, markeredgecolor="black", ecolor="black")
+        ax.errorbar(start_width, means, stds, markeredgecolor="black", ecolor="black", fmt="o")
         
         start_width += width / 2
         ax.bar_label(rects1, padding=3)
@@ -252,22 +275,34 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     returns: None 
     """
     if normalize:
-        df = normalize_scores_by_user(df)
+        if iteration_idx < 5: 
+            metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+        else: 
+            metrics_to_normalize = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+        df = normalize_scores_by_user(df, metrics_to_normalize)
     
     eval_categories = sorted(list(set(SURVEY_QUESTIONS.values())))
+    if iteration_idx < 5: 
+        eval_categories = ["coherency", "engaging", "understanding", "convincing"]
+    if iteration_idx == 5: 
+        eval_categories = ["specific", "fair", "engaging", "respectful"]
+
 
     num_unique_workers = len(df.groupby("worker_id").agg(["count"]))
     logger.info(f"Number of unique workers in this iteration: {num_unique_workers}")
 
     cols_to_drop = ["worker_id", "messages"] 
     df = df.drop(cols_to_drop, axis=1)
+    df = df[~df['bot_type'].isin(['witty'])]
 
     print(
         df.groupby("bot_type").agg(["mean", "std", "count"])[eval_categories]
     )
 
     agg_by_bots = df.groupby("bot_type")[eval_categories].agg(["mean", "median", "std", "count"])[eval_categories]
-        
+    
+    agg_by_bots.to_csv(f"it{iteration_idx}_{normalize=}_bot_mean_results.csv")
+    
     means_by_bot_type = {}
     for row in agg_by_bots.iterrows():
         means_by_bot_type[row[0]] = [round(row[1][l]["mean"], 2) for l in eval_categories]
