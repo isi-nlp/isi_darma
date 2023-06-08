@@ -12,7 +12,7 @@ class Cosmo_xl(Endpoint):
     name = 'cosmo-xl'
     
     def __init__(self):
-        self.aws_ec2_dns = "http://ec2-44-199-199-221.compute-1.amazonaws.com:7860/generate"
+        self.aws_ec2_dns = "http://ec2-52-87-158-205.compute-1.amazonaws.com:7861/generate"
         
         
     def query(self, 

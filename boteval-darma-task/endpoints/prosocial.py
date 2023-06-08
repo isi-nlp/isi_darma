@@ -16,8 +16,8 @@ class Prosocial(Endpoint):
     name = 'prosocial'
     
     def __init__(self):
-        self.canary_dns = "http://ec2-34-227-161-103.compute-1.amazonaws.com:7860/generate"
-        self.cosmo_xl_dns = "http://ec2-34-227-161-103.compute-1.amazonaws.com:7861/generate"
+        self.canary_dns = "http://ec2-52-87-158-205.compute-1.amazonaws.com:7860/generate"
+        self.cosmo_xl_dns = "http://ec2-52-87-158-205.compute-1.amazonaws.com:7861/generate"
         
         
     def query(self, 

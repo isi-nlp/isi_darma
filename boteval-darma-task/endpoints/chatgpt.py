@@ -1,7 +1,8 @@
 import os
 import re 
+import random
 import openai
-from time import sleep
+import time
 from openai.error import RateLimitError
 from boteval import log 
 from typing import Union, List, Dict
@@ -36,11 +37,24 @@ class ChatGPT(Endpoint):
         
         formatted_messages = self._messages_compose(instruction, turns, turn_idx, **kwargs)
         
-        return self.query_completion_api(
+        time_0 = time.time()
+        query_result = self.query_completion_api(
             messages= formatted_messages,  
             engine=self.engine,
             **kwargs
         )
+        openai_query_time = time.time() - time_0
+
+        log.debug(f"OpenAI query time: {openai_query_time:.4f} secs")
+        
+        sleep_time = random.uniform(15, 30)
+        log.debug(f"Random sleep time: {sleep_time:.4f} secs")
+        if openai_query_time < sleep_time:
+            actual_sleep_time = sleep_time - openai_query_time
+            log.debug(f"Need to sleep. Actual sleep time: {actual_sleep_time:.4f} secs")
+            time.sleep(actual_sleep_time)
+
+        return query_result
         
 
     def format_turn_text(self, turn): 
