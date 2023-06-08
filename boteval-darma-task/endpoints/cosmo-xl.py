@@ -1,5 +1,6 @@
 import os
 import re
+import time
 import openai
 import requests
 from boteval import log 
@@ -21,12 +22,18 @@ class Cosmo_xl(Endpoint):
               turn_idx: int,
               **kwargs):
         
+        time_0 = time.time()
+
         formatted_input = self._input_compose(instruction, turns, turn_idx, **kwargs)
-        
-        return self.query_completion_api(
+
+        query_output = self.query_completion_api(
             input_dict=formatted_input,
             **kwargs
         )
+
+        log.debug(f"Query time: {time.time() - time_0:.4f} secs")
+        
+        return query_output
         
 
     def format_turn_text(self, turn): 
@@ -65,7 +72,7 @@ class Cosmo_xl(Endpoint):
             conversation_history.append(self.format_turn_text(t))       
 
         input_dict = {
-            "situation": "",
+            "situation": "Cosmo is trying to gently convince a friend to talk civilly.",
             "instruction": "" if kwargs.get("exclude_topic") else str(instruction),
             "conversation": conversation_history,
         }
@@ -85,13 +92,11 @@ class Cosmo_xl(Endpoint):
         max_timeout_rounds = 5
         for _ in range(max_timeout_rounds):        
             
-            log.debug(f"Input dictionary: {input_dict}")
-            
             input_dict["temperature"] = temperature
             input_dict["top_p"] = top_p
             input_dict["num_return_sequences"] = n
 
-            log.debug(f"Input dict: {input_dict}")
+            log.debug(f"Input dictionary: {input_dict}")
             res = requests.get(self.aws_ec2_dns, json=input_dict)
             
             response_text = res.json()['responses'][0].strip() 

@@ -311,11 +311,11 @@
         "id": "moderator-cosmo-xl",
         "notes": "baseline",
         "title": "Moderator",
-        "instruction": "You are a moderator that seeks to build a more civil online environment."
+        "instruction": "Imagine you are a moderator and moderate problematic online conversations."
     },
     {
         "default_endpoint": "prosocial",
-        "id": "prosocial-moderator",
+        "id": "moderator-prosocial",
         "notes": "baseline",
         "title": "Moderator",
         "instruction": "Imagine you are a moderator and moderate problematic online conversations."

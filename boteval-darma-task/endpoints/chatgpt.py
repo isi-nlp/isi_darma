@@ -43,16 +43,9 @@ class ChatGPT(Endpoint):
             engine=self.engine,
             **kwargs
         )
-        openai_query_time = time.time() - time_0
+        query_time = time.time() - time_0
 
-        log.debug(f"OpenAI query time: {openai_query_time:.4f} secs")
-        
-        sleep_time = random.uniform(15, 30)
-        log.debug(f"Random sleep time: {sleep_time:.4f} secs")
-        if openai_query_time < sleep_time:
-            actual_sleep_time = sleep_time - openai_query_time
-            log.debug(f"Need to sleep. Actual sleep time: {actual_sleep_time:.4f} secs")
-            time.sleep(actual_sleep_time)
+        log.debug(f"Query time: {query_time:.4f} secs")
 
         return query_result
         

@@ -4,6 +4,7 @@ This work is done by Taiwei Shi during his internship at USC ISI (Summer 2022).
 
 import os
 import json
+import time
 import random 
 
 import endpoints
@@ -148,7 +149,7 @@ class GPTBot(BotAgent):
         assert len(init_messages) == len(self.context)
 
 
-    def talk(self, n_users=None, timeout=None):
+    def talk(self, n_users=None, timeout=None, random_response_time_range=(20, 30)):
         
         turns = self._get_turns()
         speaker_id = self.prompt_generator.title
@@ -160,11 +161,23 @@ class GPTBot(BotAgent):
             
         if should_respond: 
             # breakpoint()
+
+            time_0 = time.time()
             new_message_text = self.prompt_generator.run(
                 turns,
                 self.turn_idx
             )
             new_message_text = new_message_text.strip()
+            generation_time = time.time() - time_0
+            if random_response_time_range is not None:
+                random_response_time = random.uniform(*random_response_time_range)
+                log.debug(f"Random response time: {random_response_time:.4f} secs")
+                if generation_time < random_response_time:
+                    sleep_time = random_response_time - generation_time
+                    log.debug(f"Time used for generation ({generation_time:.4f}s) is less than the random response time. Sleep for {sleep_time:.4f} secs")
+                    time.sleep(sleep_time)
+                else:
+                    log.debug(f"Time used for generation ({generation_time:.4f}s) is not less than the random response time. No need for sleep.")
             
             if re.match(rf"^{speaker_id}: ", new_message_text):
                 new_message_text = re.sub(rf"^{speaker_id}: ", "", new_message_text)
