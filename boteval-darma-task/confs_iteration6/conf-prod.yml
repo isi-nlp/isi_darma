@@ -13,11 +13,13 @@ chatbot:
       - gpt4
       - prosocial 
       - cosmo-xl
+# sandbox chat_dir: data
+chat_dir: data-prod
 
 limits:
   max_threads_per_user: 50
-  max_threads_per_topic: &max_assignments 5
-  max_turns_per_thread: 4
+  max_threads_per_topic: &max_assignments 3
+  max_turns_per_thread: 3
   reward: &reward '1.5' # dollars
 
 onboarding:
@@ -38,7 +40,7 @@ ratings:
       - So-so
       - Somewhat
       - Very
-  - question: Was the moderator impartial? 
+  - question: Was the moderator fair to all users involved in the conversation? 
     choices: *choices
   - question: Did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive) 
     choices: *choices
@@ -61,7 +63,7 @@ ratings:
 mturk:
   client:
     profile: default # the [default] profile in ~/.aws/credentials file
-    sandbox: true  # sandbox: false to go live
+    sandbox: false  # sandbox: false to go live
   seamless_login: true  # auto signup and login for mturk user
   hit_settings:
     # config values are sent directly to mturk API
@@ -71,39 +73,38 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator persona (Ver. E) (Adult Content) iter6'
+    Title: 'Evaluate a moderator (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
     Description: Evaluate a moderator after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
     QualificationRequirements:
-      -  QualificationTypeId: "00000000000000000071"  # locale qualification
-         Comparator: In
-         LocaleValues:
-            - Country: US
-            - Country: CA
-            - Country: GB
-            - Country: AU
+      # -  QualificationTypeId: "00000000000000000071"  # locale qualification
+      #    Comparator: In
+      #    LocaleValues:
+      #       - Country: US
+      #       - Country: CA
+      #       - Country: GB
+      #       - Country: AU
+      -  QualificationTypeId: "00000000000000000040"  # number of hits 
+         Comparator: GreaterThan
+         IntegerValues: [2400]
+      -  QualificationTypeId: "00000000000000000060"  # adult content
+         Comparator: EqualTo
+         IntegerValues: [1]
+      -  QualificationTypeId: "000000000000000000L0"  # percentage approved
+         Comparator: GreaterThan
+         IntegerValues: [95]
+      -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
+         Comparator: DoesNotExist
          ActionsGuarded: DiscoverPreviewAndAccept
-      # -  QualificationTypeId: "00000000000000000040"  # 5k hits
-      #    Comparator: GreaterThan
-      #    IntegerValues: [10000]
-      #    ActionsGuarded: DiscoverPreviewAndAccept
-      # -  QualificationTypeId: "00000000000000000060"  # adult content
-      #    Comparator: EqualTo
-      #    IntegerValues: [1]
-      #    ActionsGuarded: DiscoverPreviewAndAccept
-      # -  QualificationTypeId: "000000000000000000L0"  # percentage approved
-      #    Comparator: GreaterThan
-      #    IntegerValues: [99]
-      #    ActionsGuarded: DiscoverPreviewAndAccept
-      # -  QualificationTypeId: "30TA5RYGQ1PF5Q3PYZ20O393SXP15W"  # darma block
-      #    Comparator: DoesNotExist
-      #    ActionsGuarded: DiscoverPreviewAndAccept
+      -  QualificationTypeId: "3IQKD7XV1W3VA6NGBO5N3ZKDGNQUEU" # turkernation qual 
+         Comparator: Exists
+         ActionsGuarded: DiscoverPreviewAndAccept
 
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-it6-dev.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it6-prod.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
