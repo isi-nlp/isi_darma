@@ -13,8 +13,6 @@ chatbot:
       - gpt4
       - prosocial 
       - cosmo-xl
-# sandbox chat_dir: data
-chat_dir: data-prod
 
 limits:
   max_threads_per_user: 50
@@ -75,7 +73,7 @@ mturk:
     Reward: *reward
     Title: 'Evaluate a moderator (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator after conversing with it in English given an English conversation. You MUST be able to read and write English fluently!
+    Description: Evaluate a moderator after conversing with them in English given an English conversation. You MUST be able to read and write English fluently!
     QualificationRequirements:
       # -  QualificationTypeId: "00000000000000000071"  # locale qualification
       #    Comparator: In
