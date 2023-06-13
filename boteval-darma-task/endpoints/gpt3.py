@@ -4,6 +4,7 @@ from time import sleep
 from openai.error import RateLimitError
 from boteval import log
 from typing import List, Dict
+from ._utils import retry_with_exponential_backoff
 from . import Endpoint
 
 class GPT3(Endpoint):
@@ -124,6 +125,11 @@ class GPT3(Endpoint):
             **kwargs
         ):
         
+        @retry_with_exponential_backoff
+        def _complete_with_backoff(**kwargs):
+            return  openai.Completion.create(**kwargs)
+            
+        
         for i in range(max_timeout_rounds):
             # GPT-3 Generation
             if i > 0:
@@ -131,23 +137,17 @@ class GPT3(Endpoint):
                 
             log.debug(f"Input prompt: {prompt}")
             
-            try:
-                response = openai.Completion.create(
-                    model=engine,
-                    prompt=prompt,
-                    temperature=temperature,
-                    max_tokens=1024,
-                    top_p=1,
-                    n=n,
-                    frequency_penalty=frequency_penalty,
-                    presence_penalty=presence_penalty,
-                    stop=["user A:", "user B:", "user C:", "user D:"]
-                )
-            except RateLimitError:
-                time_to_sleep = 0.15
-                log.critical(f'OpenAI RateLimitError - sleeping for {time_to_sleep} then retrying..')
-                sleep(time_to_sleep)
-                continue
+            response = _complete_with_backoff(
+                model=engine,
+                prompt=prompt,
+                temperature=temperature,
+                max_tokens=1024,
+                top_p=1,
+                n=n,
+                frequency_penalty=frequency_penalty,
+                presence_penalty=presence_penalty,
+                stop=["user A:", "user B:", "user C:", "user D:"]
+            )
 
             # Toxicity Classification
             # https://beta.openai.com/docs/models/content-filter
