@@ -2,7 +2,7 @@ chat_dir: survey-data-prod
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: mturk_chat_seed_it3.json
+  topics_file: mturk_chat_seed_it6.json
   bot_name: gpt
   bot_args:
     engines: 
