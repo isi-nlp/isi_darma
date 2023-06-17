@@ -20,6 +20,7 @@ from loguru import logger
 from argparse import ArgumentParser
 
 BASE_DATA_DIR = "/home/darma/work/boteval.prod/darma-task/data-prod/data/"
+# BASE_DATA_DIR = "/home/darma/work/boteval.prod/darma-task/data/data/" # sandbox
 
 SURVEY_QUESTIONS = {
     "how coherent was the conversation?": "coherency",
@@ -32,6 +33,7 @@ SURVEY_QUESTIONS = {
     "how coherent was the conversation?": "coherency",
     'did the moderator make specific suggestions for the given conversation to facilitate cooperation?': "specific",
     'was the moderator impartial?': "fair", 
+    'was the moderator fair to all users involved in the conversation?': "fair", 
     'did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "engaging", 
     'did you (the user) become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm)': "respectful",
     'how much did you agree with the arguments/viewpoints of the user that you were acting as?': 'agreement',
@@ -47,7 +49,8 @@ ITERATION_DATES = {
     2: [20230201, 20230202, 20230203, 20230204, 20230205, 20230206, 20230207, 20230208],
     3: [20230413, 20230414, 20230415, 20230416, 20230417],
     4: [20230423, 20230424],
-    5: [20230502, 20230503, 20230504, 20230505, 20230506, 20230507, 20230516]
+    5: [20230502, 20230503, 20230504, 20230505, 20230506, 20230507, 20230516], 
+    6: [20230609, 20230610, 20230611, 20230612, 20230613, 20230614, 20230615, 20230616, 20230617]
 }
 
 PLOT_WIDTH=12
@@ -215,7 +218,7 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
     categories_of_interest = ["human_words", "bot_words"]
     cols_to_drop = ["worker_id", "messages"] 
     df = df.drop(cols_to_drop, axis=1)
-    df = df[~df['bot_type'].isin(['witty'])]
+    # df = df[~df['bot_type'].isin(['witty'])]
 
     agg_by_bots = df.groupby("bot_type").agg(["mean", "median", "std", "count"])[
         categories_of_interest
@@ -284,7 +287,7 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     eval_categories = sorted(list(set(SURVEY_QUESTIONS.values())))
     if iteration_idx < 5: 
         eval_categories = ["coherency", "engaging", "understanding", "convincing"]
-    if iteration_idx == 5: 
+    if iteration_idx >= 5: 
         eval_categories = ["specific", "fair", "engaging", "respectful"]
 
 
@@ -293,7 +296,7 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
 
     cols_to_drop = ["worker_id", "messages"] 
     df = df.drop(cols_to_drop, axis=1)
-    df = df[~df['bot_type'].isin(['witty'])]
+    # df = df[~df['bot_type'].isin(['witty'])]
 
     print(
         df.groupby("bot_type").agg(["mean", "std", "count"])[eval_categories]
@@ -429,6 +432,7 @@ if __name__ == "__main__":
     
     args = parser.parse_args()
 
+    breakpoint()
     dates_of_interest = ITERATION_DATES.get(args.iteration_idx, [])
 
     if not dates_of_interest:

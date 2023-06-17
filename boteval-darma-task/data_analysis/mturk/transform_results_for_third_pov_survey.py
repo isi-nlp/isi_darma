@@ -5,7 +5,7 @@ from loguru import logger
 import json 
 
 
-def format_to_chat_seed(chat):
+def format_to_chat_seed(chat, idx):
     
     conversation = [] 
     users = [] 
@@ -23,23 +23,44 @@ def format_to_chat_seed(chat):
     topic_id = chat["topic_id"]
     thread_id = chat["messages"][0]["thread_id"]
         
-    result = {
-        "id": f"chat{topic_id}-{thread_id}", 
-        "name": f"chat {topic_id} - controversy", 
-        "conversation": conversation, 
-        "target_user": None, 
-        "meta": {
-            "thread_id": thread_id,
-            "topic_id": topic_id,
-            "users": users, 
-            "ratings": {
-                "coherency": chat["coherency"],
-                "engaging": chat["engaging"],
-                "convincing": chat["convincing"],
-                "understanding": chat["understanding"],
+    if args.idx < 6: 
+        result = {
+            "id": f"chat{topic_id}-{thread_id}", 
+            "name": f"chat {topic_id} - controversy", 
+            "conversation": conversation, 
+            "target_user": None, 
+            "meta": {
+                "thread_id": thread_id,
+                "topic_id": topic_id,
+                "users": users, 
+                "ratings": {
+                    "coherency": chat["coherency"],
+                    "engaging": chat["engaging"],
+                    "convincing": chat["convincing"],
+                    "understanding": chat["understanding"],
+                }
             }
         }
-    }
+    else: 
+        result = {
+            "id": f"chat{topic_id}-{thread_id}", 
+            "name": f"chat {topic_id} - controversy", 
+            "conversation": conversation, 
+            "target_user": None, 
+            "meta": {
+                "thread_id": thread_id,
+                "topic_id": topic_id,
+                "users": users, 
+                "ratings": {
+                    "engaging": chat["engaging"],
+                    "fair": chat["fair"],
+                    "respectful": chat["respectful"],
+                    "specific": chat["specific"],
+                    "likeability": chat["likeability"],
+                    "agreement": chat["agreement"],
+                }
+            }
+        }
     
     return result 
 
@@ -66,7 +87,7 @@ if __name__ == '__main__':
     
     chats_for_survey = []
     for chat in all_mturk_results: 
-        chats_for_survey.append(format_to_chat_seed(chat))
+        chats_for_survey.append(format_to_chat_seed(chat, args.idx))
        
     # add iteration index to output 
     orig_path = Path(args.output)

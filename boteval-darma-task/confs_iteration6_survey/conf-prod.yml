@@ -1,34 +1,29 @@
-# sandbox chat_dir: data
-chat_dir: data-prod
+chat_dir: survey-data-prod
 
 chatbot:
   display_name: 'Moderator'
-  topics_file: new_chat_topics.json
-  #bot_name: hf-transformers
-  #bot_args:
-  #  model_name: facebook/blenderbot_small-90M
+  topics_file: mturk_chat_seed_it3.json
   bot_name: gpt
   bot_args:
     engines: 
+      - chatgpt 
       - gpt4
-      - prosocial 
-      - cosmo-xl
+      - gpt3
+
 
 limits:
-  max_threads_per_user: 50
-  max_threads_per_topic: &max_assignments 3
-  max_turns_per_thread: 3
-  reward: &reward '1.5' # dollars
+  max_threads_per_user: 200
+  max_threads_per_topic: &max_assignments 4
+  max_turns_per_thread: 0
+  reward: &reward '0.3' # dollars
 
 onboarding:
-  agreement_file: user-agreement.html
-  instructions_file: instructions.html
-  simple_instructions_file: simple_instructions.html
-
+  agreement_file: survey-user-agreement.html
+  instructions_file: survey_instructions.html
+  simple_instructions_file: survey_simple_instructions.html
   checkboxes:
     instructions_read: I have read the instructions.
     iam_adult: I am 18 years or older and I understand that I may have to read and write using toxic language.
-    #know_french: I can read and write fluently in French and I agree to write in French in this task.
 
 ratings:
   - question: Did the moderator make specific suggestions for the given conversation to facilitate cooperation? 
@@ -40,19 +35,19 @@ ratings:
       - Very
   - question: Was the moderator fair to all users involved in the conversation? 
     choices: *choices
-  - question: Did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive) 
+  - question: Did the moderated user become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive) 
     choices: *choices
-  - question:  Did you (the user) become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm) 
+  - question:  Did the moderated user become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm) 
     choices: *choices
-  - question: How much did you agree with the arguments/viewpoints of the user that you were acting as?
+  - question: How much did you agree with the arguments/viewpoints of the moderated user?
     choices: *choices
-  - question: How much did you like the person that you were acting as?
+  - question: How much did you like the moderated user?
     choices: *choices
-  - question: How could the moderator have been more effective? (e.g. reduce repetition, less generic suggestions, more examples, etc.) 
+  - question: (optional) How could the moderator have been more effective? (e.g. reduce repetition, less generic suggestions, more examples, etc.) 
     freetext: 
       default: none 
       required: False
-  - question: How can we improve the task design or survey questions? 
+  - question: (optional) How can we improve the task design or survey questions? 
     freetext: 
       default: none 
       required: False
@@ -71,9 +66,9 @@ mturk:
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
     AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
     Reward: *reward
-    Title: 'Evaluate a moderator (Adult Content)'
+    Title: 'Evaluate a moderator after reading a conversation (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'
-    Description: Evaluate a moderator after conversing with them in English given an English conversation. You MUST be able to read and write English fluently!
+    Description: Evaluate a moderator after reading a conversation with them and the user. You MUST be able to read and write English fluently!
     QualificationRequirements:
       # -  QualificationTypeId: "00000000000000000071"  # locale qualification
       #    Comparator: In
@@ -102,7 +97,7 @@ flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
   # sandbox  DATABASE_FILE_NAME: 'sqlite-database-02.db'   # this will be placed in task dir
-  DATABASE_FILE_NAME: 'sqlite-database-it6-prod.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'sqlite-database-it6-survey-prod.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: falseq
   SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
