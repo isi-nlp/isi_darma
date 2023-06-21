@@ -69,7 +69,7 @@ mturk:
     MaxAssignments: *max_assignments
     AutoApprovalDelayInSeconds: 604800     # 7 days = 604k sec
     LifetimeInSeconds: 1209600              # 14 days = 1.2M sec
-    AssignmentDurationInSeconds: 3600      # 1 hour = 3.6k sec
+    AssignmentDurationInSeconds: 86400      # 1 hour = 3.6k sec
     Reward: *reward
     Title: 'Evaluate a moderator (Adult Content)'
     Keywords: 'chat,conversation,dialog,partner'

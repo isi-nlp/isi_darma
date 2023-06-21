@@ -6,83 +6,92 @@ import pandas as pd
 import numpy as np 
 from scipy import stats
 from collections import defaultdict, Counter
+from argparse import ArgumentParser
+
+parser = ArgumentParser()
+parser.add_argument("-idx", "--iteration_idx", type=int, default=7, help="iteration idx for the survey data")
+parser.add_argument("-n", "--normalize", action="store_true", help="normalize the scores")
+parser.add_argument("-c", "--combine", action="store_true", help="combine first person pov and thid person pov data")
+args = parser.parse_args()
+
 
 eval_categories = sorted(list(set(SURVEY_QUESTIONS.values())))
-eval_categories = ["coherency", "engaging", "understanding", "convincing"]
+
+if args.iteration_idx == 4:
+    eval_categories = ["coherency", "engaging", "understanding", "convincing"]
+else: 
+    eval_categories = ["specific", "fair", "engaging", "respectful"]
 
 # load iteration 3 data 
-it3_dates = ITERATION_DATES[3]
-it3_data_files = get_annotated_datafiles_for_dates(it3_dates)
+first_person_pov_dates = ITERATION_DATES[args.iteration_idx-1]
+first_person_pov_data_files = get_annotated_datafiles_for_dates(first_person_pov_dates)
 
-it3_mturk_results = []
-for fn in it3_data_files:
+first_person_pov_mturk_results = []
+for fn in first_person_pov_data_files:
     try:
         mturk_result = extract_data_of_interest(fn)
         if mturk_result:
-            it3_mturk_results += mturk_result
+            first_person_pov_mturk_results += mturk_result
     except Exception as e:
         logger.exception(e)
         print(e)
         print(fn)
         
 
-# load iteration 4 survey data
-it4_dates = ITERATION_DATES[4]
+# load iteration survey data
+third_person_pov_dates = ITERATION_DATES[args.iteration_idx]
 SURVEY_DATA_PATH="/home/darma/work/boteval.prod/darma-task/survey-data-prod/data/"
-it4_data_files = get_annotated_datafiles_for_dates(it4_dates, base_data_dir=SURVEY_DATA_PATH)
+third_person_pov_data_files = get_annotated_datafiles_for_dates(third_person_pov_dates, base_data_dir=SURVEY_DATA_PATH)
 
-it4_mturk_results = []
-for fn in it4_data_files:
+third_person_pov_mturk_results = []
+for fn in third_person_pov_data_files:
     try:
         mturk_result = extract_data_of_interest(fn)
         if mturk_result:
-            it4_mturk_results += mturk_result
+            third_person_pov_mturk_results += mturk_result
     except Exception as e:
         logger.exception(e)
         print(e)
         print(fn)
 
-it4_res2bot_type = {} 
-for it3_res in it3_mturk_results:
-    key = f"{it3_res['topic_id']}-{it3_res['thread_id']}"
-    it4_res2bot_type[key] = it3_res["bot_type"]
+third_person_pov_res2bot_type = {} 
+for first_person_pov_res in first_person_pov_mturk_results:
+    key = f"{first_person_pov_res['topic_id']}-{first_person_pov_res['thread_id']}"
+    third_person_pov_res2bot_type[key] = first_person_pov_res["bot_type"]
 
-for it4_res in it4_mturk_results: 
-    # get bot type from it3 results 
-    it4_res["bot_type"] = it4_res2bot_type[it4_res['topic_id']]
+for third_person_pov_res in third_person_pov_mturk_results: 
+    # get bot type from first person pov results 
+    third_person_pov_res["bot_type"] = third_person_pov_res2bot_type[third_person_pov_res['topic_id']]
 
+first_df = pd.DataFrame(first_person_pov_mturk_results)
+third_df = pd.DataFrame(third_person_pov_mturk_results)
 
-# it4_mturk_results = it3_mturk_results.copy() + it3_mturk_results.copy() + it3_mturk_results.copy()
-        
+if args.combine:
 # combine iteration 3 and iteration 4 data 
-it3_df = pd.DataFrame(it3_mturk_results)
-it4_df = pd.DataFrame(it4_mturk_results)
-combined_df = pd.concat([it3_df, it4_df])
+    df = pd.concat([first_df, third_df])
+else: 
+    df = pd.DataFrame(third_person_pov_mturk_results)
 
 
 
 # repeat analysis in mturk_analysis.py
-df = filter_users(combined_df)
-# df = filter_users(it4_df)
+df = filter_users(df)
 
 users = df.groupby("worker_id").agg("count")
 print(users['topic_id'])
 
-# df = df[(np.abs(stats.zscore(df[eval_categories])) < 4).all(axis=1)]
-# create_bot_mean_plots(df, iteration_idx=4, normalize=False)
-create_bot_mean_plots(df.copy(), iteration_idx=4, normalize=True)
-# create_bot_mean_plots(it3_df.copy(), iteration_idx=3, normalize=True)
-# create_bot_mean_plots(it3_df.copy(), iteration_idx=3, normalize=False)
-# create_bot_mean_plots(it4_df.copy(), iteration_idx=4, normalize=True)
+if not args.combine: 
+    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize)
+else: 
+    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, name="first_third_combined")
 
-# check for inconsistency in the same user
-
-df.loc[:, 'topic_id'] = df.apply(lambda row: f"{row['topic_id']}-{row['thread_id']}" if '-' not in row['topic_id'] else row['topic_id'], axis=1)
+# check for inconsistency in the same user's ratings
+combined_df = pd.concat([first_df, third_df])
+# combined_df.loc[:, 'topic_id'] = combined_df.apply(lambda row: f"{row['topic_id']}-{row['thread_id']}" if '-' not in row['topic_id'] else row['topic_id'], axis=1)
 
 # create a new column that is just topic_id split with - 
-df.loc[:, 'super_topic_id'] = df.apply(lambda row: row['topic_id'].split('-')[0], axis=1)
-
-duplicated_rows = df[df.duplicated(subset=['topic_id', 'worker_id'], keep=False)].sort_values(by=['topic_id', 'worker_id'])
+combined_df.loc[:, 'super_topic_id'] = combined_df.apply(lambda row: row['topic_id'].split('-')[0], axis=1)
+duplicated_rows = combined_df[combined_df.duplicated(subset=['topic_id', 'worker_id'], keep=False)].sort_values(by=['topic_id', 'worker_id'])
 
 print(len(duplicated_rows)//2)
 cat_diffs = defaultdict(list) 
@@ -101,15 +110,16 @@ for k,v in cat_diffs.items():
     print(f"{k}: {np.mean(v):.2f} +/- {np.std(v):.2f}, max: {np.max(v):.2f}, min: {np.min(v):.2f}")
     print(Counter(v))
 
-inconsistency_df = pd.DataFrame(inconsistency_df_data)
-per_worker_mean = inconsistency_df.groupby("worker_id").agg(["mean", "max", "count"])
+if inconsistency_df_data: 
+    inconsistency_df = pd.DataFrame(inconsistency_df_data)
+    per_worker_mean = inconsistency_df.groupby("worker_id").agg(["mean", "max", "count"])
 
-print(per_worker_mean)
+    print(per_worker_mean)
     
-# exam1ine variance within same super_topic_id 
-for super_topic_id in set(df.super_topic_id.tolist()):
-    create_bot_mean_plots(df[df['super_topic_id'] == super_topic_id], iteration_idx=4, normalize=False, title=f"topic_id={super_topic_id}")
-    create_bot_mean_plots(df[df['super_topic_id'] == super_topic_id], iteration_idx=4, normalize=True, title=f"topic_id={super_topic_id}")
+# examine variance within same super_topic_id 
+# for super_topic_id in set(df.super_topic_id.tolist()):
+#     create_bot_mean_plots(df[df['super_topic_id'] == super_topic_id], iteration_idx=4, normalize=False, title=f"topic_id={super_topic_id}")
+#     create_bot_mean_plots(df[df['super_topic_id'] == super_topic_id], iteration_idx=4, normalize=True, title=f"topic_id={super_topic_id}")
 
 # A1E77HZO63E334      9
 # A1ELPYAFO7MANS     37
@@ -120,6 +130,6 @@ for super_topic_id in set(df.super_topic_id.tolist()):
 # A2Y7FD1D7PUGBL      6
 # A3EU8ENRH654SB     62
 # A9HQ3E0F2AGVO      94
-for worker_id in ["A9HQ3E0F2AGVO", "A2T11H7YI7QPGD", "A2GO2OXS4VM1PR"]: 
-    create_bot_mean_plots(df[df['worker_id'] == worker_id], iteration_idx=4, normalize=False, title=f"worker_id={worker_id}")
-    create_bot_mean_plots(df[df['worker_id'] == worker_id], iteration_idx=4, normalize=True, title=f"worker_id={worker_id}")
+# for worker_id in ["A9HQ3E0F2AGVO", "A2T11H7YI7QPGD", "A2GO2OXS4VM1PR"]: 
+#     create_bot_mean_plots(df[df['worker_id'] == worker_id], iteration_idx=4, normalize=False, title=f"worker_id={worker_id}")
+#     create_bot_mean_plots(df[df['worker_id'] == worker_id], iteration_idx=4, normalize=True, title=f"worker_id={worker_id}")
