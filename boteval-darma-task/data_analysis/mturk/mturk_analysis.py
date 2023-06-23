@@ -240,10 +240,10 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
     
     agg_by_bots.to_csv(f"it{iteration_idx}_{normalize=}_word_count_results.csv")
     
-    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratric"})
+    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratric"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
     # reorder the bot_types with bot_order
     agg_by_bots = agg_by_bots.reindex(bot_order)
     
@@ -344,10 +344,10 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
 
     agg_by_bots = df.groupby("bot_type")[eval_categories].agg(["mean", "median", "sem", "count"])[eval_categories]
     
-    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratric"})
+    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratric"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
     # reorder the bot_types with bot_order
     agg_by_bots = agg_by_bots.reindex(bot_order)
     
@@ -470,10 +470,10 @@ def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize:
 
     grouped_df = df.groupby("bot_type")[eval_categories]
     # rename the bot_types 
-    grouped_df = grouped_df.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratric"})
+    grouped_df = grouped_df.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     # reorder the bot_types
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratric"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
 
     x = np.arange(len(eval_categories))  # the label locations
     fig, ax = plt.subplots()
@@ -530,7 +530,7 @@ def create_task_per_worker_plot(df, iteration_idx=None):
 
 
 def t_test(df, iteration_idx, normalize):
-    model_map = {"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratric"}
+    model_map = {"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"}
     if normalize: 
         if iteration_idx < 5: 
             metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
