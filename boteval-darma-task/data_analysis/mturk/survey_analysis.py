@@ -1,6 +1,6 @@
 # author: Justin Cho 
 
-from mturk_analysis import filter_users, create_bot_mean_plots, ITERATION_DATES, get_annotated_datafiles_for_dates, extract_data_of_interest, SURVEY_QUESTIONS, t_test
+from mturk_analysis import filter_users, create_bot_mean_plots, ITERATION_DATES, get_annotated_datafiles_for_dates, extract_data_of_interest, SURVEY_QUESTIONS, t_test, spearman_correlation
 from loguru import logger 
 import pandas as pd 
 import numpy as np 
@@ -96,11 +96,12 @@ if args.partition_by is not None:
 users = df.groupby("worker_id").agg("count")
 print(users['topic_id'])
 
+
+spearman_correlation(df)
+sig_diff = t_test(df, iteration_idx=args.iteration_idx, normalize=args.normalize)
 if not args.combine: 
-    sig_diff = t_test(df, iteration_idx=args.iteration_idx, normalize=args.normalize)
     create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, sig_diff=sig_diff, partition_by=args.partition_by, partition_threshold=args.partition_threshold, partition_operator=args.partition_operator)
 else: 
-    assert False
     create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, name="first_third_combined", partition_by=args.partition_by, partition_threshold=args.partition_threshold, partition_operator=args.partition_operator)
 
 # check for inconsistency in the same user's ratings

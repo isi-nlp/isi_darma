@@ -562,6 +562,27 @@ def t_test(df, iteration_idx, normalize):
             print(f"{model_0:<20}", ''.join([f"{ps[i]:>{model_names_lens[i]+4}.4f}" if ps[i] >=0 else f"{'':>{model_names_lens[i]+4}}" for i in range(len(ps))]))
     return sig_diff
 
+
+def spearman_correlation(df):
+    metrics = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+    for metric_0 in metrics:
+        scores_0 = df[metric_0].tolist()
+        rs, ps = [], []
+        print(f"{'':<12}" + ''.join([f"{metric:>16}" for metric in metrics]))
+        for metric_1 in metrics:
+            if metric_0 != metric_1:
+                scores_1 = df[metric_1].tolist()
+                spearmanr = st.spearmanr(scores_0, scores_1)
+                r = spearmanr.statistic
+                p = spearmanr.pvalue
+                rs.append(r)
+                ps.append(p)
+            else:
+                rs.append(-100)
+                ps.append(-100)
+        print(f"{metric_0:<12}" + ''.join([f"{rs[i]:>8.4f}({ps[i]:.4f})" if rs[i] >= -10 else f"{'':<16}" for i in range(len(rs))]))
+
+
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument(
@@ -618,26 +639,9 @@ if __name__ == "__main__":
 
     # t-test
     sig_diff = t_test(df, iteration_idx=args.iteration_idx, normalize=args.normalize)
-
-    metrics = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
-    for metric_0 in metrics:
-        scores_0 = df[metric_0].tolist()
-        rs, ps = [], []
-        print(f"{'':<12}" + ''.join([f"{metric:>16}" for metric in metrics]))
-        for metric_1 in metrics:
-            if metric_0 != metric_1:
-                scores_1 = df[metric_1].tolist()
-                spearmanr = st.spearmanr(scores_0, scores_1)
-                r = spearmanr.statistic
-                p = spearmanr.pvalue
-                rs.append(r)
-                ps.append(p)
-            else:
-                rs.append(-100)
-                ps.append(-100)
-        print(f"{metric_0:<12}" + ''.join([f"{rs[i]:>8.4f}({ps[i]:.4f})" if rs[i] >= -10 else f"{'':<16}" for i in range(len(rs))]))
                 
-                
+    # spearmans correlation
+    spearman_correlation(df)
 
     # plot
     create_bot_mean_plots(df, iteration_idx=args.iteration_idx, normalize=args.normalize, sig_diff=sig_diff, partition_by=args.partition_by, partition_threshold=args.partition_threshold, partition_operator=args.partition_operator)
