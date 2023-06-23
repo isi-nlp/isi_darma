@@ -1,17 +1,29 @@
 # author: Justin Cho 
 
-from mturk_analysis import filter_users, create_bot_mean_plots, ITERATION_DATES, get_annotated_datafiles_for_dates, extract_data_of_interest, SURVEY_QUESTIONS
+from mturk_analysis import filter_users, create_bot_mean_plots, ITERATION_DATES, get_annotated_datafiles_for_dates, extract_data_of_interest, SURVEY_QUESTIONS, t_test
 from loguru import logger 
 import pandas as pd 
 import numpy as np 
 from scipy import stats
 from collections import defaultdict, Counter
 from argparse import ArgumentParser
+import operator
+
+OPS = {'>': operator.gt, '<': operator.lt, '=': operator.eq, '>=': operator.ge, '<=': operator.le, '!=': operator.ne}
 
 parser = ArgumentParser()
 parser.add_argument("-idx", "--iteration_idx", type=int, default=7, help="iteration idx for the survey data")
 parser.add_argument("-n", "--normalize", action="store_true", help="normalize the scores")
 parser.add_argument("-c", "--combine", action="store_true", help="combine first person pov and thid person pov data")
+parser.add_argument(
+        "--partition_by", "-p", type=str, help="partition the data by which variable", default=None,
+    )
+parser.add_argument(
+    "--partition_threshold", "-t", type=int, help="partition threshold"
+)
+parser.add_argument(
+    "--partition_operator", "-o", type=str, help="partition operator", choices=['=', '<', '>', '>=', '<=']
+)
 args = parser.parse_args()
 
 
@@ -77,13 +89,19 @@ else:
 # repeat analysis in mturk_analysis.py
 df = filter_users(df)
 
+# partition
+if args.partition_by is not None:
+    df = df[OPS[args.partition_operator](df[args.partition_by], args.partition_threshold)]
+
 users = df.groupby("worker_id").agg("count")
 print(users['topic_id'])
 
 if not args.combine: 
-    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize)
+    sig_diff = t_test(df, iteration_idx=args.iteration_idx, normalize=args.normalize)
+    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, sig_diff=sig_diff, partition_by=args.partition_by, partition_threshold=args.partition_threshold, partition_operator=args.partition_operator)
 else: 
-    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, name="first_third_combined")
+    assert False
+    create_bot_mean_plots(df.copy(), iteration_idx=args.iteration_idx, normalize=args.normalize, name="first_third_combined", partition_by=args.partition_by, partition_threshold=args.partition_threshold, partition_operator=args.partition_operator)
 
 # check for inconsistency in the same user's ratings
 combined_df = pd.concat([first_df, third_df])
