@@ -11,6 +11,7 @@ from typing import Dict, List, Any
 import matplotlib.pyplot as plt
 plt.rcParams.update({'font.size': 16})
 from matplotlib.patches import Patch
+from matplotlib.colors import LinearSegmentedColormap
 import seaborn as sns
 
 import numpy as np
@@ -25,23 +26,30 @@ from sklearn.utils import resample
 
 OPS = {'>': operator.gt, '<': operator.lt, '=': operator.eq, '>=': operator.ge, '<=': operator.le, '!=': operator.ne}
 
+cmap = plt.get_cmap('tab20c')
+blues = [(1, 1, 1), cmap(0)]
+TAB20C_BLUES = LinearSegmentedColormap.from_list("mycmap", blues)(np.linspace(0.2, 1, 5))
+oranges = [(1, 1, 1), cmap(4)]
+TAB20C_ORANGES = LinearSegmentedColormap.from_list("mycmap", oranges)(np.linspace(0.2, 1, 5))
+
+# BASE_DATA_DIR = "/home/liushuai/darma/isi_darma/boteval-darma-task/data/data/" # gpt annotation
 BASE_DATA_DIR = "/home/darma/work/boteval.prod/darma-task/data-prod/data/"
 # BASE_DATA_DIR = "/home/darma/work/boteval.prod/darma-task/data/data/" # sandbox
 
 SURVEY_QUESTIONS = {
     "how coherent was the conversation?": "coherency",
-    "how likely are you to continue chatting with the moderator?": "engaging",
+    "how likely are you to continue chatting with the moderator?": "cooperative",
     "to what degree did the moderator understand your point of view?": "understanding",
     "to what degree did the moderator convince you to change your behavior?": "convincing",
-    "if you were the user, how likely are you to continue chatting with the moderator?": "engaging", 
+    "if you were the user, how likely are you to continue chatting with the moderator?": "cooperative", 
     "how successful was the moderator in convincing to change the user's behavior?": "convincing",
     "how well did it seem like the moderator understand the user's point of view?": "understanding",
     "how coherent was the conversation?": "coherency",
     'did the moderator make specific suggestions for the given conversation to facilitate cooperation?': "specific",
     'was the moderator impartial?': "fair", 
     'was the moderator fair to all users involved in the conversation?': "fair", 
-    'did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "engaging", 
-    'did the moderated user become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "engaging",
+    'did you (the user) become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "cooperative", 
+    'did the moderated user become more engaged and willing to cooperate? (e.g. provide more details or ask sincere questions to make the conversation more constructive or be more persuasive)': "cooperative",
     'did the moderated user become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm)': "respectful",
     'did you (the user) become more respectful and less abusive? (e.g. less profanity, unconstructive criticism, or condescending sarcasm)': "respectful",
     'how much did you agree with the arguments/viewpoints of the user that you were acting as?': 'agreement',
@@ -63,7 +71,9 @@ ITERATION_DATES = {
     4: [20230423, 20230424],
     5: [20230502, 20230503, 20230504, 20230505, 20230506, 20230507, 20230516], 
     6: [20230609, 20230610, 20230611, 20230612, 20230613, 20230614, 20230615, 20230616, 20230617],
-    7: [20230617, 20230618, 20230619]
+    7: [20230617, 20230618, 20230619],
+    100: [20230623],
+    101: [20230624],
 }
 
 PLOT_WIDTH=12
@@ -86,7 +96,7 @@ def extract_bot_type(endpoint: str) -> str:
 
 def filter_users(df): 
     # drop users if they have less than MIN_TASK_COUNT tasks
-    counts_per_worker = df.groupby("worker_id").agg("count")["engaging"]
+    counts_per_worker = df.groupby("worker_id").agg("count")["cooperative"]
     workers_to_drop = counts_per_worker[counts_per_worker < MIN_TASK_COUNT].index.tolist()
     df = df[~df["worker_id"].isin(workers_to_drop)]
     return df 
@@ -224,9 +234,9 @@ def get_human_bot_number_words(messages):
 def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:bool=False, sig_diff=None): 
     if normalize: 
         if iteration_idx < 5: 
-            metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+            metrics_to_normalize = ["coherency", "cooperative", "understanding", "convincing", "human_words", "bot_words"]
         else: 
-            metrics_to_normalize = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+            metrics_to_normalize = ["specific", "fair", "cooperative", "respectful", "agreement", "likeability", "human_words", "bot_words"]
         df = normalize_scores_by_user(df, metrics_to_normalize)
 
     categories_of_interest = ["human_words", "bot_words"]
@@ -240,10 +250,10 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
     
     agg_by_bots.to_csv(f"it{iteration_idx}_{normalize=}_word_count_results.csv")
     
-    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
+    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Baseline", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Baseline", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
     # reorder the bot_types with bot_order
     agg_by_bots = agg_by_bots.reindex(bot_order)
     
@@ -304,7 +314,7 @@ def create_word_count_plots(df:pd.DataFrame, iteration_idx:int=None, normalize:b
 
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
-    fig.savefig(f"it{iteration_idx}_{normalize=}_words_mean_results.png", dpi=100)
+    fig.savefig(f"it{iteration_idx}_{normalize=}_words_mean_results.pdf", dpi=100, bbox_inches='tight')
 
 def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:bool=False, sig_diff=None, custom_name:str="", title:str="", partition_by="", partition_threshold=None, partition_operator=""): 
     """creates a bar plot of the mean scores for each bot type 
@@ -319,16 +329,16 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     """
     if normalize:
         if iteration_idx < 5: 
-            metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+            metrics_to_normalize = ["coherency", "cooperative", "understanding", "convincing", "human_words", "bot_words"]
         else: 
-            metrics_to_normalize = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+            metrics_to_normalize = ["specific", "fair", "cooperative", "respectful", "agreement", "likeability", "human_words", "bot_words"]
         df = normalize_scores_by_user(df, metrics_to_normalize)
     
     eval_categories = sorted(list(set(SURVEY_QUESTIONS.values())))
     if iteration_idx < 5: 
-        eval_categories = ["coherency", "engaging", "understanding", "convincing"]
+        eval_categories = ["coherency", "cooperative", "understanding", "convincing"]
     if iteration_idx >= 5: 
-        eval_categories = ["specific", "fair", "engaging", "respectful"]
+        eval_categories = ["specific", "fair", "cooperative", "respectful"]
 
 
     num_unique_workers = len(df.groupby("worker_id").agg(["count"]))
@@ -344,10 +354,10 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
 
     agg_by_bots = df.groupby("bot_type")[eval_categories].agg(["mean", "median", "sem", "count"])[eval_categories]
     
-    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
+    agg_by_bots = agg_by_bots.rename(index={"moderator": "GPT-Baseline", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Baseline", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
     # reorder the bot_types with bot_order
     agg_by_bots = agg_by_bots.reindex(bot_order)
     
@@ -377,8 +387,10 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
         palette_mako = sns.color_palette("mako_r", 2)
         if "gpt" in bot_type.lower():
             color = palette_rocket[idx-2]
+            # color = TAB20C_ORANGES[idx-2]
         else:
             color = palette_mako[idx]
+            # color = TAB20C_BLUES[idx-2]
         
         stds = [agg_by_bots.loc[bot_type][cat]['sem'] for cat in eval_categories]
         max_err = max(max_err, max(stds))
@@ -412,10 +424,10 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     if normalize: 
-        ax.set_ylabel("Normalized Scores")
+        ax.set_ylabel("Mean Normalized Scores")
         ax.set_yticks(np.arange(0, 1.2, 0.2))
     else: 
-        ax.set_ylabel("Scores")
+        ax.set_ylabel("Mean Scores")
         ax.set_yticks(list(range(5)))
         
     # if normalize:
@@ -432,6 +444,7 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     ax.set_xticks(x, eval_categories)
     ax.set_xlabel("Evaluation categories")
     # ax.legend()
+    # plt.grid(color='gainsboro', zorder=0, axis='y')
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
 
@@ -442,14 +455,23 @@ def create_bot_mean_plots(df: pd.DataFrame , iteration_idx:int=None, normalize:b
     if partition_by:
         partition_string = f"{partition_by}{partition_operator}{partition_threshold}"
     
+    if iteration_idx == 6:
+        title = "1st Person POV Results (Human)"
+    elif iteration_idx == 7:
+        title = "3rd Person POV Results (Human)"
+    elif iteration_idx == 100:
+        title = "3rd Person POV Results (GPT-3.5-turbo)"
+    elif iteration_idx == 101:
+        title = "3rd Person POV Results (GPT-4)"
+
     if custom_name: 
-        plt.savefig(f"it{iteration_idx}_{normalize=}_{partition_string}_{custom_name=}.png")
+        plt.savefig(f"it{iteration_idx}_{normalize=}_{partition_string}_{custom_name=}.pdf", bbox_inches='tight')
     else:
         if not partition_string:
-            plt.title("Bot Evaluation Mean Results")
+            plt.title(title)
         else:
-            plt.title(f"Bot Evaluation Mean Results ({partition_string})")
-        plt.savefig(f"it{iteration_idx}_{normalize=}_{partition_string}_bot_mean_results.png")
+            plt.title(f"{title} ({partition_string})")
+        plt.savefig(f"it{iteration_idx}_{normalize=}_{partition_string}_bot_mean_results.pdf", bbox_inches='tight')
 
 
 def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize: bool = False):
@@ -470,10 +492,10 @@ def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize:
 
     grouped_df = df.groupby("bot_type")[eval_categories]
     # rename the bot_types 
-    grouped_df = grouped_df.rename(index={"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
+    grouped_df = grouped_df.rename(index={"moderator": "GPT-Baseline", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"})
     
     # reorder the bot_types
-    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Moderator", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
+    bot_order = ["Cosmo-XL", "Canary+Cosmo-XL", "GPT-Baseline", "GPT-Stern", "GPT-Witty", "GPT-NVC", "GPT-Socratic"]
 
     x = np.arange(len(eval_categories))  # the label locations
     fig, ax = plt.subplots()
@@ -495,9 +517,9 @@ def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize:
 
     # Add some text for labels, title and custom x-axis tick labels, etc.
     if normalize:
-        ax.set_ylabel("Normalized Scores")
+        ax.set_ylabel("Mean Normalized Scores")
     else:
-        ax.set_ylabel("Scores")
+        ax.set_ylabel("Mean Scores")
 
     ax.set_xticks(x, eval_categories)
     ax.set_xlabel("Evaluation categories")
@@ -507,7 +529,7 @@ def create_bot_box_plots(df: pd.DataFrame, iteration_idx: int = None, normalize:
 
     fig.tight_layout()
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
-    plt.savefig(f"it{iteration_idx}_{normalize=}_bot_mean_results_boxplot.png")
+    plt.savefig(f"it{iteration_idx}_{normalize=}_bot_mean_results_boxplot.pdf", bbox_inches='tight')
 
 
 
@@ -526,20 +548,20 @@ def create_task_per_worker_plot(df, iteration_idx=None):
     fig.set_size_inches(PLOT_WIDTH, PLOT_HEIGHT)
 
     plt.title("Worker - # Task distribution")
-    plt.savefig(f"it{iteration_idx}_worker_task_histogram.png")
+    plt.savefig(f"it{iteration_idx}_worker_task_histogram.pdf", bbox_inches='tight')
 
 
 def t_test(df, iteration_idx, normalize):
-    model_map = {"moderator": "GPT-Moderator", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"}
+    model_map = {"moderator": "GPT-Baseline", "wisebeing": "GPT-NVC", "witty": "GPT-Witty", "stern": "GPT-Stern", "moderator-cosmo-xl": "Cosmo-XL", "moderator-prosocial": "Canary+Cosmo-XL", "socratic": "GPT-Socratic"}
     if normalize: 
         if iteration_idx < 5: 
-            metrics_to_normalize = ["coherency", "engaging", "understanding", "convincing", "human_words", "bot_words"]
+            metrics_to_normalize = ["coherency", "cooperative", "understanding", "convincing", "human_words", "bot_words"]
         else: 
-            metrics_to_normalize = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+            metrics_to_normalize = ["specific", "fair", "cooperative", "respectful", "agreement", "likeability", "human_words", "bot_words"]
         df = normalize_scores_by_user(df, metrics_to_normalize)
     score_dict = defaultdict(dict)
     for name, group in df.groupby('bot_type'):
-        for metric in ["specific", "fair", "engaging", "respectful", "human_words", "bot_words"]:
+        for metric in ["specific", "fair", "cooperative", "respectful", "human_words", "bot_words"]:
             score_dict[metric][name] = group[metric].tolist()
     sig_diff = defaultdict(set)
     for metric, models_scores in score_dict.items():
@@ -564,7 +586,7 @@ def t_test(df, iteration_idx, normalize):
 
 
 def spearman_correlation(df):
-    metrics = ["specific", "fair", "engaging", "respectful", "agreement", "likeability", "human_words", "bot_words"]
+    metrics = ["specific", "fair", "cooperative", "respectful", "agreement", "likeability", "human_words", "bot_words"]
     for metric_0 in metrics:
         scores_0 = df[metric_0].tolist()
         rs, ps = [], []
