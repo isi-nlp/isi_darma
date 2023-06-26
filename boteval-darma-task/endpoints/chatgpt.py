@@ -6,6 +6,8 @@ import time
 from openai.error import RateLimitError
 from boteval import log 
 from typing import Union, List, Dict
+
+from ._utils import retry_with_exponential_backoff
 from . import Endpoint
 
 class ChatGPT(Endpoint):
@@ -121,6 +123,7 @@ class ChatGPT(Endpoint):
                     
         return messages
     
+    
     @staticmethod
     def query_completion_api(
             messages: List[Dict[str,str]], engine:str,
@@ -129,6 +132,11 @@ class ChatGPT(Endpoint):
             max_timeout_rounds = 10,
             **kwargs
         ):
+        
+        @retry_with_exponential_backoff
+        def _complete_with_backoff(**kwargs):
+            return openai.ChatCompletion.create(**kwargs)
+            
         log.debug(f"Using engine: {engine}")
 
         for i in range(max_timeout_rounds):        
@@ -137,23 +145,17 @@ class ChatGPT(Endpoint):
             
             log.debug(f"Input messages: {messages}")
             
-            try:
-                response = openai.ChatCompletion.create(
-                    model=engine,
-                    messages = messages, 
-                    temperature=temperature,
-                    max_tokens=1024,
-                    top_p=1,
-                    n=n,
-                    frequency_penalty=frequency_penalty,
-                    presence_penalty=presence_penalty,
-                    stop=["user A:", "user B:", "user C:", "user D:"]
-                )
-            except RateLimitError:
-                time_to_sleep = 0.15
-                log.critical(f'OpenAI RateLimitError - sleeping for {time_to_sleep} then retrying..')
-                sleep(time_to_sleep)
-                continue
+            response = _complete_with_backoff(
+                model=engine,
+                messages = messages, 
+                temperature=temperature,
+                max_tokens=1024,
+                top_p=1,
+                n=n,
+                frequency_penalty=frequency_penalty,
+                presence_penalty=presence_penalty,
+                stop=["user A:", "user B:", "user C:", "user D:"]
+            )
                 
                 
             response_text = response.choices[0]['message']['content'].strip() 
