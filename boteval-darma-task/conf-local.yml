@@ -14,7 +14,6 @@ chatbot:
       - gpt3
       - cosmo-xl
       - prosocial
-    # default_engine: 'gpt4'
   # transforms:
   #   human:
   #     - name: rtg-api
@@ -35,6 +34,8 @@ limits:
   max_human_users_per_thread: 1
   human_moderator: 'no'
   reward: &reward '0.01' # dollars
+  default_engine: 'chatgpt'
+  default_persona_id: 'moderator'
   
 onboarding:
   agreement_file: user-agreement.html
