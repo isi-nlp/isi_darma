@@ -14,6 +14,7 @@ chatbot:
       - gpt3
       - cosmo-xl
       - prosocial
+    # default_engine: 'gpt4'
   # transforms:
   #   human:
   #     - name: rtg-api
@@ -31,6 +32,8 @@ limits:
   max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 10
   max_turns_per_thread: 1
+  max_human_users_per_thread: 1
+  human_moderator: 'no'
   reward: &reward '0.01' # dollars
   
 onboarding:
