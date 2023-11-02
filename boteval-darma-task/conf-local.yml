@@ -34,8 +34,13 @@ limits:
   max_human_users_per_thread: 1
   human_moderator: 'no'
   reward: &reward '0.01' # dollars
-  default_engine: 'chatgpt'
-  default_persona_id: 'moderator'
+
+customization:
+  parameter1: 100
+  parameter2:
+    - option1
+    - option2
+    - option3
   
 onboarding:
   agreement_file: user-agreement.html
