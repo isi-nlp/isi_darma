@@ -18,19 +18,21 @@ import re
 @R.register(R.BOT, name="gpt")
 class GPTBot(BotAgent):
 
-    def __init__(self, persona_id: str,
+    def __init__(self,
             *args, engine: str=None, api_key='',
-            default_endpoint='gpt3',
             few_shot_example=None, max_ctx_len=2048,
             persona_configs_relative_filepath='persona_configs.json',
             num_threads=None, # NOT USED NOW
             allow_endpoint_override=False,
+            parameters=None,
             **kwargs):
         super().__init__(*args, name="gpt", **kwargs)
         
         self.max_ctx_len = max_ctx_len
         self.few_shot_example = few_shot_example # e.g. nvc
-        self.default_endpoint = default_endpoint
+        self.default_endpoint = parameters['endpoint']
+
+        persona_id = parameters['persona_id']
         
         if engine:
             # TODO remove completely .. still used only for backward compatibility..
@@ -56,7 +58,8 @@ class GPTBot(BotAgent):
         self.context = []
         
         log.info(
-            f"Initialized GPT bot with {default_endpoint=}\n"
+            f"Initialized GPT bot with {self.default_endpoint=}\n"
+            f"{persona_id=}\n"
             f"{self.prompt_generator.id=}\n"
             f"{self.prompt_generator.title=}\n"
             f"{self.prompt_generator.instruction._instruction_raw=}")
