@@ -1,0 +1,71 @@
+{% set focus_mode = True %}
+{% extends 'base.html' %}
+{%block head%}
+<style type="text/css">
+    .dot {
+        opacity: 0;
+        animation: showHideDot 2s ease-in-out infinite;
+        font-size: 1rem;
+    }
+    .dot.one {animation-delay: 0.2s;}
+    .dot.two {animation-delay: 0.4s;}
+    .dot.three {animation-delay: 0.6s;}
+    
+    @keyframes showHideDot {
+        0% { opacity: 0; }
+        50% { opacity: 1; }
+        60% { opacity: 1; }
+        100% { opacity: 0; }
+    }
+</style>
+{%endblock%}
+{% block content %}
+<div class="container">
+    <div class="row" id="myTabContent">
+
+            {% if onboarding and onboarding.get('agreement_text') %}
+                <div class="col-12">
+                    {{onboarding['agreement_text']|safe}}
+                </div>
+            {%endif%}
+            <div class="col-12" id="signup">
+            <form action="{{url_for('app.seamlesslogin')}}" method="POST" class="form">           
+                <input type="hidden" name="action" value="signup">
+                <!-- <h1 class="h3 mb-3 mt-4 font-weight-normal">Please Review Agreement</h1> -->
+                <input type="hidden" name="user_id" id="s_user_id" class="form-control mt-2" value="{{ext_id}}" >
+                <input type="hidden" name="secret" id="s_password" class="form-control mt-2" value="{{ext_id}}">
+                <input type="hidden" name="ext_id" value="{{ext_id}}"> 
+                <input type="hidden" name="ext_src" value="{{ext_src}}"> 
+                {% if onboarding %}
+                    {%if onboarding.get('checkboxes') %}
+                        {%for check_name, check_value in onboarding['checkboxes'].items() %}
+                            <div class="form-check my-2">
+                                <input class="form-check-input" type="checkbox" value="true" id="{{check_name}}" name="checkbox_{{check_name}}" required
+                                    autofocus>
+                                <label class="form-check-label" for="{{check_name}}">
+                                    {{check_value|safe}}
+                                </label>
+                            </div>
+                        {%endfor%}
+                    {%endif%}
+                {%endif%}
+                <!-- Name not required; favor anonymity
+                <input type="text" name="name" id="name" class="form-control mt-2" placeholder="Name" required>
+                -->
+                {% if next %} <input type="hidden" name="next" value="{{next}}"> {%endif%}
+                <button class="btn btn-lg btn-primary btn-block col-4 mt-2" onClick="check_and_submit(this)">Agree and proceed</button>
+
+                <div id="waiting_info" class="text-center alert alert-primary" style="display: none;">
+                    Wait for server to load 
+                    <span class="dot one">⦿</span>
+                    <span class="dot two">⦿</span>
+                    <span class="dot three">⦿</span>
+                </div>
+                
+                <small class="text-muted">The server may take about 20 seconds to set up. Please wait patiently.</small>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

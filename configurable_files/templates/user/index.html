@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="container">
+    <div class="col-12">
+
+        <h3 class="col-12"> Chat Topics </h3>
+        {% if limits %}
+        <b>Summary</b>
+        <ul>
+            <li>We have <code>{{data | length}}</code> chat topics in total.</li>
+            <li>You have started chatting on <code>{{limits['threads_launched']}}</code> topics. You may work on upto <code>{{[data | length, limits['max_threads_per_user']]| min }}</code> items below.</li>
+            <li>We call the chat thread is complete after certain turns (i.e., your replies). So far you have completed <code>{{limits['threads_completed']}}</code> of such.</li>
+            <li>We are trying to collect upto <code>10</code> (might be different for different tasks) threads per topic. You may not be able to start a chat if we have already received sufficient submissions.</li>
+        </ul>
+        {% endif %}
+    <ol class="list-group">
+
+    {% for topic, thread, n_threads in data %}
+        <li class="list-item m-2 p-2 border">
+            <b>{{topic['name']}}</b> <span>User Num: {{ topic.max_human_users_per_thread }}</span> <span style="float: right;"> {{n_threads}}/{{ topic.max_threads_per_topic }}</span><br>
+            {% if thread %}
+                <small style="float: right;">{{ thread.time_created | ctime }}</small>
+                    {% if thread.episode_done %}
+                        <span>You have already completed this task.
+                             No further action is necessary, though you may </span> <a class="link" href="{{url_for('app.get_thread', thread_id=thread.id)}}">review your previous submission.</a> 
+                    {% else %}
+                    <a class="link" href="{{url_for('app.get_thread', thread_id=thread.id)}}"><span class="btn btn-primary">Continue</span></a> <span class="disabled">You have not yet completed this task</span>{%endif%}
+                    </a> <br/>
+            {% else %}
+                <a href="{{url_for('app.launch_topic', topic_id=topic.id)}}">
+                    <span class="btn btn-success">Start chat</span>
+                </a><br>
+            {% endif %}
+        </li>
+    {%endfor %}
+    </ol>
+    </div>
+</section>
+
+{% endblock %}

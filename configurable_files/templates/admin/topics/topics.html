@@ -1,0 +1,121 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="container-fluid">
+    <nav aria-label="breadcrumb">
+      <ol class="breadcrumb">
+        <li class="breadcrumb-item"><a href="{{ url_for('admin.index') }}">Admin</a></li>
+        <li class="breadcrumb-item active" aria-current="page">Topics</li>
+      </ol>
+    </nav>
+
+    <h3 class="text-center">{% block title %} Topics {% endblock %}</h3>
+    <div class="row">
+      <div class="col-12">
+        {% set ext_url= url_for('app.index', _external=True, _scheme='https') %}
+        External URL: <a href="{{ ext_url }}" target="_blank">{{ ext_url }}</a>
+        Okay? {{ external_url_ok and 'Yes' or 'No' }}
+        <div class="alert {% if external_url_ok %} alert-info {% else %} alert-warning {% endif %}">
+          If you are planning to crowdsource tasks on platforms like MTurk, make sure to have the above URL is
+          accessible via the (public) Internet. <br/>
+          <details>
+            <summary>More Info:</summary>
+            <ol>
+              <li>set <code>flask_config.SERVER_NAME=</code> in config YML file to publicly visible server name/address.
+              </li>
+              <li>Install and verify your SSL certificate are correct for HTTPS connection. Example: <a
+                  href="https://certbot.eff.org/" target="_blank">https://certbot.eff.org/</a> makes it easy. However,
+                you need a domain name for your server.
+              </li>
+              <li>Setup reverse proxy to serve this app. Example: see <code>docs/nginx-conf.adoc</code> file in git
+                repository for an example Nginx config.
+              </li>
+            </ol>
+          </details>
+        </div>
+      </div>
+    </div>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <table class="table table-striped">
+            {% include "admin/topics/topics_global_settings.html" %}
+            <tr>
+              <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.delete_all_topics') }}">
+                  <div>
+                    <input class="button btn btn-danger" type="submit" value="Delete All Tasks"/>
+                  </div>
+                </form>
+              </div>
+            </tr>
+          </table>
+          <div class="card-body">
+            <span>Found {{ super_topics | length }} topics </span>
+          </div>
+        </div>
+        <table class="table table-striped">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Topic</th>
+            <th scope="col">Num Threads</th>
+            <th scope="col">Time</th>
+            <th scope="col">Actions</th>
+          </tr>
+          {% for super_topic, num_threads in super_topics %}
+            <tr>
+              <td>{{ loop.index }}</td>
+              <td scope="row"> {{ super_topic.id }} </td>
+              <td> {{ num_threads }} </td>
+              <td> Created {{ super_topic.time_created|ctime }}; {{ super_topic.time_modified|ctime }}  </td>
+              <td>
+                <form method="POST" action="#">
+                  {% include "admin/topics/customized_panel.html" %}
+                  {% include "admin/topics/topics_limits_panel.html" %}
+                  <div>
+                    <input type="submit" value="Create New Task"/>
+                  </div>
+                  <input type="hidden" id="super_topic_id" name="super_topic_id" value="{{ super_topic.id }}">
+                </form>
+                {% for topic in super_topic.topics %}
+                  <div>Task ID: {{ topic.id }}</div>
+                  <ul>
+                    <li>Num of Threads = {{ topic_thread_counts_dict.get(topic.id, 0) }}</li>
+                    {% include "admin/topics/task_status.html" %}
+                    {% if topic.ext_id %}
+                      {% set task_url = topic.data.get(topic.ext_src, {}).get('ext_url') %}
+                      <li>{{ topic.ext_src }}: {{ topic.ext_id }}</li>
+                      <li>
+                        <a href="{{ task_url }}" target="_blank">Task URL</a>
+                        <button type="button" class="btn btn-primary"
+                                onclick="copy_to_clipboard(text='{{ task_url }}')">Copy URL
+                        </button>
+                      </li>
+                      {% if topic.ext_src in [C.MTURK, C.MTURK_SANDBOX ] %}
+                        <li><a href="{{ url_for('admin.' + topic.ext_src + '_get_HIT', HIT_id=topic.ext_id) }}">See
+                          MTurk Assignments</a></li>
+                      {% endif %}
+
+                    {% elif crowd_name %}
+                      <li>
+                        <a href="{{ url_for('admin.launch_topic_on_crowd', crowd_name=crowd_name, topic_id=topic.id) }}">Launch
+                          on {{ crowd_name }}</a>
+                      </li>
+                    {% else %}
+                      <li>N/A</li>
+                    {% endif %}
+                    <li>
+                      <!-- <button type="button" class="btn btn-primary" onclick="admin.delete_topic()">Delete Task</button> -->
+                      <a href="{{ url_for('admin.delete_topic', topic_id=topic.id) }}">Delete Task</a>
+                    </li>
+                    <br/>
+                  </ul>
+                {% endfor %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+      </div>
+    </div>
+  </div>
+{% endblock %}

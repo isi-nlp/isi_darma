@@ -1,0 +1,52 @@
+{% set limits_display_list = service.config.get('limits_to_display') or [] %}
+<div>
+  {% if "max_threads_per_topic" in limits_display_list %}
+    <label for="max_threads_per_topic">Max_threads_per_topic:</label>
+    <input type="number" name="max_threads_per_topic" id="max_threads_per_topic"
+           value="{{ service.limits["max_threads_per_topic"] }}"/>
+  {% else %}
+    <input type="hidden" name="max_threads_per_topic" id="max_threads_per_topic"
+           value="{{ service.limits["max_threads_per_topic"] }}"/>
+  {% endif %}
+</div>
+<div>
+  {% if "max_turns_per_thread" in limits_display_list %}
+    <label for="max_turns_per_thread">Max_turns_per_thread:</label>
+    <input type="number" name="max_turns_per_thread" id="max_turns_per_thread"
+           value="{{ service.limits["max_turns_per_thread"] }}"/>
+  {% else %}
+    <input type="hidden" name="max_turns_per_thread" id="max_turns_per_thread"
+           value="{{ service.limits["max_turns_per_thread"] }}"/>
+  {% endif %}
+</div>
+<div>
+  {% if "max_human_users_per_thread" in limits_display_list %}
+    <label for="max_human_users_per_thread">max_human_users_per_thread:</label>
+    <select name="max_human_users_per_thread" id="max_human_users_per_thread">
+      <option value=1>1</option>
+      <option value=2>2</option>
+    </select>
+  {% else %}
+    <input type="hidden" name="max_human_users_per_thread" id="max_human_users_per_thread"
+           value="{{ service.limits["max_human_users_per_thread"] }}"/>
+  {% endif %}
+</div>
+<div>
+  {% if "human_moderator" in limits_display_list %}
+    <label for="human_moderator">human_moderator:</label>
+    <select name="human_moderator" id="human_moderator">
+      <option value="no">no</option>
+      <option value="yes">yes</option>
+    </select>
+  {% else %}
+    <input type="hidden" name="human_moderator" id="human_moderator" value="{{ service.limits["human_moderator"] }}"/>
+  {% endif %}
+</div>
+<div>
+  {% if "reward" in limits_display_list %}
+    <label for="reward">Reward:</label>
+    <input type="text" name="reward" id="reward" value="{{ service.limits["reward"] }}"/>
+  {% else %}
+    <input type="hidden" name="reward" id="reward" value="{{ service.limits["reward"] }}"/>
+  {% endif %}
+</div>

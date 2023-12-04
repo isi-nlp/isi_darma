@@ -1,0 +1,16 @@
+{% set limits_display_list = service.config.get('limits_to_display') or [] %}
+{% if "max_threads_per_user" in limits_display_list %}
+  <li>Max threads per topic: {{ topic.max_threads_per_topic }}</li>
+{% endif %}
+{% if "max_turns_per_thread" in limits_display_list %}
+  <li>Max turns per thread: {{ topic.max_turns_per_thread }}</li>
+{% endif %}
+{% if "max_human_users_per_thread" in limits_display_list %}
+  <li>Max human users per thread: {{ topic.max_human_users_per_thread }}</li>
+{% endif %}
+{% if "human_moderator" in limits_display_list %}
+  <li>Human moderator: {{ topic.human_moderator }}</li>
+{% endif %}
+{% if "reward" in limits_display_list %}
+  <li>Reward: {{ topic.reward }}</li>
+{% endif %}

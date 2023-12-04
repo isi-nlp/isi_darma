@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container">
+    <ul class="nav nav-tabs row" id="myTab" role="tablist">
+        <li class="nav-item col-4" role="presentation">
+            <a class="nav-link active" id="login-tab" data-toggle="tab" href="#login" role="tab" aria-controls="login"
+                aria-selected="true">Login</a>
+        </li>
+        <li class="nav-item col-4" role="presentation">
+            <a class="nav-link" id="signup-tab" data-toggle="tab" href="#signup" role="tab" aria-controls="signup"
+                aria-selected="false">Sign Up</a>
+        </li>
+    </ul>
+    <div class="tab-content row" id="myTabContent">
+        <div class="tab-pane fade show active col-8" id="login" role="tabpanel" aria-labelledby="home-tab">
+            <form action="{{url_for('app.login')}}" method="POST" class="form">
+                <input type="hidden" name="action" value="login">
+                <h1 class="h3 mb-3 mt-4 font-weight-normal mt-2">Please Sign In</h1>
+                <small class="text-muted">Dont have an account? Click 'Sign Up' </small>
+                <input type="text" name="user_id" id="user_id" class="form-control mt-2" placeholder="UserId" required
+                    autofocus value="{{user_id}}">
+                <input type="password" name="secret" id="secret" class="form-control mt-2" placeholder="Password"
+                    required>
+                {% if next %}
+                    <input type="hidden" name="next" value="{{next}}">
+                {%endif%}
+
+                <button class="btn btn-lg btn-primary btn-block col-3 mt-3" type="submit">Log in</button>
+            </form>
+        </div>
+        <div class="tab-pane fade col-8" id="signup" role="tabpanel" aria-labelledby="profile-tab">
+            <form action="{{url_for('app.login')}}" method="POST" class="form">           
+                <input type="hidden" name="action" value="signup">
+                <h1 class="h3 mb-3 mt-4 font-weight-normal">Please Sign Up</h1>
+                <input type="text" name="user_id" id="s_user_id" class="form-control mt-2" placeholder="ID" required value="{{user_id}}">
+                <input type="password" name="secret" id="s_password" class="form-control mt-2" placeholder="Password"
+                required>
+                {% if ext_id %} <input type="hidden" name="ext_id" value="{{ext_id}}"> {%endif%}
+                {% if ext_src %} <input type="hidden" name="ext_src" value="{{ext_src}}"> {%endif%}
+                <!--
+                <input type="email" name="s_email" id="s_user_id" class="form-control mt-2" placeholder="Email"
+                    required autofocus>
+                <small class="text-muted">We will never spam or sell your email ID. Email is needed for resetting password on the likely case that you'll forget it.</small>
+                -->
+                {% if onboarding %}
+                {%if onboarding.get('agreement_text') %}
+                <button type="button" class="btn btn-info my-3" data-toggle="modal" data-target="#staticBackdrop">
+                    Open terms and conditions
+                </button>
+                <small class="text-muted">Please refresh if the agree and sign up button doesn't get you to the task.</small>
+                {%endif%}
+                {%if onboarding.get('checkboxes') %}
+                {%for check_name, check_value in onboarding['checkboxes'].items() %}
+                <div class="form-check my-2">
+                    <input class="form-check-input" type="checkbox" value="true" id="{{check_name}}" name="checkbox_{{check_name}}" required
+                        autofocus>
+                    <label class="form-check-label" for="{{check_name}}">
+                        {{check_value|safe}}
+                    </label>
+                </div>
+                {%endfor%}
+                {%endif%}
+                {%endif%}
+                <!-- Name not required; favor anonymity
+                <input type="text" name="name" id="name" class="form-control mt-2" placeholder="Name" required>
+                -->
+                {% if next %} <input type="hidden" name="next" value="{{next}}"> {%endif%}
+              
+                <button class="btn btn-lg btn-primary btn-block col-4 mt-2" type="submit">Agree and Sign Up</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if onboarding and onboarding.get('agreement_text') %}
+<!-- Modal has to be at the top level -->
+<div class="modal fade" id="staticBackdrop" data-backdrop="static" data-keyboard="false" tabindex="-1"
+    aria-labelledby="staticBackdropLabel" aria-hidden="true">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="staticBackdropLabel"></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                {{onboarding['agreement_text']|safe}}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Understood</button>
+            </div>
+        </div>
+    </div>
+</div>
+{%endif%}
+<script type="text/javascript">
+    if ('{{action}}' == 'signup') {
+        $('#myTab a[href="#signup"]').tab('show')
+    }
+</script>
+
+{% endblock %}

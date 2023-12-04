@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+
+{% block content %}
+{% set mturk_where = meta['mturk_where'] %}
+<div class="container-fluid">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Admin</a></li>
+      <li class="breadcrumb-item"><a href="../">MTurk ({{mturk_where}})</a></li>
+      <li class="breadcrumb-item"><a href="../qualification">Qualification</a></li>
+      <li class="breadcrumb-item active" aria-current="page">{{ qual_id }}</li>
+    </ol>
+  </nav>
+  <div class="row">
+    <div class="col-6">
+      <h3>HITs</h3>
+      <div role="alert" class="alert {% if data['HITs'] %}  alert-success {% else %}  alert-danger {% endif %}">
+        Found {{ data['HITs'] | length }} HITs </div>
+      <ul class="list-group">
+        {% for HIT in data['HITs'] %}
+        {% set hit_id = HIT['HITId'] %}
+        <li id="{{hit_id}}" class="list-group-item">
+          <span class="text-muted">{{ loop.index }} ― </span>
+
+          <a href="../HIT/{{ hit_id }}">
+            {{ hit_id }} | {{ HIT['Title'] }}</a>
+          <details style="display: inline">
+            <summary>⤵</summary>
+            {% for key, value in HIT.items() %}
+            <ul>
+              <li><b>{{key}}</b>: {{value}}</li>
+            </ul>
+            {% endfor %}
+          </details>
+          <button type="button" class="btn btn-danger btn-sm float-right"
+            onclick="delete_hit('{{hit_id}}', '{{mturk_where}}')">Delete</button>
+        </li>
+        {% endfor %}
+        </li>
+      </ul>
+    </div>
+    <div class="col-5">
+      <h3>Workers</h3>
+      <div role="alert" class="alert {% if data['workers'] %}  alert-success {% else %}  alert-danger {% endif %}">
+        Found {{ data['workers'] | length }} workers </div>
+        <ol class="list-group">
+          {% for worker in data['workers'] %}
+          {% set worker_id = worker['WorkerId'] %}
+            <li id="{{worker_id}}" class="list-group-item">
+                <code>{{worker_id}}</code>
+                <small>Status: {{worker['Status']}} | {{worker['GrantTime']}} </small>
+                <button type="button" onclick="disqualify('{{worker_id}}', '{{qual_id}}', '{{mturk_where}}')" class="btn btn-sm btn-danger float-right">Revoke</button>
+            </li>
+          {% endfor %}
+        </ol>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

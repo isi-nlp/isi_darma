@@ -1,0 +1,437 @@
+{% extends "base.html" %}
+{% block head %}
+  <style type="text/css">
+      .dot {
+          opacity: 0;
+          animation: showHideDot 2s ease-in-out infinite;
+          font-size: 1rem;
+      }
+
+      .dot.one {
+          animation-delay: 0.2s;
+      }
+
+      .dot.two {
+          animation-delay: 0.4s;
+      }
+
+      .dot.three {
+          animation-delay: 0.6s;
+      }
+
+      @keyframes showHideDot {
+          0% {
+              opacity: 0;
+          }
+          50% {
+              opacity: 1;
+          }
+          60% {
+              opacity: 1;
+          }
+          100% {
+              opacity: 0;
+          }
+      }
+  </style>
+{% endblock %}
+{% block content %}
+  {% set reply_as_user = topic.data.get('target_user') %}
+  <section style="background-color: #eee;">
+    {% if not focus_mode %}
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><a href="../">All chats</a></li>
+          <li class="breadcrumb-item active" aria-current="page">{{ thread.id }}</li>
+        </ol>
+      </nav>
+    {% endif %}
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-md-5 col-lg-6 col-xl-7 border-left border-right">
+          {% if reply_as_user %}
+            <div class="alert alert-info p-1 text-center"> You are replying as <b>Speaker
+              {{ reply_as_user }}</b></div>
+          {% endif %}
+
+          <ul id="chat-thread" class="list-unstyled" style="overflow-y:scroll; max-height: 800px;"></ul>
+          <form id="next_msg_form" class="form" action="#" method="POST">
+            <div class="form-group basic-textarea" style="display: flex">
+                        <textarea id="next_msg_text" class="form-control pl-2 my-0" rows="2"
+                                  placeholder="Type your message here..."></textarea>
+              <div class="my-1">
+                <input type="submit" class="btn btn-primary mx-2" id='send_btn' value="Send" type="submit"/>
+              </div>
+            </div>
+          </form>
+          <div id="waiting_info" class="text-center alert alert-primary" style="display: none;">
+            Waiting for response from moderator or other user...
+            <span class="dot one">⦿</span>
+            <span class="dot two">⦿</span>
+            <span class="dot three">⦿</span>
+          </div>
+
+          <div id="end_info" class="p-4 alert alert-info">
+            Thanks for participating in the chat! Please submit your ratings to complete this task and receive
+            compensation.
+          </div>
+        </div>
+        <!-- hide this block when more turns to go; but show this to admin regardless -->
+        <div class="col-md-7 col-lg-6 col-xl-5 mb-4 border-right border-left">
+          {{ simple_instructions_html |safe }}
+          <div> Your remaining turns: <code><span id="remaining-turns-count">{{ remaining_turns }} </span> </code></div>
+
+          {% if instructions_html %}
+            <button type="button" class="btn btn-info my-3" data-toggle="modal"
+                    data-target="#instructionsmodal">Detailed Instructions
+            </button>
+          {% endif %}
+
+          <div {% if cur_user.is_admin or remaining_turns> 0 %} style="display:none" {% endif %}
+                                                                id="ratings-view">
+            {% set is_disabled = 'disabled' if (thread.data or {}).get('rating_done') else '' %}
+            <form action="{{ url_for('app.thread_rating', thread_id=thread.id, user_id=cur_user.id) }}" method="POST"
+                  id="ratings-form" onsubmit="ratings_validation()"
+                  class="form">
+
+              Thank you for your time. To complete this task, <b>please answer the questions below:</b>
+              {% set ratings_dict = (thread.data or {}).get('ratings') or {} %}
+              {% set prev_ratings = ratings_dict.get(cur_user.id) or {} %}
+              <ul class="list-group">
+                {% for q in rating_questions %}
+                  <li class="list-group-item my-1">
+                    <i>{{ q['question'] }}</i>
+                    {% if q['choices'] %}
+                      <input id="rating-{{ loop.index }}" type="range" list="tickmarks-{{ loop.index }}"
+                             style="width: 100%;" min="-1"
+                             max="{{ q['choices']|length - 1 }}" name="{{ q['question'] }}" required
+                             value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+                      <datalist id="tickmarks-{{ loop.index }}"
+                                style="display: flex; justify-content: space-between; width: 100%;">
+                        <option> -</option>
+                        {% for ch in q['choices'] %}
+                          <option>{{ ch }}</option>
+                        {% endfor %}
+                      </datalist>
+                    {% endif %}
+                    {% if q['range'] %}
+                      <input id="rating-{{ loop.index }}" type="range" style="width: 100%;"
+                             min="{{ q['range'][0] - 1 }}"
+                             max="{{ q['range'][1] }}" name="{{ q['question'] }}" required
+                             value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+                      <datalist id="tickmarks-{{ loop.index }}"
+                                style="display: flex; justify-content: space-between; width: 100%;">
+                        <option> -</option>
+                        {% for i in range(q['range'][0], q['range'][1] + 1) %}
+                          {% if q['range'][1] - q['range'][0] > 40 %}
+                            {% if loop.index0 % 10 == 0 %}
+                              <option>{{ i }}</option>
+                            {% endif %}
+                          {% else %}
+                            <option>{{ i }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </datalist>
+                    {% endif %}
+                    {% if q['freetext'] %}
+                      <textarea name="{{ q['question'] }}" rows="4"
+                                style="width: 100%; max-width: 100%;" {{ is_disabled }}
+                                placeholder="{{ q['freetext']['default'] }}" {% if q['freetext']['required'] %}
+                                required {% endif %}>{{ prev_ratings.get('optional_feedback') or "" }}</textarea>
+                    {% endif %}
+                  </li>
+                {% endfor %}
+                <li class="list-group-item my-1">
+
+                </li>
+              </ul>
+              {% if focus_mode %} <input name="focus_mode" value="True" type="hidden"/> {% endif %}
+              <input type="submit" value="Submit" class="btn btn-primary my-4 ml-2" {{ is_disabled }} />
+            </form>
+            <hr/>
+          </div>
+          <div {% if not cur_user.is_admin %} style="display:none" {% endif %}
+                                              id="ratings-view">
+            {% set is_disabled = 'disabled' %}
+            {% set all_ratings = thread.data.get('ratings') or {} %}
+            {% for one_user_rating in all_ratings.items() %}
+              Ratings from user: {{ one_user_rating[0] }}
+              {% set prev_ratings = one_user_rating[1] or {} %}
+              <ul class="list-group">
+                {% for q in rating_questions %}
+                  <li class="list-group-item my-1">
+                    <i>{{ q['question'] }}</i>
+                    {% if q['choices'] %}
+                      <input id="rating-{{ loop.index }}" type="range" list="tickmarks-{{ loop.index }}"
+                             style="width: 100%;" min="-1"
+                             max="{{ q['choices']|length - 1 }}" name="{{ q['question'] }}" required
+                             value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+                      <datalist id="tickmarks-{{ loop.index }}"
+                                style="display: flex; justify-content: space-between; width: 100%;">
+                        <option> -</option>
+                        {% for ch in q['choices'] %}
+                          <option>{{ ch }}</option>
+                        {% endfor %}
+                      </datalist>
+                    {% endif %}
+                    {% if q['range'] %}
+                      <input id="rating-{{ loop.index }}" type="range" style="width: 100%;"
+                             min="{{ q['range'][0] - 1 }}"
+                             max="{{ q['range'][1] }}" name="{{ q['question'] }}" required
+                             value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+                      <datalist id="tickmarks-{{ loop.index }}"
+                                style="display: flex; justify-content: space-between; width: 100%;">
+                        <option> -</option>
+                        {% for i in range(q['range'][0], q['range'][1] + 1) %}
+                          {% if q['range'][1] - q['range'][0] > 40 %}
+                            {% if loop.index0 % 10 == 0 %}
+                              <option>{{ i }}</option>
+                            {% endif %}
+                          {% else %}
+                            <option>{{ i }}</option>
+                          {% endif %}
+                        {% endfor %}
+                      </datalist>
+                    {% endif %}
+                  </li>
+                  {% if q['freetext'] %}
+                    <textarea name="{{ q['question'] }}" rows="4"
+                              style="width: 100%; max-width: 100%;" {{ is_disabled }}
+                              placeholder="{{ q['freetext']['default'] }}" {% if q['freetext']['required'] %}
+                              required {% endif %}>{{ prev_ratings.get('optional_feedback') or "" }}</textarea>
+                  {% endif %}
+                {% endfor %}
+              </ul>
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script type="text/javascript">
+
+        var remaining_turns = {{ remaining_turns }};
+        //const socket_name = '{{socket_name}}'
+        const cur_user_id = '{{cur_user.id}}'
+        const reply_as_user = '{{reply_as_user}}'
+        const thread =
+        {{ thread_json| safe}}  // json data
+        const user_data = {user_name: '{{cur_user.name}}', user_id: '{{cur_user.id}}', thread_id: '{{thread.id}}'}
+        const BOT_ID = 'Moderator'
+        const show_text_extra = Boolean({{ 'true' if show_text_extra else 'false' }})
+        const user_to_name = new Map(thread['users'].map(u => [u['id'], u['name']]))
+
+        let waiting_for_bot_reply = false
+
+        function show_new_message(msg, user_ids) {
+
+            const colors = ["secondary", "light", "dark", "info", "primary"]
+
+            if (!msg['data']) {
+                msg['data'] = new Object()
+            }
+            //let theme = side == 'right' ? 'alert-primary' : 'alert-warning'
+            let display_user = msg['data']['fake_start'] ? msg['data']['speaker_id'] : user_to_name.get(msg['user_id'])
+            if (msg['user_id'] == cur_user_id && reply_as_user) {
+                display_user = `<i>Your reply as</i> ${reply_as_user}`
+            }
+
+            let theme = ''
+            let side = 'left'
+            if (msg['user_id'] == cur_user_id || msg['data']['speaker_id'] == reply_as_user) {
+                theme = 'alert-danger'
+                side = 'right'
+            } else if (msg['user_id'] == BOT_ID) {
+                theme = 'alert-success'
+            } else {
+                for (let i = 0; i < user_ids.length; i++) {
+                    if (msg['data']['speaker_id'] == user_ids[i]) {
+                        set_color = colors[i % colors.length]
+                        theme = 'alert-' + set_color
+                    }
+                }
+            }
+
+            let text_display = msg['text']
+            let text_extra = msg['data']['text_orig']
+            if (text_extra && msg['user_id'] != BOT_ID) {
+                [text_extra, text_display] = [text_display, text_extra]
+            }
+
+            if (text_extra && show_text_extra) {
+                text_display = `<details>
+                    <summary>${text_display}</summary>
+                    <i class="text-muted">${text_extra}</i>
+                </details>`
+            }
+            let chat_html = `<li style="width:100%">
+                <div class="card ${theme} mb-4" style="float:${side}; width:75%">
+                    <div class="card-header d-flex justify-content-between p-2">
+                        <p class="fw-bold mb-0"> ${display_user} </p>
+                        <p class="text-muted small mb-0"><i class="far fa-clock"></i>${msg['time_created']}</p>
+                    </div>
+                    <div class="card-body" style="padding: 0.5em">
+                        ${text_display}
+                    </div>
+                </div>
+            </li>`
+            $('#chat-thread').append($.parseHTML(chat_html))
+            refresh_view()
+        }
+
+        function refresh_view() {
+            //$('#chat-thread').animate({ scrollTop: $('#chat-thread').last().offset().bottom }, 'slow');
+            scroll_chat_to_bottom();
+            if (remaining_turns < 1) {
+                $('#end_info').show() // show end info
+                $('#next_msg_form').hide()
+                $('#waiting_info').hide()
+            } else { // ongoing conversation
+                $('#end_info').hide()
+                if (waiting_for_bot_reply) { // but waiting for bot reply
+                    $('#next_msg_form').hide()  // dont let human reply
+                    $('#waiting_info').show()  // waiting animation show
+                } else {
+                    $('#next_msg_form').show() // let human reply
+                    $('#waiting_info').hide() // waiting animation hide
+                }
+            }
+        }
+
+        function play_beep() {
+            new Audio('{{url_for("app.static", filename="img/new_message_beep.mp3")}}').play();
+        }
+
+        window.onload = () => {
+            const speaker_ids = []
+            const colors = ["secondary", "light", "dark"]
+            for (const msg of thread['messages']) {
+                this_user_id = msg['data']['speaker_id']
+                add_element = true
+                for (let i = 0; i < speaker_ids.length; i++) {
+                    if (speaker_ids[i] == this_user_id) {
+                        add_element = false
+                    }
+                }
+                if (add_element == true) {
+                    speaker_ids.push(this_user_id)
+                }
+            }
+            for (const msg of thread['messages']) {
+                show_new_message(msg, speaker_ids)
+            }
+            refresh_view()
+
+            // include cross-origin session details with ajax calls
+            $.ajaxSetup({
+                crossDomain: true,
+                xhrFields: {
+                    withCredentials: true
+                },
+            });
+
+            // initial submit 
+            // if there is no message in the thread that is from a user with BOT_ID, submit
+            if (remaining_turns > 0 && !thread['messages'].some(msg => msg['user_id'] == BOT_ID)) {
+                waiting_for_bot_reply = true
+                refresh_view()
+
+                var post_url = '{{url_for("app.post_current_thread", thread_id=thread.id, user_id=cur_user.id)}}'
+                $.post(post_url).done(reply => {
+                    try {
+                        waiting_for_bot_reply = false
+                        msg_id = show_new_message(reply)
+                    } catch {
+                        alert('Something went wrong. See logs.')
+                    }
+                }).fail(function () {
+                    alert('Something went wrong. Could not send message.')
+                })
+            }
+
+            $("#next_msg_text").keyup(event => {  // submit on enter key
+                if (event.which === 13) {
+                    $("#next_msg_form").submit();
+                }
+            });
+            $("#next_msg_form").submit(event => {
+                event.preventDefault();
+                var text = $('#next_msg_text').val().trim()
+                if (!text) {
+                    console.log('No text to send')
+                    return
+                }
+                waiting_for_bot_reply = true
+                data = {'text': text, time_created: new Date().toISOString()}
+                data = {...user_data, ...data}  //combine two
+
+                msg_id = show_new_message(data, side = 'right')
+                console.log(data)
+                var post_url = '{{url_for("app.post_new_message", thread_id=thread.id, user_id=cur_user.id)}}'
+                $.post(post_url, {text: text, speaker_id: reply_as_user}).done(reply => {
+                    $('#next_msg_text').val('')
+                    try {
+                        remaining_turns--;
+                        if (remaining_turns == 0 || reply['episode_done']) {
+                            $('#ratings-view').show();
+                            remaining_turns = 0;
+                        }
+                        $('#remaining-turns-count').html(remaining_turns);
+                        waiting_for_bot_reply = false
+                        msg_id = show_new_message(reply)
+                        play_beep();
+                    } catch {
+                        alert('Something went wrong. See logs.')
+                    }
+                }).fail(function () {
+                    alert('Something went wrong. Could not send message.')
+                })
+            })
+        }
+
+        function ratings_validation() {
+            let invalid = false
+            for (const el of $('#ratings-form').find(":input[type='range']")) {
+                if (el.value == el.min) {
+                    el.parentNode.classList.add('bg-warning')
+                    invalid = true
+                } else {
+                    el.parentNode.classList.remove('bg-warning')
+                }
+            }
+            if (invalid) {
+                alert('Please provide your rating to ALL questions.')
+                event.preventDefault();
+            }
+        }
+
+        function scroll_chat_to_bottom() {
+            const chat_thread = document.getElementById('chat-thread');
+            chat_thread.scrollTop = chat_thread.scrollHeight;
+            {#$("#chat-thread").animate({scrollTop: $("#chat-thread").height()}, 'slow')#}
+        }
+    </script>
+  </section>
+
+  {% if instructions_html %}
+    <div class="modal fade" id="instructionsmodal" data-backdrop="static" data-keyboard="false" tabindex="-1"
+         aria-labelledby="staticBackdropLabel" aria-hidden="true">
+      <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="staticBackdropLabel">Instructions</h5>
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <span aria-hidden="true">&times;</span>
+            </button>
+          </div>
+          <div class="modal-body">
+            {{ instructions_html |safe }}
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  {% endif %}
+{% endblock %}

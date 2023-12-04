@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><a href="{{url_for('admin.index')}}">Admin</a></li>
+      <li class="breadcrumb-item active" aria-current="page">Threads</li>
+    </ol>
+  </nav>
+
+  <h3 class="text-center">{% block title %} Chat Admin {% endblock %}</h3>
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <span>Found {{threads | length }} threads </span>
+        </div>
+      </div>
+      <table class="table table-striped">
+        <tr>
+          <th scope="col">ID</th>
+          <th scope="col">Topic</th>
+          <th scope="col">Users</th>
+          <th scope="col">Episode | Ratings</th>
+          <th scope="col">Time</th>
+          <th scope="col">Actions</th>
+          <th scope="col">Ext</th>
+        </tr>
+        {% for thread in threads %}
+        <tr>
+          <td scope="row"> {{thread.id}} </td>
+          <td> {{thread.topic_id}} </td>
+          <td scope="row"> {% for user in thread.users %} <code>{{user.id}}</code>,  {%endfor%}</td>
+          <td> {{thread.episode_done}}, {{thread.data.get('rating_done', '')}} </td>
+          <td> {{thread.time_created|ctime}} {{thread.time_modified|ctime}}  </td>
+          <td> <ul>
+            <li><a href="{{url_for('app.get_thread', thread_id=thread.id)}}" target="_blank">Open Chat</a></li>
+            <li><a href="{{url_for('admin.thread_export', thread_id=thread.id)}}" target="_blank">Export as JSON</a></li>
+          </ul> </td>
+          <td>
+            {% if thread.ext_id %} 
+            <ul>
+              <li>{{thread.ext_src or ''}}   ID:  {{thread.ext_id or ''}} </li>
+            </ul>
+            {%else%} N/A {% endif%}
+          </td>
+        </tr>
+        {% endfor %}
+      </table>
+    </div>
+  </div>
+</div>
+{% endblock %}

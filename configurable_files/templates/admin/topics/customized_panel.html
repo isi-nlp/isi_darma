@@ -1,0 +1,15 @@
+{% set customization_dict = service.config.get('customization') or {} %}
+{% for key, value in customization_dict.items() %}
+<div>
+    <label for="{{key}}">{{key}}:</label>
+    {% if value is iterable %}
+        <select name="{{key}}" id="{{key}}">
+            {% for item in value %}
+                <option value="{{ item }}">{{ item }}</option>
+            {% endfor %}
+        </select>
+    {% else %}
+        <input type="text" name="{{key}}" id="{{key}}" value="{{value}}" />
+    {% endif %}
+</div>
+{% endfor %}

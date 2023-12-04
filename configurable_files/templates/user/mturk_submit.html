@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    {% set assignment_id = thread.assignment_id_dict[user.id] %}
+    {% set submit_url = thread.submit_url_dict[user.id] %}
+
+    <div class="col-12">
+        <p class="text"> Great job! This assignment is now complete.<br/><br/>
+            One last thing..., please click "Inform .." button below to inform Mechanical Turk about the task completion. 
+    </div>
+    <form class="form col-12" id="external-submit" action="{{submit_url}}" method="POST">
+        <input type="hidden" name="assignmentId" value="{{assignment_id}}">
+        <input type="hidden" name="threadId" value="{{thread.id}}">
+        <input type="hidden" name="topicId" value="{{thread.topic_id}}">
+        <input type="hidden" name="userId" value="{{user.id}}">
+        <input class="btn btn-primary" type="submit" value="Inform MTurk about the task completion">
+    </form>
+    
+    <div class="col-12">
+        Our team will review your work and issue the agreed upon reward.
+        For future communications with our team, please include the assignment ID <code>{{assignment_id}}</code>.
+    </div>
+</div>
+
+{%endblock%}

@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <link rel="stylesheet" href="{{url_for('app.static', filename='css/bootstrap.min.css')}}" type="text/css">
+  <title>{% block title %} {% endblock %}</title>
+  {% block head %} {% endblock %}
+  <style type="text/css">
+    html,
+    body {
+      width: 100%;
+      height: 100%;
+    }
+
+    #wrap {
+      min-height: 100%;
+      height: auto !important;
+      height: 100%;
+      margin: 0 auto -30px;
+      /* Bottom value must = footer height */
+    }
+
+    .pagefooter,
+    .push {
+      width: 100%;
+      height: 30px;
+      position: relative;
+      bottom: 0;
+    }
+
+    #forkme {
+      position: absolute;
+      top: 0;
+      right: 0
+    }
+  </style>
+
+  {% if environ['GA_GTAG'] is defined %}
+  <script async src="https://www.googletagmanager.com/gtag/js?id={{environ['GA_GTAG']}}"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', "{{environ['GA_GTAG']}}");
+  </script>
+  {% endif %}
+  <!-- Optional JavaScript -->
+  <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+  <script src="{{url_for('app.static', filename='js/jquery-3.5.1.min.js')}}"></script>
+  <script src="{{url_for('app.static', filename='js/bootstrap.bundle.min.js')}}"></script>
+  <!--  <script src="{{url_for('app.static', filename='js/socket.io.min.js')}}"></script> -->
+  <script src="{{url_for('app.static', filename='js/mycode.js')}}"></script>
+
+</head>
+
+{% set is_admin_user = cur_user and cur_user.is_authenticated and cur_user.role == 'admin' %}
+
+<body>
+  <div id="wrap">
+    {%if not focus_mode %}
+    <nav class="navbar navbar-expand-lg navbar-light border">
+      <a class="navbar-brand" href="{{ url_for('app.index')}}">Home</a>
+      <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+        aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav mr-auto">
+          {% if cur_user and cur_user.is_authenticated and cur_user.role == 'admin' %}
+          <li class="nav-item"><a class="nav-link" href="{{url_for('admin.index')}}">Admin Dashboard</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{url_for('admin.get_config')}}">Task Config</a></li>
+          <!--
+            <li class="nav-item"><a class="nav-link" href="/mturk/sandbox">MTurk Sandbox</a></li>
+            <li class="nav-item"><a class="nav-link" href="/mturk/live">MTurk Live</a></li>
+            <li class="nav-item">
+          <a class="nav-link" href="/about">About</a>
+        </li>
+            -->
+          {% endif %}
+
+        </ul>
+        <span class="mr-auto col-3"></span>
+        <ul class="navbar-nav mr-auto">
+          {% if cur_user and cur_user.is_authenticated %}
+          <li class="nav-item px-2"> <span>{{ cur_user.id }}</span></li>
+          <li class="nav-item px-2"><a href="{{url_for('app.logout')}}">Logout</a></li>
+          {% else %}
+          <li class="nav-item px-2"><a href="{{url_for('app.login')}}">Login</a></li>
+          {% endif %}
+          <li class="col-2"></li>
+        </ul>
+      </div>
+      {% if not focus_mode %}
+      <a href="https://github.com/isi-nlp/isi_darma" target="_blank">
+        <img id="forkme" height="80" src="{{url_for('app.static', filename='img/forkme.svg')}}"
+          alt="Fork me on GitHub" />
+      </a>
+      {%endif%}
+    </nav>
+    {%endif%}
+    <div class="container-fluid" style="overflow-y: scroll;">
+      {% with messages = get_flashed_messages() %}
+      {% if messages %}
+      <div class="alert alert-warning alert-dismissible fade show d-flex row col-6 ml-4" role="alert">
+        {% for message in messages %}
+        {{ message }}<br />
+        {% endfor %}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      {% endif %}
+      {% endwith %}
+      {% block content %} {% endblock %}
+    </div>
+
+    <div class="push"></div>
+  </div>
+
+  <!-- style="position: absolute; bottom: 0; left: 0; right: 0; padding: 2px; margin: 2px"-->
+  {% if not focus_mode %}
+  <footer class="pagefooter alert-secondary" style="text-align: center">
+    <p class="font-weight-light float-none" style="margin: 0; padding: 1px">
+      <small><a href="https://github.com/thammegowda/boteval" target="_blank">Boteval</a></small>
+    </p>
+    <!--Note: if this footer is not at the bottom of page, your HTML DOM is broken; hint: you may have missed closing one of DIV tags-->
+  </footer>
+  {% endif %}
+
+</body>
+
+</html>

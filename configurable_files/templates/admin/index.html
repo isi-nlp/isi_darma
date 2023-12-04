@@ -1,0 +1,45 @@
+{% extends 'base.html' %}
+
+
+{% block content %}
+<div class="container-fluid">
+  <h3 class="text-center">{% block title %} Chat Admin {% endblock %}</h3>
+  <div class="row m-4">
+    <div class="col-4">
+      <ul class="list-group">
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="{{url_for('admin.get_topics')}}">Topics</a>
+          <span class="badge badge-primary">{{counts.get('topic')}}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="{{url_for('admin.get_users')}}">Users </a>
+          <span class="badge badge-primary">{{counts.get('user')}}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          <a href="{{url_for('admin.get_threads')}}">Threads</a>
+          <span class="badge badge-primary">{{counts.get('thread')}}</span>
+        </li>
+        <li class="list-group-item d-flex justify-content-between align-items-center">
+          Messages
+          <span class="badge badge-primary">{{counts.get('message')}}</span>
+        </li>
+      </ul>
+    </div>
+
+    <div class="col-4">
+      {% if crowd_name %}
+      <div class="card class-12">
+        <div class="card-body">
+          <p><b>Endpoint: </b><code> {{mturk_endpoint_url}}</code></p>
+        </div>
+      </div>
+      <ul class="list-group col-12">
+        <li class="list-group-item"><a href="{{url_for('admin.' + crowd_name + '_list_HITs')}}">All Hits</li>
+        <li class="list-group-item"><a href="{{url_for('admin.' + crowd_name +'_list_qualifications')}}">All
+            Qualifications</li>
+      </ul>
+      {%endif%}
+    </div>
+  </div>
+</div>
+{% endblock %}

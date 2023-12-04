@@ -1,0 +1,62 @@
+{% macro render_assignment(asgn, base_pay, pay_per_hour, bonus_pay, qtypes=None, crowd_name='mturk') %}
+<b>{{asgn['AssignmentId']}}</b>
+    <span class="badge badge-success float-right">[{{'sandbox' if 'sandbox' in crowd_name else 'live'}}]</span>
+<ul class="list-group">
+    <li><i>Worker</i>: <code>{{asgn['WorkerId']}}</code> | Status: {{asgn['AssignmentStatus']}}</li>
+    <li><b>HIT</b>: <a href="{{url_for('admin.' + crowd_name + '_get_HIT', HIT_id=asgn['HITId'])}}"><code>{{asgn['HITId']}}</code></a></li>
+    <li><small> Submitted on {{asgn['SubmitTime']}} </small></li>
+    {% if 'ApprovalTime' in asgn %} <li><small> Approved on {{asgn['ApprovalTime']}} </small></li>{%endif%}
+    {% if 'AcceptTime' in asgn %} <li><small> Accepted on {{asgn['AcceptTime']}} </small></li> {%endif%}
+    {% if 'AcceptTime' in asgn %} <li><small id = "total_time">Total time spent on hit (h:mm:ss): {{asgn['SubmitTime'] - asgn['AcceptTime']}} </small></li> {%endif%}
+</ul>
+{% if asgn['AssignmentStatus'] == 'Submitted' %}
+<form method="POST" action="{{url_for('admin.' + crowd_name + '_approve_assignment', asgn_id=asgn['AssignmentId'])}}">
+    <button type="submit" value="Submit" class="col-3 mb-2 btn btn-success btn-sm">Approve and Pay</button>
+    <span class="col-1"></span>
+</form>
+{% elif asgn['AssignmentStatus'] == 'Approved'  %}
+    <p class="alert alert-success"> (Already approved)</p>
+{% else %}
+<p class="alert alert-warning"> (Approval is not applicable)</p>
+{% endif %}
+
+<script>
+    function notify_user() {
+        document.getElementById("user_note").innerHTML = "You have successfully given the user a bonus payment! If you click on the bonus button again, you'll give the user an additional bonus payment.";
+    }
+</script>
+
+{% if asgn['AssignmentStatus'] == 'Approved' %}
+<section id = bonus_button>
+
+<p>Base pay given to worker for completing task: {{base_pay}} </p>
+<p>Hourly rate of pay desired for worker: {{pay_per_hour}} dollars/hour</p>
+<p>Bonus to be given: ${{bonus_pay}}</p>
+<form method="POST" action="{{url_for('admin.' + crowd_name + '_give_bonus', worker_id=asgn['WorkerId'], payment=bonus_pay, asgn_id=asgn['AssignmentId'])}}" onsubmit="notify_user()">
+    <button type="submit" value="Submit" class="col-3 mb-2 btn btn-success btn-sm">Give Bonus </button>
+    <span class="col-1"></span>
+</form>
+<p id="user_note"></p>
+</section>
+{% endif %}
+
+{% if qtypes %}
+<form method="POST" action="{{url_for('admin.' + crowd_name + '_qualify_worker', worker_id=asgn['WorkerId'])}}">
+    <div class="form-group" style="display: flex;">
+        <label for="change-qualification" class="col">Assign Qualification to worker
+            <code>{{asgn['WorkerId']}}</code></label>
+        <select id="QualificationTypeId" name='QualificationTypeId' class="form-control col">
+            <option selected></option>
+            {% for qtype in qtypes %}
+            <option value="{{qtype['QualificationTypeId']}}">
+                {{qtype['Name']}} | {{qtype['QualificationTypeId']}}</option>
+            {% endfor %}
+        </select>
+    </div>
+    <button type="submit" value="Submit" class="mx-2 btn btn-info btn-sm"> Qualify Worker</button>
+</form>
+{% else %}
+    <p class="alert alert-warning"> (No qualifications are available)</p>
+{%endif%}
+
+{% endmacro %}

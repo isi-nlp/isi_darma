@@ -1,0 +1,63 @@
+{% set limits_display_list = service.config.get('limits_to_display') or [] %}
+<tr>
+  <td>
+    {% if "max_threads_per_user" in limits_display_list %}
+      <div class="card-body">
+        <h4>Set maximum thread per user:</h4>
+        <form method="POST" action="#">
+          <div>
+            <label for="max_threads_per_user">Max_threads_per_user:</label>
+            <input type="number" name="max_threads_per_user" id="max_threads_per_user"
+                   value="{{ service.limits["max_threads_per_user"] }}"/>
+          </div>
+          <div>
+            <input type="submit" value="Set"/>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+
+    {% if "multi_tasks_launch" in limits_display_list %}
+      <div class="card-body">
+        <h4>Multi-task Launch:</h4>
+        <form method="POST" action="#">
+          <div>
+            <label for="multi-tasks-launch" style="vertical-align: top;">Unlaunched Tasks:</label>
+            <select name="multi-tasks-launch" id="multi-tasks-launch" multiple style="height: 10rem;"
+                    class="form-control selectpicker" data-live-search="true">
+              {% for task in tasks %}
+                {% if not task.ext_id %}
+                  <option value="{{ task.id }}">{{ task.id }}</option>
+                {% endif %}
+              {% endfor %}
+            </select>
+          </div>
+          <div>
+            <input type="submit" value="Launch multiple tasks"/>
+          </div>
+        </form>
+      </div>
+    {% endif %}
+  </td>
+  {% if "multi_topics_creation" in limits_display_list %}
+    <td>
+      <h4>Multi-task Creation:</h4>
+      <form method="POST" action="#">
+        {% include "admin/topics/customized_panel.html" %}
+        <div>
+          <label for="multi-topics-creation" style="vertical-align: top;">Topics:</label>
+          <select name="multi-topics-creation" id="multi-topics-creation" multiple style="height: 10rem;"
+                  class="form-control selectpicker" data-live-search="true">
+            {% for super_topic, num_threads in super_topics %}
+              <option value="{{ super_topic.id }}">{{ super_topic.id }}</option>
+            {% endfor %}
+          </select>
+        </div>
+        {% include "admin/topics/topics_limits_panel.html" %}
+        <div>
+          <input type="submit" value="Create Multiple Tasks"/>
+        </div>
+      </form>
+    </td>
+  {% endif %}
+</tr>

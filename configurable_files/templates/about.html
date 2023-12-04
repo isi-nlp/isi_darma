@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container-fluid">
+  <section class="container">
+    <h2>{% block title %} About {% endblock %}</h2>
+    <br />
+    Chat Evaluation UI</a>
+    <ul>
+       {% set repo_url="https://github.com/thammegowda/boteval"%}
+      <li><a href="{{repo_url}}">{{repo_url}}</a></li>
+    </ul>
+  </section>
+
+  {% if sys_info %}
+  <section class="container">
+    <h2 id="sysinfo"> System Info</h2>
+      <table class="table float-left">
+        {% for key, value in sys_info.items() %}
+        <tr>
+          <th> {{ key }} </th>
+          <td> {{ value }} </td>
+        </tr>
+        {% endfor %}
+      </table>
+
+  </section>
+  {%endif%}
+</div>
+
+{% endblock %}
