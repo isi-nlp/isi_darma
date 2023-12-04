@@ -1,0 +1,203 @@
+<script type="text/javascript">
+
+    var remaining_turns = {{ remaining_turns }};
+    //const socket_name = '{{socket_name}}'
+    const cur_user_id = '{{cur_user.id}}'
+    const reply_as_user = '{{reply_as_user}}'
+    const thread =
+    {{ thread_json| safe}}  // json data
+    const user_data = {user_name: '{{cur_user.name}}', user_id: '{{cur_user.id}}', thread_id: '{{thread.id}}'}
+    const BOT_ID = 'Moderator'
+    const show_text_extra = Boolean({{ 'true' if show_text_extra else 'false' }})
+    const user_to_name = new Map(thread['users'].map(u => [u['id'], u['name']]))
+
+    let waiting_for_bot_reply = false
+
+    function show_new_message(msg, user_ids) {
+
+        const colors = ["secondary", "light", "dark", "info", "primary"]
+
+        if (!msg['data']) {
+            msg['data'] = new Object()
+        }
+        //let theme = side == 'right' ? 'alert-primary' : 'alert-warning'
+        let display_user = msg['data']['fake_start'] ? msg['data']['speaker_id'] : user_to_name.get(msg['user_id'])
+        if (msg['user_id'] == cur_user_id && reply_as_user) {
+            display_user = `<i>Your reply as</i> ${reply_as_user}`
+        }
+
+        let theme = ''
+        let side = 'left'
+        if (msg['user_id'] == cur_user_id || msg['data']['speaker_id'] == reply_as_user) {
+            theme = 'alert-danger'
+            side = 'right'
+        } else if (msg['user_id'] == BOT_ID) {
+            theme = 'alert-success'
+        } else {
+            for (let i = 0; i < user_ids.length; i++) {
+                if (msg['data']['speaker_id'] == user_ids[i]) {
+                    set_color = colors[i % colors.length]
+                    theme = 'alert-' + set_color
+                }
+            }
+        }
+
+        let text_display = msg['text']
+        let text_extra = msg['data']['text_orig']
+        if (text_extra && msg['user_id'] != BOT_ID) {
+            [text_extra, text_display] = [text_display, text_extra]
+        }
+
+        if (text_extra && show_text_extra) {
+            text_display = `<details>
+                    <summary>${text_display}</summary>
+                    <i class="text-muted">${text_extra}</i>
+                </details>`
+        }
+        let chat_html = `<li style="width:100%">
+                <div class="card ${theme} mb-4" style="float:${side}; width:75%">
+                    <div class="card-header d-flex justify-content-between p-2">
+                        <p class="fw-bold mb-0"> ${display_user} </p>
+                        <p class="text-muted small mb-0"><i class="far fa-clock"></i>${msg['time_created']}</p>
+                    </div>
+                    <div class="card-body" style="padding: 0.5em">
+                        ${text_display}
+                    </div>
+                </div>
+            </li>`
+        $('#chat-thread').append($.parseHTML(chat_html))
+        refresh_view()
+    }
+
+    function refresh_view() {
+        //$('#chat-thread').animate({ scrollTop: $('#chat-thread').last().offset().bottom }, 'slow');
+        scroll_chat_to_bottom();
+        if (remaining_turns < 1) {
+            $('#end_info').show() // show end info
+            $('#next_msg_form').hide()
+            $('#waiting_info').hide()
+        } else { // ongoing conversation
+            $('#end_info').hide()
+            if (waiting_for_bot_reply) { // but waiting for bot reply
+                $('#next_msg_form').hide()  // dont let human reply
+                $('#waiting_info').show()  // waiting animation show
+            } else {
+                $('#next_msg_form').show() // let human reply
+                $('#waiting_info').hide() // waiting animation hide
+            }
+        }
+    }
+
+    function play_beep() {
+        new Audio('{{url_for("app.static", filename="img/new_message_beep.mp3")}}').play();
+    }
+
+    window.onload = () => {
+        const speaker_ids = []
+        const colors = ["secondary", "light", "dark"]
+        for (const msg of thread['messages']) {
+            this_user_id = msg['data']['speaker_id']
+            add_element = true
+            for (let i = 0; i < speaker_ids.length; i++) {
+                if (speaker_ids[i] == this_user_id) {
+                    add_element = false
+                }
+            }
+            if (add_element == true) {
+                speaker_ids.push(this_user_id)
+            }
+        }
+        for (const msg of thread['messages']) {
+            show_new_message(msg, speaker_ids)
+        }
+        refresh_view()
+
+        // include cross-origin session details with ajax calls
+        $.ajaxSetup({
+            crossDomain: true,
+            xhrFields: {
+                withCredentials: true
+            },
+        });
+
+        // initial submit
+        // if there is no message in the thread that is from a user with BOT_ID, submit
+        if (remaining_turns > 0 && !thread['messages'].some(msg => msg['user_id'] == BOT_ID)) {
+            waiting_for_bot_reply = true
+            refresh_view()
+
+            var post_url = '{{url_for("app.post_current_thread", thread_id=thread.id, user_id=cur_user.id)}}'
+            $.post(post_url).done(reply => {
+                try {
+                    waiting_for_bot_reply = false
+                    msg_id = show_new_message(reply)
+                } catch {
+                    alert('Something went wrong. See logs.')
+                }
+            }).fail(function () {
+                alert('Something went wrong. Could not send message.')
+            })
+        }
+
+        $("#next_msg_text").keyup(event => {  // submit on enter key
+            if (event.which === 13) {
+                $("#next_msg_form").submit();
+            }
+        });
+        $("#next_msg_form").submit(event => {
+            event.preventDefault();
+            var text = $('#next_msg_text').val().trim()
+            if (!text) {
+                console.log('No text to send')
+                return
+            }
+            waiting_for_bot_reply = true
+            data = {'text': text, time_created: new Date().toISOString()}
+            data = {...user_data, ...data}  //combine two
+
+            msg_id = show_new_message(data, side = 'right')
+            console.log(data)
+            var post_url = '{{url_for("app.post_new_message", thread_id=thread.id, user_id=cur_user.id)}}'
+            $.post(post_url, {text: text, speaker_id: reply_as_user}).done(reply => {
+                $('#next_msg_text').val('')
+                try {
+                    remaining_turns--;
+                    if (remaining_turns == 0 || reply['episode_done']) {
+                        $('#ratings-view').show();
+                        remaining_turns = 0;
+                    }
+                    $('#remaining-turns-count').html(remaining_turns);
+                    waiting_for_bot_reply = false
+                    msg_id = show_new_message(reply)
+                    play_beep();
+                } catch {
+                    alert('Something went wrong. See logs.')
+                }
+            }).fail(function () {
+                alert('Something went wrong. Could not send message.')
+            })
+        })
+    }
+
+    function ratings_validation() {
+        let invalid = false
+        for (const el of $('#ratings-form').find(":input[type='range']")) {
+            if (el.value == el.min) {
+                el.parentNode.classList.add('bg-warning')
+                invalid = true
+            } else {
+                el.parentNode.classList.remove('bg-warning')
+            }
+        }
+        if (invalid) {
+            alert('Please provide your rating to ALL questions.')
+            event.preventDefault();
+        }
+    }
+
+    function scroll_chat_to_bottom() {
+        const chat_thread = document.getElementById('chat-thread');
+        chat_thread.scrollTop = chat_thread.scrollHeight;
+        {#$("#chat-thread").animate({scrollTop: $("#chat-thread").height()}, 'slow')#}
+    }
+</script>

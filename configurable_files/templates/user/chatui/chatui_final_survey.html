@@ -1,0 +1,120 @@
+{# The final questionnaire after the completion of the conversation #}
+<div {% if cur_user.is_admin or remaining_turns> 0 %} style="display:none" {% endif %}
+                                                      id="ratings-view">
+  {% set is_disabled = 'disabled' if (thread.data or {}).get('rating_done') else '' %}
+  <form action="{{ url_for('app.thread_rating', thread_id=thread.id, user_id=cur_user.id) }}" method="POST"
+        id="ratings-form" onsubmit="ratings_validation()"
+        class="form">
+
+    Thank you for your time. To complete this task, <b>please answer the questions below:</b>
+    {% set ratings_dict = (thread.data or {}).get('ratings') or {} %}
+    {% set prev_ratings = ratings_dict.get(cur_user.id) or {} %}
+    <ul class="list-group">
+      {% for q in rating_questions %}
+        <li class="list-group-item my-1">
+          <i>{{ q['question'] }}</i>
+          {% if q['choices'] %}
+            <input id="rating-{{ loop.index }}" type="range" list="tickmarks-{{ loop.index }}"
+                   style="width: 100%;" min="-1"
+                   max="{{ q['choices']|length - 1 }}" name="{{ q['question'] }}" required
+                   value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+            <datalist id="tickmarks-{{ loop.index }}"
+                      style="display: flex; justify-content: space-between; width: 100%;">
+              <option> -</option>
+              {% for ch in q['choices'] %}
+                <option>{{ ch }}</option>
+              {% endfor %}
+            </datalist>
+          {% endif %}
+          {% if q['range'] %}
+            <input id="rating-{{ loop.index }}" type="range" style="width: 100%;"
+                   min="{{ q['range'][0] - 1 }}"
+                   max="{{ q['range'][1] }}" name="{{ q['question'] }}" required
+                   value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+            <datalist id="tickmarks-{{ loop.index }}"
+                      style="display: flex; justify-content: space-between; width: 100%;">
+              <option> -</option>
+              {% for i in range(q['range'][0], q['range'][1] + 1) %}
+                {% if q['range'][1] - q['range'][0] > 40 %}
+                  {% if loop.index0 % 10 == 0 %}
+                    <option>{{ i }}</option>
+                  {% endif %}
+                {% else %}
+                  <option>{{ i }}</option>
+                {% endif %}
+              {% endfor %}
+            </datalist>
+          {% endif %}
+          {% if q['freetext'] %}
+            <textarea name="{{ q['question'] }}" rows="4"
+                      style="width: 100%; max-width: 100%;" {{ is_disabled }}
+                      placeholder="{{ q['freetext']['default'] }}" {% if q['freetext']['required'] %}
+                      required {% endif %}>{{ prev_ratings.get('optional_feedback') or "" }}</textarea>
+          {% endif %}
+        </li>
+      {% endfor %}
+      <li class="list-group-item my-1">
+
+      </li>
+    </ul>
+    {% if focus_mode %} <input name="focus_mode" value="True" type="hidden"/> {% endif %}
+    <input type="submit" value="Submit" class="btn btn-primary my-4 ml-2" {{ is_disabled }} />
+  </form>
+  <hr/>
+</div>
+
+{# display the survey results if completed #}
+<div {% if not cur_user.is_admin %} style="display:none" {% endif %}
+                                    id="ratings-view">
+  {% set is_disabled = 'disabled' %}
+  {% set all_ratings = thread.data.get('ratings') or {} %}
+  {% for one_user_rating in all_ratings.items() %}
+    Ratings from user: {{ one_user_rating[0] }}
+    {% set prev_ratings = one_user_rating[1] or {} %}
+    <ul class="list-group">
+      {% for q in rating_questions %}
+        <li class="list-group-item my-1">
+          <i>{{ q['question'] }}</i>
+          {% if q['choices'] %}
+            <input id="rating-{{ loop.index }}" type="range" list="tickmarks-{{ loop.index }}"
+                   style="width: 100%;" min="-1"
+                   max="{{ q['choices']|length - 1 }}" name="{{ q['question'] }}" required
+                   value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+            <datalist id="tickmarks-{{ loop.index }}"
+                      style="display: flex; justify-content: space-between; width: 100%;">
+              <option> -</option>
+              {% for ch in q['choices'] %}
+                <option>{{ ch }}</option>
+              {% endfor %}
+            </datalist>
+          {% endif %}
+          {% if q['range'] %}
+            <input id="rating-{{ loop.index }}" type="range" style="width: 100%;"
+                   min="{{ q['range'][0] - 1 }}"
+                   max="{{ q['range'][1] }}" name="{{ q['question'] }}" required
+                   value="{{ prev_ratings.get(q['question']) or -1 }}" {{ is_disabled }}>
+            <datalist id="tickmarks-{{ loop.index }}"
+                      style="display: flex; justify-content: space-between; width: 100%;">
+              <option> -</option>
+              {% for i in range(q['range'][0], q['range'][1] + 1) %}
+                {% if q['range'][1] - q['range'][0] > 40 %}
+                  {% if loop.index0 % 10 == 0 %}
+                    <option>{{ i }}</option>
+                  {% endif %}
+                {% else %}
+                  <option>{{ i }}</option>
+                {% endif %}
+              {% endfor %}
+            </datalist>
+          {% endif %}
+        </li>
+        {% if q['freetext'] %}
+          <textarea name="{{ q['question'] }}" rows="4"
+                    style="width: 100%; max-width: 100%;" {{ is_disabled }}
+                    placeholder="{{ q['freetext']['default'] }}" {% if q['freetext']['required'] %}
+                    required {% endif %}>{{ prev_ratings.get('optional_feedback') or "" }}</textarea>
+        {% endif %}
+      {% endfor %}
+    </ul>
+  {% endfor %}
+</div>
