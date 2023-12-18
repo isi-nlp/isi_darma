@@ -65,7 +65,9 @@
                     </div>
                 </div>
             </li>`
-        $('#chat-thread').append($.parseHTML(chat_html))
+        if (text_display && text_display !== "") {
+            $('#chat-thread').append($.parseHTML(chat_html))
+        }
         refresh_view()
     }
 
@@ -122,7 +124,7 @@
 
         // initial submit
         // if there is no message in the thread that is from a user with BOT_ID, submit
-        if (remaining_turns > 0 && !thread['messages'].some(msg => msg['user_id'] == BOT_ID)) {
+        if (remaining_turns > 0 && thread['messages'].length > 0 && !thread['messages'].some(msg => msg['user_id'] == BOT_ID)) {
             waiting_for_bot_reply = true
             refresh_view()
 
