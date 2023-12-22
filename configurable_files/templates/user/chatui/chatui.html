@@ -3,7 +3,9 @@
   {% include "user/chatui/chatui_css.html" %}
 {% endblock %}
 {% block content %}
-  {% set reply_as_user = topic.data.get('target_user') %}
+  {#<!-- {% set reply_as_user = topic.data.get('target_user') %} -->#}
+  {% set reply_as_user = thread.speakers[cur_user.id] %}
+
   <section style="background-color: #eee;">
     {% if not focus_mode %}
       <nav aria-label="breadcrumb">

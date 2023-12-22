@@ -65,7 +65,7 @@
                     </div>
                 </div>
             </li>`
-        if (!text_display || text_display === "") {
+        if (text_display && text_display !== "") {
             $('#chat-thread').append($.parseHTML(chat_html))
         }
         refresh_view()
