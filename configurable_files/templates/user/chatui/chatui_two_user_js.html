@@ -23,6 +23,7 @@
     var prev_user_id;
     // Record the ChatMessage.id of the latest message locally.
     var cur_message_id;
+    var need_moderator_bot = {{ thread.need_moderator_bot|lower }};
 
     /**
      * Dynamically show a new message in the chat window.
@@ -116,9 +117,7 @@
 
             console.log("waiting_for_other_human_reply: ", waiting_for_other_human_reply)
             console.log("waiting_for_bot_reply: ", waiting_for_bot_reply)
-            if (waiting_for_bot_reply || waiting_for_other_human_reply) {
-
-            } else {
+            if (!((need_moderator_bot && waiting_for_bot_reply) || waiting_for_other_human_reply)) {
                 $('#end_info').show() // show end info
                 $('#next_msg_form').hide()
                 $('#waiting_info').hide()
@@ -174,7 +173,12 @@
         for (const msg of thread['messages']) {
             show_new_message(msg)
         }
-        cur_message_id = thread['messages'][thread['messages'].length - 1]['id'];
+        if (thread['messages'].length > 0) {
+            cur_message_id = thread['messages'][thread['messages'].length - 1]['id'];
+        } else {
+            cur_message_id = 0;
+        }
+
 
         /**
          * Logic unused for now.
@@ -196,7 +200,7 @@
             },
         });
 
-        var need_moderator_bot = {{ thread.need_moderator_bot|lower }};
+
 
         // initial submit
         // if there is no message in the thread that is from a user with BOT_ID, submit
