@@ -411,9 +411,9 @@
                     cur_message_id = thread['messages'][thread['messages'].length - 1]['id'];
                 }
 
-                if (
-                    (data['messages'][data['messages'].length - 2]['user_id'] === cur_user_id && data['messages'][data['messages'].length - 1]['user_id'] === BOT_ID) ||
-                    data['messages'][data['messages'].length - 1]['user_id'] === cur_user_id) {
+                if (data['messages'].length > 0 &&
+                    ((data['messages'][data['messages'].length - 2]['user_id'] === cur_user_id && data['messages'][data['messages'].length - 1]['user_id'] === BOT_ID) ||
+                    data['messages'][data['messages'].length - 1]['user_id'] === cur_user_id)) {
                     waiting_for_other_human_reply = true;
                     refresh_view();
                 }
