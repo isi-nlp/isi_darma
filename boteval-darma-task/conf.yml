@@ -26,13 +26,78 @@ chatbot:
   #         src_lang: eng_Latn
   #         tgt_lang: deu_Latn
   #         # tgt_lang: fra_Latn
-  
+
+# TODO: move the following "limits" to the conf-boteval.yml under the boteval repo.
 limits:
   max_threads_per_user: 10
   max_threads_per_topic: &max_assignments 10
-  max_turns_per_thread: 1
+  max_turns_per_thread: 5
+  max_human_users_per_thread: 1
+  human_moderator: 'no'
   reward: &reward '0.01' # dollars
-  
+
+customization:
+  endpoint:
+    - chatgpt
+    - gpt4
+    - gpt3
+    - cosmo-xl
+    - prosocial
+  persona_id:
+    - moderator
+    - sarcastic
+    - wisebeing
+    - persuasive
+    - stern
+    - goto_interest_simple
+    - goto_interest_colloquial
+    - mirror_simple
+    - empathetic_colloquial
+    - cognitive_reappraisal_paraphrase_suggestor
+    - witty
+    - rude_user_persona
+    - stubborn_reasonable_user_persona
+    - goto_interest_dynamic_strategy_simple
+    - th1
+    - em1
+    - socratic
+    - moderator
+    - wisebeing-gpt3
+    - dyn-2nd-gpt3
+    - dyn-2nd-chatgpt
+    - moderator-cosmo-xl
+    - moderator-prosocial
+
+# Here are some pre-defined configurations options when launching (one) task(s) or for global settings.
+# You can choose to display some of them including the followings under the limits_to_display.
+
+# Here are all the options for launching (one) task(s):
+# If not included, the default values will be used.
+# - max_threads_per_user: how many threads per user we allow - integer
+# default: 10
+# - max_threads_per_topic: how many threads per topic we allow - integer
+# default: 10
+# - max_turns_per_thread: how many turns per thread we allow the volunteer to chat (with the bot) - integer
+# default: 10
+# - max_human_users_per_thread: how many volunteers can chat in the same thread - integer
+# default: 1
+# - human_moderator: whether the moderator of the thread is a human or not - two options: 'yes' or 'no'
+# default: 'no'
+# - reward: how much we pay the volunteer for completing the task (on MTurk) - float
+# default: 0.01
+
+# Here are all the options for global settings:
+# If not included, the corresponding panel won't appear on the admin topics page.
+# - multi_topics_creation: whether we allow the admin to create multiple topics at once
+# default: 'no'
+
+
+limits_to_display:
+  - max_threads_per_user
+  - max_threads_per_topic
+  - multi_topics_creation
+  - multi_tasks_launch
+
 onboarding:
   agreement_file: user-agreement.html
   instructions_file: instructions.html
@@ -44,7 +109,7 @@ onboarding:
     # know_french: I can read and write fluently in German and I agree to write in German in this task.
 
 ratings:
-  - question: How Coherent was the conversation?
+  - question: How coherent was the conversation?
     choices: &choices
       - Not at all
       - Mostly not
@@ -57,10 +122,6 @@ ratings:
     choices: *choices
   - question:  To what degree did the moderator convince you to change your behavior?
     choices: *choices
-  - question: Let us know if you have any other thoughts about the chatbot (e.g. how would it have been more effective?) or feedback about the task itself.
-    freetext: 
-      default: none 
-      required: False
 
 # rename _mturk -> mturk to enable crowd backend
 mturk: 
@@ -98,8 +159,8 @@ mturk:
 flask_config:
   # sqlalchemy settings https://flask-sqlalchemy.palletsprojects.com/en/2.x/config/
   #SQLALCHEMY_DATABASE_URI: sqlite:///sqlite-dev-01.db
-  DATABASE_FILE_NAME: 'dev.db'   # this will be placed in task dir
+  #DATABASE_FILE_NAME: 'dev.db'   # this will be placed in task dir
+  DATABASE_FILE_NAME: 'local.db'   # this will be placed in task dir
   SQLALCHEMY_TRACK_MODIFICATIONS: false
-  SERVER_NAME: darmaeval.cutelab.name
+  #SERVER_NAME: darmaeval.cutelab.name
   PREFERRED_URL_SCHEME: https
-  
