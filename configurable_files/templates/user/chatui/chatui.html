@@ -1,6 +1,7 @@
 {% extends "base.html" %}
 {% block head %}
-  {% include "user/chatui/chatui_css.html" %}
+  <link rel="stylesheet" href="{{ url_for('app.static', filename='css/chatui.css') }}">
+  {#  {% include "user/chatui/chatui_css.html" %}#}
 {% endblock %}
 {% block content %}
   {#<!-- {% set reply_as_user = topic.data.get('target_user') %} -->#}
@@ -62,8 +63,16 @@
         </div>
       </div>
     </div>
-
-    {% include "user/chatui/chatui_js.html" %}
+    <div style="display: none" id="thread-id">{{ thread.id }}</div>
+    <div style="display: none" id="user-id">{{ cur_user.id }}</div>
+    <div style="display: none" id="user-role">{{ reply_as_user }}</div>
+    <a href="{{ url_for('app.get_thread_object', thread_id=thread.id) }}" id="thread-object-url"
+       style="display: none;"></a>
+    <a href="{{ url_for('app.post_message') }}" id="post-message-url"
+       style="display: none;"></a>
+    <a href="{{ url_for('app.get_bot_reply') }}" id="bot-reply-url"
+       style="display: none;"></a>
+    <script src="{{ url_for("app.static", filename="js/chatui.js") }}"></script>
   </section>
 
   {% if instructions_html %}
